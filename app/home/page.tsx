@@ -32,16 +32,23 @@ export default function Dashboard() {
             <h1 style={{fontSize: '22px', fontWeight: 800, color: '#111318', letterSpacing: '-0.5px', marginTop: '2px'}}>{name}</h1>
           </div>
           <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-            <div style={{width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px'}}>
+            {/* Notification bell */}
+            <Link href="/notifications" style={{width: '38px', height: '38px', borderRadius: '10px', border: '1px solid #E9EAEC', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', textDecoration: 'none'}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A5060" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <div style={{position: 'absolute', top: '-1px', right: '-1px', width: '8px', height: '8px', borderRadius: '50%', background: '#DC143C', border: '2px solid white'}}/>
+            </Link>
+            {/* Avatar */}
+            <Link href="/profile" style={{width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', textDecoration: 'none'}}>
               {initials}
-            </div>
+            </Link>
           </div>
         </div>
 
-        <div style={{display: 'flex', alignItems: 'center', gap: '10px', background: '#F5F6F8', border: '1px solid #E9EAEC', borderRadius: '28px', padding: '10px 16px', marginBottom: '12px'}}>
+        {/* Search bar — links to search page */}
+        <Link href="/search" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', background: '#F5F6F8', border: '1px solid #E9EAEC', borderRadius: '28px', padding: '10px 16px', marginBottom: '12px'}}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <span style={{fontSize: '14px', color: '#9CA3AF'}}>Search companions, services…</span>
-        </div>
+        </Link>
 
         <div style={{display: 'flex', gap: '2px', padding: '3px', background: '#F5F6F8', border: '1px solid #E9EAEC', borderRadius: '28px', marginBottom: '-1px'}}>
           <button style={{flex: 1, padding: '9px', borderRadius: '24px', border: 'none', background: 'white', color: '#DC143C', fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', cursor: 'pointer'}}>Care & Companions</button>
@@ -117,6 +124,16 @@ export default function Dashboard() {
                 </div>
               </Link>
             ))}
+          </div>
+        </div>
+
+        <div style={{borderRadius: '20px', padding: '20px', background: 'linear-gradient(135deg, #0A0A1A, #1C0008)', position: 'relative', overflow: 'hidden'}}>
+          <div style={{position: 'absolute', top: '-20px', right: '-20px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(220,20,60,0.15)', pointerEvents: 'none'}}/>
+          <p style={{fontSize: '10px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(220,20,60,0.7)', marginBottom: '6px', position: 'relative', zIndex: 1}}>For Professionals</p>
+          <p style={{fontSize: '18px', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: '14px', position: 'relative', zIndex: 1}}>Earn ₹40,000+ a month on your own terms.</p>
+          <div style={{display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', borderRadius: '20px', padding: '9px 18px', position: 'relative', zIndex: 1, cursor: 'pointer'}}>
+            <span style={{fontSize: '13px', fontWeight: 800, color: '#DC143C'}}>Join Free</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC143C" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>
         </div>
 

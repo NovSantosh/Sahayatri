@@ -5,7 +5,7 @@ import Link from 'next/link'
 const links = [
   {
     label: 'Home',
-    path: '/',
+    path: '/home',
     icon: (active: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={active ? '#DC143C' : '#9CA3AF'} strokeWidth="2" strokeLinecap="round">
         <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -73,30 +73,10 @@ export default function BottomNav() {
       {links.map((item) => {
         const active = pathname === item.path
         return (
-          <Link
-            key={item.path}
-            href={item.path}
-            style={{
-              flex: 1, display: 'flex', flexDirection: 'column',
-              alignItems: 'center', gap: '3px',
-              textDecoration: 'none', padding: '4px 0',
-              transition: 'transform 0.1s ease',
-            }}
-          >
+          <Link key={item.path} href={item.path} style={{flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', textDecoration: 'none', padding: '4px 0'}}>
             {item.icon(active)}
-            <span style={{
-              fontSize: '10px', fontWeight: 600,
-              color: active ? '#DC143C' : '#9CA3AF',
-              transition: 'color 0.15s ease',
-            }}>
-              {item.label}
-            </span>
-            {active && (
-              <div style={{
-                width: '4px', height: '4px', borderRadius: '50%',
-                background: '#DC143C', marginTop: '-2px',
-              }}/>
-            )}
+            <span style={{fontSize: '10px', fontWeight: 600, color: active ? '#DC143C' : '#9CA3AF'}}>{item.label}</span>
+            {active && <div style={{width: '4px', height: '4px', borderRadius: '50%', background: '#DC143C', marginTop: '-2px'}}/>}
           </Link>
         )
       })}

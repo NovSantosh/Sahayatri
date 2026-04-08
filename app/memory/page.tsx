@@ -16,6 +16,7 @@ export default function Memory() {
   const imagesRef = useRef<string[]>([])
   const [imagePreview, setImagePreview] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [likingIds, setLikingIds] = useState<string[]>([])
 
   useEffect(() => { fetchPosts() }, [])
 
@@ -26,6 +27,26 @@ export default function Memory() {
       setPosts(data.posts || [])
     } catch (e) { console.error(e) }
     setLoading(false)
+  }
+
+  const handleLike = async (postId: string) => {
+    if (!session?.user?.email) return
+    if (likingIds.includes(postId)) return
+    setLikingIds(prev => [...prev, postId])
+    try {
+      const res = await fetch('/api/posts/like', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId, userEmail: session.user.email }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setPosts(prev => prev.map(p =>
+          p._id === postId ? { ...p, likes: data.likes, liked: data.liked } : p
+        ))
+      }
+    } catch (e) { console.error(e) }
+    setLikingIds(prev => prev.filter(id => id !== postId))
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,30 +114,6 @@ export default function Memory() {
     'Care moment': { bg: '#ECFDF5', color: '#059669' },
     'Service story': { bg: '#FFFBEB', color: '#D97706' },
     'Community': { bg: '#EFF6FF', color: '#2563EB' },
-  }
-
-  const renderImages = (images: string[]) => {
-    if (!images || images.length === 0) return null
-    return (
-      <div style={{padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: '6px'}}>
-        {images.slice(0, 4).map((url, i) => (
-          <img
-            key={i}
-            src={url}
-            alt="moment"
-            style={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '12px',
-              display: 'block',
-              maxHeight: '500px',
-              objectFit: 'contain',
-              background: '#F5F6F8',
-            }}
-          />
-        ))}
-      </div>
-    )
   }
 
   return (
@@ -210,10 +207,21 @@ export default function Memory() {
             {post.content && (
               <div style={{padding: '0 16px 12px', fontSize: '14px', color: '#374151', lineHeight: 1.7}}>{post.content}</div>
             )}
-            {renderImages(post.images)}
+            {post.images && post.images.length > 0 && (
+              <div style={{padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: '6px'}}>
+                {post.images.slice(0, 4).map((url: string, i: number) => (
+                  <img key={i} src={url} alt="moment" style={{width: '100%', height: 'auto', borderRadius: '12px', display: 'block', maxHeight: '500px', objectFit: 'contain', background: '#F5F6F8'}}/>
+                ))}
+              </div>
+            )}
             <div style={{display: 'flex', borderTop: '1px solid #F0F1F3'}}>
-              <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <button
+                onClick={() => handleLike(post._id)}
+                disabled={likingIds.includes(post._id)}
+                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: post.liked ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif', transition: 'all 0.15s ease'}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={post.liked ? '#DC143C' : 'none'} stroke={post.liked ? '#DC143C' : '#6B7280'} strokeWidth="2" strokeLinecap="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
                 {post.likes || 0}
               </button>
               <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '11px', border: 'none', background: 'transparent', cursor: 'pointer', color: '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>Share</button>

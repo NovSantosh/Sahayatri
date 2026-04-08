@@ -17,6 +17,9 @@ export default function Memory() {
   const [imagePreview, setImagePreview] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [likingIds, setLikingIds] = useState<string[]>([])
+  const [openComments, setOpenComments] = useState<string[]>([])
+  const [commentText, setCommentText] = useState<{[key: string]: string}>({})
+  const [submittingComment, setSubmittingComment] = useState<string[]>([])
 
   useEffect(() => { fetchPosts() }, [])
 
@@ -47,6 +50,28 @@ export default function Memory() {
       }
     } catch (e) { console.error(e) }
     setLikingIds(prev => prev.filter(id => id !== postId))
+  }
+
+  const handleComment = async (postId: string) => {
+    if (!session?.user?.email) return
+    const text = commentText[postId]?.trim()
+    if (!text) return
+    setSubmittingComment(prev => [...prev, postId])
+    try {
+      const res = await fetch('/api/posts/comment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ postId, userEmail: session.user.email, text }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setCommentText(prev => ({ ...prev, [postId]: '' }))
+        setPosts(prev => prev.map(p =>
+          p._id === postId ? { ...p, comments: [...(p.comments || []), data.comment] } : p
+        ))
+      }
+    } catch (e) { console.error(e) }
+    setSubmittingComment(prev => prev.filter(id => id !== postId))
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -214,18 +239,74 @@ export default function Memory() {
                 ))}
               </div>
             )}
+
+            {/* Action buttons */}
             <div style={{display: 'flex', borderTop: '1px solid #F0F1F3'}}>
               <button
                 onClick={() => handleLike(post._id)}
                 disabled={likingIds.includes(post._id)}
-                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: post.liked ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif', transition: 'all 0.15s ease'}}>
+                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: post.liked ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill={post.liked ? '#DC143C' : 'none'} stroke={post.liked ? '#DC143C' : '#6B7280'} strokeWidth="2" strokeLinecap="round">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                 </svg>
                 {post.likes || 0}
               </button>
+              <button
+                onClick={() => setOpenComments(prev => prev.includes(post._id) ? prev.filter(id => id !== post._id) : [...prev, post._id])}
+                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: openComments.includes(post._id) ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                {post.comments?.length || 0}
+              </button>
               <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '11px', border: 'none', background: 'transparent', cursor: 'pointer', color: '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>Share</button>
             </div>
+
+            {/* Comments section */}
+            {openComments.includes(post._id) && (
+              <div style={{borderTop: '1px solid #F0F1F3', padding: '12px 16px', background: '#FAFAFA'}}>
+                {post.comments && post.comments.length > 0 && (
+                  <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '12px'}}>
+                    {post.comments.map((comment: any, i: number) => (
+                      <div key={i} style={{display: 'flex', gap: '8px', alignItems: 'flex-start'}}>
+                        <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>
+                          {initials(comment.authorName)}
+                        </div>
+                        <div style={{flex: 1, background: 'white', borderRadius: '10px', padding: '8px 10px', border: '1px solid #E9EAEC'}}>
+                          <p style={{fontSize: '12px', fontWeight: 700, color: '#111318', marginBottom: '2px'}}>{comment.authorName}</p>
+                          <p style={{fontSize: '13px', color: '#374151', lineHeight: 1.5}}>{comment.text}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {!post.comments?.length && (
+                  <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '12px', textAlign: 'center'}}>No comments yet. Be the first.</p>
+                )}
+                {session?.user ? (
+                  <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                    <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>
+                      {initials(session.user.name || '')}
+                    </div>
+                    <input
+                      value={commentText[post._id] || ''}
+                      onChange={(e) => setCommentText(prev => ({ ...prev, [post._id]: e.target.value }))}
+                      onKeyDown={(e) => e.key === 'Enter' && handleComment(post._id)}
+                      placeholder="Write a comment…"
+                      style={{flex: 1, background: 'white', border: '1px solid #E9EAEC', borderRadius: '20px', padding: '8px 14px', fontSize: '13px', color: '#374151', outline: 'none', fontFamily: 'sans-serif'}}
+                    />
+                    <button
+                      onClick={() => handleComment(post._id)}
+                      disabled={submittingComment.includes(post._id) || !commentText[post._id]?.trim()}
+                      style={{width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0}}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                  </div>
+                ) : (
+                  <p style={{fontSize: '12px', color: '#9CA3AF', textAlign: 'center'}}><a href="/login" style={{color: '#DC143C', fontWeight: 700}}>Log in</a> to comment</p>
+                )}
+              </div>
+            )}
           </div>
         ))}
         {!loading && posts.length > 0 && (

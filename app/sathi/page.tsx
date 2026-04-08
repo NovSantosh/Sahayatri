@@ -1,68 +1,170 @@
+'use client'
+import { useState, useEffect, useRef } from 'react'
+import { useSession } from 'next-auth/react'
 import BottomNav from '../components/BottomNav'
 
 export default function Sathi() {
+  const { data: session } = useSession()
+  const [messages, setMessages] = useState<{role: string, content: string}[]>([])
+  const [input, setInput] = useState('')
+  const [loading, setLoading] = useState(false)
+  const bottomRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const userName = session?.user?.name || 'Friend'
+
+  useEffect(() => {
+    setMessages([{
+      role: 'assistant',
+      content: `Namaste ${userName}! �� Ma Sathi chu — tapailko saathi. I am here to listen, to talk, and to remind you that distance is just a number. How are you feeling today?`
+    }])
+  }, [userName])
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return
+    const userMessage = { role: 'user', content: input.trim() }
+    const newMessages = [...messages, userMessage]
+    setMessages(newMessages)
+    setInput('')
+    setLoading(true)
+
+    try {
+      const res = await fetch('/api/sathi', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: newMessages,
+          userName,
+        }),
+      })
+      const data = await res.json()
+      if (data.reply) {
+        setMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
+      }
+    } catch (e) {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'I am having trouble connecting. Please try again.' }])
+    }
+    setLoading(false)
+    inputRef.current?.focus()
+  }
+
+  const suggestions = [
+    "I miss my family back home",
+    "I feel lonely today",
+    "Tell me something comforting",
+    "मलाई आज मन छैन",
+  ]
+
   return (
-    <div style={{minHeight: '100vh', background: '#06060F', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden', paddingBottom: '80px'}}>
+    <div style={{minHeight: '100vh', background: '#06060F', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', paddingBottom: '80px'}}>
 
-      <div style={{position: 'absolute', top: '-10%', left: '50%', transform: 'translateX(-50%)', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(37,99,235,0.18) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none'}}/>
-
-      <a href="/" style={{position: 'absolute', top: '52px', left: '18px', zIndex: 20, width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', display: 'flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none'}}>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-      </a>
-
-      <div style={{paddingTop: '80px', paddingBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 2, flexShrink: 0}}>
-        <div style={{position: 'relative', marginBottom: '16px'}}>
-          <div style={{position: 'absolute', inset: '-12px', borderRadius: '50%', border: '1.5px solid rgba(37,99,235,0.25)'}}/>
-          <div style={{position: 'absolute', inset: '-6px', borderRadius: '50%', border: '1.5px solid rgba(37,99,235,0.15)'}}/>
-          <div style={{width: '96px', height: '96px', borderRadius: '50%', background: 'linear-gradient(135deg, #1E3A8A, #2563EB)', border: '3px solid rgba(37,99,235,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', fontWeight: 800, color: 'white', boxShadow: '0 0 40px rgba(37,99,235,0.3)'}}>B</div>
-          <div style={{position: 'absolute', bottom: '4px', right: '4px', width: '14px', height: '14px', borderRadius: '50%', background: '#4ADE80', border: '2.5px solid #06060F'}}/>
-        </div>
-        <h1 style={{fontSize: '26px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: '4px'}}>Buwa</h1>
-        <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
-          <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#4ADE80'}}/>
-          <span style={{fontSize: '13px', color: 'rgba(255,255,255,0.38)', fontWeight: 500}}>Sathi is listening · Pokhara, Nepal</span>
+      {/* Header */}
+      <div style={{background: 'rgba(10,10,26,0.95)', padding: '52px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(20px)', position: 'sticky', top: 0, zIndex: 50}}>
+        <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
+          <div style={{position: 'relative'}}>
+            <div style={{width: '44px', height: '44px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 20px rgba(220,20,60,0.4)'}}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
+            </div>
+            <div style={{position: 'absolute', bottom: '1px', right: '1px', width: '10px', height: '10px', borderRadius: '50%', background: '#22C55E', border: '2px solid #06060F'}}/>
+          </div>
+          <div>
+            <h1 style={{fontSize: '18px', fontWeight: 800, color: 'white', letterSpacing: '-0.3px'}}>Sathi AI</h1>
+            <p style={{fontSize: '11px', color: '#22C55E', fontWeight: 600, marginTop: '1px'}}>● Online · Always here for you</p>
+          </div>
         </div>
       </div>
 
-      <div style={{flex: 1, overflowY: 'auto', padding: '8px 18px 16px', display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative', zIndex: 2}}>
-        <div style={{alignSelf: 'flex-start', maxWidth: '80%'}}>
-          <div style={{padding: '11px 14px', borderRadius: '18px', borderBottomLeftRadius: '4px', background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.07)', fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: 1.55, fontWeight: 500}}>
-            Rohan, ke garchhas? Aaja Ananya le bhanchhe timle bholi call garchha re — sachchi ho?
-          </div>
-          <span style={{fontSize: '10px', color: 'rgba(255,255,255,0.22)', paddingLeft: '3px', fontWeight: 500, display: 'block', marginTop: '3px'}}>Buwa · via Sathi · 8:42 AM</span>
-        </div>
+      {/* Messages */}
+      <div style={{flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
 
-        <div style={{alignSelf: 'flex-end', maxWidth: '80%'}}>
-          <div style={{padding: '11px 14px', borderRadius: '18px', borderBottomRightRadius: '4px', background: '#DC143C', fontSize: '14px', color: 'white', lineHeight: 1.55, fontWeight: 500}}>
-            Haa Buwa, call garchu bholi pakkai. Timi theek chha?
+        {messages.map((msg, i) => (
+          <div key={i} style={{display: 'flex', justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', alignItems: 'flex-end', gap: '8px'}}>
+            {msg.role === 'assistant' && (
+              <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 0 12px rgba(220,20,60,0.3)'}}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
+              </div>
+            )}
+            <div style={{
+              maxWidth: '75%',
+              padding: '12px 16px',
+              borderRadius: msg.role === 'user' ? '20px 20px 4px 20px' : '20px 20px 20px 4px',
+              background: msg.role === 'user'
+                ? 'linear-gradient(135deg, #DC143C, #A50E2D)'
+                : 'rgba(255,255,255,0.08)',
+              border: msg.role === 'assistant' ? '1px solid rgba(255,255,255,0.08)' : 'none',
+              fontSize: '14px',
+              color: 'white',
+              lineHeight: 1.6,
+              boxShadow: msg.role === 'user' ? '0 2px 12px rgba(220,20,60,0.3)' : 'none',
+            }}>
+              {msg.content}
+            </div>
+            {msg.role === 'user' && (
+              <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #374151, #1F2937)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '12px', fontWeight: 800, color: 'white'}}>
+                {userName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)}
+              </div>
+            )}
           </div>
-          <span style={{fontSize: '10px', color: 'rgba(255,255,255,0.22)', paddingRight: '3px', textAlign: 'right', fontWeight: 500, display: 'block', marginTop: '3px'}}>You · 9:15 AM · Delivered</span>
-        </div>
+        ))}
 
-        <div style={{alignSelf: 'flex-start', maxWidth: '80%'}}>
-          <div style={{padding: '11px 14px', borderRadius: '18px', borderBottomLeftRadius: '4px', background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.07)', fontSize: '14px', color: 'rgba(255,255,255,0.88)', lineHeight: 1.55, fontWeight: 500}}>
-            Khaaye. Dal bhat khaaye. Timle miss garchha — hami sab miss gardaichham beta.
+        {loading && (
+          <div style={{display: 'flex', alignItems: 'flex-end', gap: '8px'}}>
+            <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>
+            </div>
+            <div style={{padding: '12px 16px', borderRadius: '20px 20px 20px 4px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.08)', display: 'flex', gap: '4px', alignItems: 'center'}}>
+              {[0,1,2].map(i => (
+                <div key={i} style={{width: '6px', height: '6px', borderRadius: '50%', background: '#DC143C', animation: 'pulse 1.2s ease-in-out infinite', animationDelay: `${i * 0.2}s`, opacity: 0.7}}/>
+              ))}
+            </div>
           </div>
-          <span style={{fontSize: '10px', color: 'rgba(255,255,255,0.22)', paddingLeft: '3px', fontWeight: 500, display: 'block', marginTop: '3px'}}>Buwa · via Sathi · 9:38 AM</span>
-        </div>
+        )}
 
-        <div style={{alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '4px', padding: '12px 14px', borderRadius: '18px', borderBottomLeftRadius: '4px', background: 'rgba(255,255,255,0.09)', border: '1px solid rgba(255,255,255,0.07)'}}>
-          {[0.0, 0.2, 0.4].map((delay, i) => (
-            <div key={i} style={{width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(255,255,255,0.45)'}}/>
+        <div ref={bottomRef}/>
+      </div>
+
+      {/* Suggestions */}
+      {messages.length <= 1 && (
+        <div style={{padding: '0 16px 12px', display: 'flex', gap: '8px', overflowX: 'auto'}}>
+          {suggestions.map((s, i) => (
+            <button key={i} onClick={() => { setInput(s); inputRef.current?.focus() }}
+              style={{flexShrink: 0, padding: '8px 14px', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', fontSize: '12px', fontWeight: 500, cursor: 'pointer', fontFamily: 'sans-serif', whiteSpace: 'nowrap'}}>
+              {s}
+            </button>
           ))}
         </div>
+      )}
+
+      {/* Input */}
+      <div style={{padding: '12px 16px', background: 'rgba(10,10,26,0.95)', borderTop: '1px solid rgba(255,255,255,0.06)', backdropFilter: 'blur(20px)'}}>
+        <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="Talk to Sathi…"
+            style={{flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '24px', padding: '12px 18px', fontSize: '14px', color: 'white', outline: 'none', fontFamily: 'sans-serif'}}
+          />
+          <button
+            onClick={sendMessage}
+            disabled={loading || !input.trim()}
+            style={{width: '44px', height: '44px', borderRadius: '50%', background: input.trim() ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'rgba(255,255,255,0.08)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: input.trim() ? 'pointer' : 'default', flexShrink: 0, transition: 'all 0.2s ease', boxShadow: input.trim() ? '0 2px 12px rgba(220,20,60,0.4)' : 'none'}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
       </div>
 
-      <div style={{padding: '10px 18px', borderTop: '1px solid rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: '10px', position: 'relative', zIndex: 2, flexShrink: 0}}>
-        <p style={{flex: 1, fontSize: '12px', color: 'rgba(255,255,255,0.35)', fontWeight: 500}}>Buwa had breakfast · Medication taken · Ananya present</p>
-      </div>
-
-      <div style={{padding: '12px 18px 16px', display: 'flex', alignItems: 'center', gap: '10px', borderTop: '1px solid rgba(255,255,255,0.06)', background: 'rgba(6,6,15,0.9)', position: 'relative', zIndex: 2, flexShrink: 0}}>
-        <input placeholder="Type or speak to Buwa…" style={{flex: 1, background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '24px', padding: '11px 16px', fontSize: '14px', color: 'rgba(255,255,255,0.85)', outline: 'none', fontFamily: 'sans-serif'}}/>
-        <button style={{width: '44px', height: '44px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 14px rgba(220,20,60,0.4)'}}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" stroke="white" strokeWidth="2" fill="none" strokeLinecap="round"/><line x1="12" y1="19" x2="12" y2="23" stroke="white" strokeWidth="2" strokeLinecap="round"/><line x1="8" y1="23" x2="16" y2="23" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
-        </button>
-      </div>
+      <style>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+      `}</style>
 
       <BottomNav />
     </div>

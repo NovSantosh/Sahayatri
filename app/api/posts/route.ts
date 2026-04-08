@@ -15,7 +15,10 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { content, category, authorEmail } = await req.json()
+    const body = await req.json()
+    console.log('POST /api/posts received:', JSON.stringify(body))
+
+    const { content, category, authorEmail, images } = body
 
     if (!content) {
       return NextResponse.json({ error: 'Content is required' }, { status: 400 })
@@ -34,12 +37,17 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    console.log('Creating post with images:', images)
+
     const post = await Post.create({
       author: authorId,
       authorName,
       content,
+      images: images && images.length > 0 ? images : [],
       category: category || 'Care moment',
     })
+
+    console.log('Post created:', JSON.stringify(post))
 
     return NextResponse.json({ success: true, post }, { status: 201 })
   } catch (error) {

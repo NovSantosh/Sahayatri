@@ -10,6 +10,7 @@ const CommentSchema = new mongoose.Schema({
 const PostSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   authorName: { type: String, required: true },
+  authorEmail: { type: String },
   authorRole: { type: String, default: 'FAMILY' },
   content: { type: String, required: true },
   images: { type: [String], default: [] },

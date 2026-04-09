@@ -16,19 +16,13 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    console.log('POST /api/posts received:', JSON.stringify(body))
-
     const { content, category, authorEmail, images } = body
-
     if (!content) {
       return NextResponse.json({ error: 'Content is required' }, { status: 400 })
     }
-
     await connectDB()
-
     let authorName = 'Anonymous'
     let authorId = null
-
     if (authorEmail) {
       const user = await User.findOne({ email: authorEmail })
       if (user) {
@@ -36,19 +30,14 @@ export async function POST(req: NextRequest) {
         authorId = user._id
       }
     }
-
-    console.log('Creating post with images:', images)
-
     const post = await Post.create({
       author: authorId,
       authorName,
+      authorEmail,
       content,
-      images: images && images.length > 0 ? images : [],
+      images: images || [],
       category: category || 'Care moment',
     })
-
-    console.log('Post created:', JSON.stringify(post))
-
     return NextResponse.json({ success: true, post }, { status: 201 })
   } catch (error) {
     console.error('Post error:', error)

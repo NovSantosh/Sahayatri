@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import BottomNav from '../components/BottomNav'
 
 export default function Profile() {
@@ -41,7 +40,6 @@ export default function Profile() {
       <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', paddingBottom: '80px'}}>
         <div style={{fontSize: '48px', marginBottom: '16px'}}>👤</div>
         <p style={{fontSize: '18px', fontWeight: 800, color: '#111318', marginBottom: '8px'}}>Not logged in</p>
-        <p style={{fontSize: '14px', color: '#9CA3AF', marginBottom: '24px', textAlign: 'center'}}>Sign in to see your profile</p>
         <a href="/login" style={{padding: '13px 32px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', borderRadius: '14px', fontWeight: 700, textDecoration: 'none', fontSize: '15px'}}>Sign In</a>
         <BottomNav />
       </div>
@@ -51,7 +49,6 @@ export default function Profile() {
   return (
     <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', paddingBottom: '80px'}}>
 
-      {/* Header */}
       <div style={{background: 'linear-gradient(135deg, #0A1628, #1C0008)', padding: '52px 20px 28px', position: 'relative', overflow: 'hidden'}}>
         <div style={{position: 'absolute', top: '-40px', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(220,20,60,0.15)', pointerEvents: 'none'}}/>
         <div style={{display: 'flex', alignItems: 'center', gap: '16px', position: 'relative', zIndex: 1}}>
@@ -77,14 +74,14 @@ export default function Profile() {
       <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
 
         {/* Stats */}
-        <div style={{display: 'flex', background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)'}}>
+        <div style={{display: 'flex', background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden'}}>
           {[
             {val: posts.length.toString(), label: 'Moments'},
             {val: posts.reduce((sum, p) => sum + (p.likes || 0), 0).toString(), label: 'Likes'},
             {val: new Date(profile?.createdAt || Date.now()).toLocaleDateString('en', {month: 'short', year: 'numeric'}), label: 'Joined'},
           ].map((s, i) => (
             <div key={i} style={{flex: 1, textAlign: 'center', padding: '16px 4px', borderRight: i < 2 ? '1px solid #F0F1F3' : 'none'}}>
-              <p style={{fontSize: '20px', fontWeight: 800, color: '#111318', letterSpacing: '-0.3px'}}>{s.val}</p>
+              <p style={{fontSize: '20px', fontWeight: 800, color: '#111318'}}>{s.val}</p>
               <p style={{fontSize: '10px', fontWeight: 700, color: '#9CA3AF', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.4px'}}>{s.label}</p>
             </div>
           ))}
@@ -92,7 +89,7 @@ export default function Profile() {
 
         {/* Posts */}
         {loading ? (
-          <div style={{textAlign: 'center', padding: '40px', color: '#9CA3AF', fontSize: '14px'}}>Loading…</div>
+          <div style={{textAlign: 'center', padding: '40px', color: '#9CA3AF', fontSize: '14px'}}>Loading...</div>
         ) : posts.length === 0 ? (
           <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '32px 20px', textAlign: 'center'}}>
             <div style={{fontSize: '40px', marginBottom: '12px'}}>📷</div>
@@ -133,10 +130,11 @@ export default function Profile() {
         <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden'}}>
           {[
             {icon: '✏️', label: 'Edit Profile', sub: 'Name, photo, bio, location', path: '/edit-profile'},
-            {icon: '🔔', label: 'Notifications', sub: 'Manage your alerts', path: '/notifications'},
+            {icon: '📅', label: 'My Bookings', sub: 'View and manage your bookings', path: '/bookings'},
+            {icon: '🔔', label: 'Notifications', sub: 'Likes and comments', path: '/notifications'},
             {icon: '🔍', label: 'Search', sub: 'Find people and moments', path: '/search'},
-            {icon: '💳', label: 'Subscription', sub: 'Family Plan · Free', path: null},
-            {icon: '🇳��', label: 'Language', sub: 'Nepali / English', path: null},
+            {icon: '💳', label: 'Payment History', sub: 'eSewa · Khalti · Bank', path: '/bookings'},
+            {icon: '🇳🇵', label: 'Language', sub: 'Nepali / English', path: null},
           ].map((item, i, arr) => (
             <div key={i} onClick={() => item.path && router.push(item.path)}
               style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '14px 16px', borderBottom: i < arr.length - 1 ? '1px solid #F0F1F3' : 'none', cursor: item.path ? 'pointer' : 'default'}}>

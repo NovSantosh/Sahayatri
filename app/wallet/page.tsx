@@ -1,98 +1,152 @@
+'use client'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import BottomNav from '../components/BottomNav'
 
 export default function Wallet() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const [bookings, setBookings] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (session?.user?.email) fetchBookings()
+  }, [session])
+
+  const fetchBookings = async () => {
+    try {
+      const res = await fetch(`/api/bookings?email=${session?.user?.email}`)
+      const data = await res.json()
+      setBookings(data.bookings || [])
+    } catch (e) { console.error(e) }
+    setLoading(false)
+  }
+
+  const totalSpent = bookings.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + b.total, 0)
+  const pending = bookings.filter(b => b.paymentStatus === 'unpaid').reduce((sum, b) => sum + b.total, 0)
+
+  const paymentColor: any = {
+    esewa: { bg: 'rgba(96,187,70,0.1)', color: '#60BB46', label: 'eSewa' },
+    khalti: { bg: 'rgba(92,45,145,0.1)', color: '#5C2D91', label: 'Khalti' },
+    bank: { bg: 'rgba(37,99,235,0.1)', color: '#2563EB', label: 'Bank' },
+    pending: { bg: '#F5F6F8', color: '#9CA3AF', label: 'Pending' },
+  }
+
+  const statusColor: any = {
+    pending: '#D97706',
+    confirmed: '#059669',
+    cancelled: '#DC143C',
+    completed: '#2563EB',
+  }
+
+  const timeAgo = (date: string) => {
+    const s = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000)
+    if (s < 3600) return `${Math.floor(s / 60)}m ago`
+    if (s < 86400) return `${Math.floor(s / 3600)}h ago`
+    return `${Math.floor(s / 86400)}d ago`
+  }
+
   return (
     <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', paddingBottom: '80px'}}>
 
-      <div style={{background: 'linear-gradient(135deg, #0A1628 0%, #1E3A8A 60%, #DC143C 100%)', padding: '52px 20px 24px', position: 'relative', overflow: 'hidden'}}>
-        <div style={{position: 'absolute', top: '-40px', right: '-40px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)'}}/>
-        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px', position: 'relative', zIndex: 1}}>
-          <div>
-            <p style={{fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.55)'}}>Total Balance</p>
-            <p style={{fontSize: '42px', fontWeight: 800, color: 'white', letterSpacing: '-1px', marginTop: '4px', lineHeight: 1}}>₹12,450</p>
-          </div>
-        </div>
-        <div style={{background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '20px', padding: '20px', position: 'relative', zIndex: 1}}>
-          <div style={{marginBottom: '18px'}}>
-            <svg width="32" height="24" viewBox="0 0 32 24"><rect width="32" height="24" rx="4" fill="rgba(255,255,255,0.22)"/><rect x="3" y="6" width="10" height="8" rx="2" fill="rgba(255,255,255,0.5)"/></svg>
-          </div>
-          <p style={{fontSize: '16px', color: 'rgba(255,255,255,0.85)', letterSpacing: '3px', fontWeight: 500, marginBottom: '16px'}}>•••• •••• •••• 4291</p>
-          <div style={{display: 'flex', justifyContent: 'space-between'}}>
-            <div>
-              <p style={{fontSize: '10px', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600}}>Cardholder</p>
-              <p style={{fontSize: '14px', fontWeight: 800, color: 'white', marginTop: '2px'}}>Priya Sharma</p>
+      {/* Header */}
+      <div style={{background: 'linear-gradient(135deg, #0A1628, #1C0008)', padding: '52px 20px 28px', position: 'relative', overflow: 'hidden'}}>
+        <div style={{position: 'absolute', top: '-40px', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(220,20,60,0.15)', pointerEvents: 'none'}}/>
+        <div style={{position: 'relative', zIndex: 1}}>
+          <p style={{fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px'}}>Payment Center</p>
+          <h1 style={{fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px', marginBottom: '4px'}}>NPR {totalSpent.toLocaleString()}</h1>
+          <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.45)'}}>Total paid · {bookings.filter(b => b.paymentStatus === 'paid').length} bookings</p>
+
+          {pending > 0 && (
+            <div style={{marginTop: '14px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(217,119,6,0.15)', border: '1px solid rgba(217,119,6,0.3)', borderRadius: '12px', padding: '8px 14px'}}>
+              <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#D97706'}}/>
+              <span style={{fontSize: '12px', fontWeight: 700, color: '#D97706'}}>NPR {pending.toLocaleString()} pending payment</span>
             </div>
-            <div>
-              <p style={{fontSize: '10px', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600}}>Expires</p>
-              <p style={{fontSize: '14px', fontWeight: 800, color: 'white', marginTop: '2px'}}>08/27</p>
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
       <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px'}}>
 
-        <div style={{display: 'flex', gap: '10px'}}>
-          {[
-            {label: 'Add Money', bg: '#EFF6FF', color: '#2563EB'},
-            {label: 'Withdraw', bg: '#ECFDF5', color: '#059669'},
-            {label: 'Transfer', bg: '#FFFBEB', color: '#D97706'},
-            {label: 'Cards', bg: '#F5F3FF', color: '#7C3AED'},
-          ].map((action) => (
-            <div key={action.label} style={{flex: 1, background: 'white', borderRadius: '14px', border: '1px solid #E9EAEC', padding: '14px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '7px', cursor: 'pointer'}}>
-              <div style={{width: '36px', height: '36px', borderRadius: '10px', background: action.bg, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={action.color} strokeWidth="2" strokeLinecap="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-              </div>
-              <p style={{fontSize: '11px', fontWeight: 700, color: '#374151', textAlign: 'center'}}>{action.label}</p>
-            </div>
-          ))}
-        </div>
-
-        <div>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px'}}>
-            <p style={{fontSize: '16px', fontWeight: 800, color: '#111318'}}>Transactions</p>
-            <span style={{fontSize: '12px', fontWeight: 700, color: '#DC143C', cursor: 'pointer'}}>See all</span>
-          </div>
-          <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+        {/* Payment methods */}
+        <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '16px'}}>
+          <p style={{fontSize: '15px', fontWeight: 800, color: '#111318', marginBottom: '14px'}}>Accepted Payment Methods</p>
+          <div style={{display: 'flex', gap: '10px'}}>
             {[
-              {initials:'VP', color:'#D97706', bg:'#FFFBEB', name:'Vikram Patil · Electrician', date:'Today · 2 hrs', amount:'−₹945', debit:true},
-              {initials:'AS', color:'#DC143C', bg:'#FEF2F2', name:'Ananya Singh · Elder Care', date:'Mar 25 · 4 hrs', amount:'−₹1,400', debit:true},
-              {initials:'eS', color:'#059669', bg:'#ECFDF5', name:'Wallet Top-up · eSewa', date:'Mar 24 · UPI', amount:'+₹5,000', debit:false},
-              {initials:'SK', color:'#2563EB', bg:'#EFF6FF', name:'Suresh Kumar · Plumber', date:'Mar 22 · 1 hr', amount:'−₹450', debit:true},
-            ].map((txn, i) => (
-              <div key={i} style={{background: 'white', borderRadius: '14px', border: '1px solid #E9EAEC', padding: '12px 14px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 1px 2px rgba(0,0,0,0.04)'}}>
-                <div style={{width: '42px', height: '42px', borderRadius: '12px', background: txn.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                  <span style={{fontSize: '14px', fontWeight: 800, color: txn.color}}>{txn.initials}</span>
-                </div>
-                <div style={{flex: 1, minWidth: 0}}>
-                  <p style={{fontSize: '14px', fontWeight: 800, color: '#111318', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>{txn.name}</p>
-                  <p style={{fontSize: '11px', color: '#9CA3AF', marginTop: '2px', fontWeight: 500}}>{txn.date}</p>
-                </div>
-                <p style={{fontSize: '15px', fontWeight: 800, color: txn.debit ? '#DC143C' : '#059669', flexShrink: 0}}>{txn.amount}</p>
+              {label: 'eSewa', color: '#60BB46', sub: 'Most popular'},
+              {label: 'Khalti', color: '#5C2D91', sub: 'Fast & secure'},
+              {label: 'Bank', color: '#2563EB', sub: 'Any Nepali bank'},
+            ].map((pm) => (
+              <div key={pm.label} style={{flex: 1, background: `${pm.color}10`, border: `1px solid ${pm.color}30`, borderRadius: '12px', padding: '12px', textAlign: 'center'}}>
+                <p style={{fontSize: '13px', fontWeight: 800, color: pm.color}}>{pm.label}</p>
+                <p style={{fontSize: '10px', color: '#9CA3AF', marginTop: '2px'}}>{pm.sub}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '14px'}}>
-          <p style={{fontSize: '13px', fontWeight: 800, color: '#111318', marginBottom: '10px'}}>Linked Payment Methods</p>
-          {[
-            {name:'eSewa', sub:'Linked · 9812XXXXXX', color:'#059669', bg:'#ECFDF5'},
-            {name:'Khalti', sub:'Linked · 9801XXXXXX', color:'#7C3AED', bg:'#F5F3FF'},
-          ].map((pm) => (
-            <div key={pm.name} style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', background: pm.bg, borderRadius: '10px', marginBottom: '6px'}}>
-              <div style={{width: '32px', height: '32px', borderRadius: '8px', background: pm.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: 800}}>{pm.name[0]}</div>
-              <div style={{flex: 1}}>
-                <p style={{fontSize: '13px', fontWeight: 700, color: '#111318'}}>{pm.name}</p>
-                <p style={{fontSize: '11px', color: '#9CA3AF', fontWeight: 500}}>{pm.sub}</p>
-              </div>
-              <div style={{width: '8px', height: '8px', borderRadius: '50%', background: pm.color}}/>
-            </div>
-          ))}
+        {/* Book a companion CTA */}
+        <div onClick={() => router.push('/home')} style={{background: 'linear-gradient(135deg, #DC143C, #A50E2D)', borderRadius: '16px', padding: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+          <div>
+            <p style={{fontSize: '16px', fontWeight: 800, color: 'white', marginBottom: '4px'}}>Book a Companion</p>
+            <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.7)'}}>Starting from NPR 280/hr</p>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </div>
 
-      </div>
+        {/* Transaction history */}
+        <div>
+          <p style={{fontSize: '17px', fontWeight: 800, color: '#111318', marginBottom: '12px'}}>
+            Transaction History {bookings.length > 0 && `(${bookings.length})`}
+          </p>
 
+          {loading && <div style={{textAlign: 'center', padding: '40px', color: '#9CA3AF'}}>Loading...</div>}
+
+          {!loading && bookings.length === 0 && (
+            <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '40px 20px', textAlign: 'center'}}>
+              <div style={{fontSize: '48px', marginBottom: '16px'}}>💳</div>
+              <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '8px'}}>No transactions yet</p>
+              <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '20px'}}>Book a companion to see your payment history here.</p>
+              <button onClick={() => router.push('/home')}
+                style={{padding: '12px 24px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
+                Find Companions
+              </button>
+            </div>
+          )}
+
+          <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+            {bookings.map((booking) => {
+              const pm = paymentColor[booking.paymentMethod] || paymentColor.pending
+              return (
+                <div key={booking._id} style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden'}}>
+                  <div style={{padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
+                    <div style={{width: '44px', height: '44px', borderRadius: '12px', background: pm.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                      <span style={{fontSize: '13px', fontWeight: 800, color: pm.color}}>{pm.label[0]}</span>
+                    </div>
+                    <div style={{flex: 1}}>
+                      <p style={{fontSize: '14px', fontWeight: 800, color: '#111318'}}>{booking.companionName}</p>
+                      <p style={{fontSize: '12px', color: '#9CA3AF', marginTop: '2px'}}>{booking.service} · {timeAgo(booking.createdAt)}</p>
+                    </div>
+                    <div style={{textAlign: 'right'}}>
+                      <p style={{fontSize: '15px', fontWeight: 800, color: '#111318'}}>NPR {booking.total}</p>
+                      <p style={{fontSize: '11px', fontWeight: 700, color: booking.paymentStatus === 'paid' ? '#059669' : '#D97706', marginTop: '2px'}}>
+                        {booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                      </p>
+                    </div>
+                  </div>
+                  <div style={{padding: '8px 16px', background: '#F5F6F8', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <span style={{fontSize: '11px', color: '#9CA3AF'}}>Ref: {booking.confirmationCode}</span>
+                    <span style={{fontSize: '11px', fontWeight: 700, color: statusColor[booking.status] || '#9CA3AF', textTransform: 'capitalize'}}>
+                      {booking.status}
+                    </span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
       <BottomNav />
     </div>
   )

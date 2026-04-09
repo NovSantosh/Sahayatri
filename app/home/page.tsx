@@ -168,7 +168,7 @@ export default function Dashboard() {
           <div style={{position: 'absolute', top: '-20px', right: '-20px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(220,20,60,0.15)', pointerEvents: 'none'}}/>
           <p style={{fontSize: '10px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(220,20,60,0.7)', marginBottom: '6px', position: 'relative', zIndex: 1}}>For Professionals</p>
           <p style={{fontSize: '18px', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: '14px', position: 'relative', zIndex: 1}}>Earn NPR 40,000+ a month on your own terms.</p>
-          <div style={{display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', borderRadius: '20px', padding: '9px 18px', position: 'relative', zIndex: 1, cursor: 'pointer'}}>
+          <div style={{display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', borderRadius: '20px', padding: '9px 18px', position: 'relative', zIndex: 1, cursor: 'pointer'}} onClick={() => router.push('/join-professional')}>
             <span style={{fontSize: '13px', fontWeight: 800, color: '#DC143C'}}>Join Free</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC143C" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </div>

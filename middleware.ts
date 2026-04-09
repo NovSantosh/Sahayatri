@@ -26,5 +26,8 @@ export const config = {
     '/notifications/:path*',
     '/search/:path*',
     '/wallet/:path*',
+    '/book/:path*',
+    '/bookings/:path*',
+    '/professional/:path*',
   ],
 }

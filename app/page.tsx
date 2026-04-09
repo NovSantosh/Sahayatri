@@ -252,7 +252,7 @@ export default function Welcome() {
           {icon: '🚫', label: 'No Ads. Ever.'},
           {icon: '🇳🇵', label: 'Built for Nepal', href: '/about'},
         ].map((t, i) => (
-          <div key={i} style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+          <div key={i} onClick={() => t.href && (window.location.href = t.href)} style={{display: 'flex', alignItems: 'center', gap: '5px', cursor: t.href ? 'pointer' : 'default'}}> 
             <span style={{fontSize: '12px'}}>{t.icon}</span>
             <span style={{fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.25)'}}>{t.label}</span>
           </div>

@@ -1,6 +1,6 @@
 'use client'
 import { useSession } from 'next-auth/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import BottomNav from '../components/BottomNav'
@@ -8,6 +8,7 @@ import BottomNav from '../components/BottomNav'
 export default function Dashboard() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [activeTab, setActiveTab] = useState('Care & Companions')
 
   useEffect(() => {
     if (status === 'unauthenticated') router.push('/login')
@@ -22,6 +23,19 @@ export default function Dashboard() {
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
 
+  const companions = [
+    {name: 'Ananya Singh', role: 'Elder Care · Yoga', rate: '350', rating: '4.9', initials: 'AS', color: '#DC143C'},
+    {name: 'Rajan Mehta', role: 'Child Care · Tutor', rate: '300', rating: '4.8', initials: 'RM', color: '#2563EB'},
+    {name: 'Meera Kapoor', role: 'Cook · Companion', rate: '280', rating: '5.0', initials: 'MK', color: '#059669'},
+  ]
+
+  const homeServices = [
+    {name: 'Electrician', icon: '⚡', rate: 'NPR 800/visit'},
+    {name: 'Plumber', icon: '🔧', rate: 'NPR 700/visit'},
+    {name: 'Carpenter', icon: '🪚', rate: 'NPR 900/visit'},
+    {name: 'House Cleaner', icon: '🧹', rate: 'NPR 600/visit'},
+  ]
+
   return (
     <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', paddingBottom: '80px'}}>
 
@@ -32,27 +46,30 @@ export default function Dashboard() {
             <h1 style={{fontSize: '22px', fontWeight: 800, color: '#111318', letterSpacing: '-0.5px', marginTop: '2px'}}>{name}</h1>
           </div>
           <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-            {/* Notification bell */}
             <Link href="/notifications" style={{width: '38px', height: '38px', borderRadius: '10px', border: '1px solid #E9EAEC', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', textDecoration: 'none'}}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#4A5060" strokeWidth="2" strokeLinecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
               <div style={{position: 'absolute', top: '-1px', right: '-1px', width: '8px', height: '8px', borderRadius: '50%', background: '#DC143C', border: '2px solid white'}}/>
             </Link>
-            {/* Avatar */}
             <Link href="/profile" style={{width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', textDecoration: 'none'}}>
               {initials}
             </Link>
           </div>
         </div>
 
-        {/* Search bar — links to search page */}
         <Link href="/search" style={{textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px', background: '#F5F6F8', border: '1px solid #E9EAEC', borderRadius: '28px', padding: '10px 16px', marginBottom: '12px'}}>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <span style={{fontSize: '14px', color: '#9CA3AF'}}>Search companions, services…</span>
         </Link>
 
         <div style={{display: 'flex', gap: '2px', padding: '3px', background: '#F5F6F8', border: '1px solid #E9EAEC', borderRadius: '28px', marginBottom: '-1px'}}>
-          <button style={{flex: 1, padding: '9px', borderRadius: '24px', border: 'none', background: 'white', color: '#DC143C', fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif', boxShadow: '0 1px 3px rgba(0,0,0,0.08)', cursor: 'pointer'}}>Care & Companions</button>
-          <button style={{flex: 1, padding: '9px', borderRadius: '24px', border: 'none', background: 'transparent', color: '#9CA3AF', fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif', cursor: 'pointer'}}>Home Services</button>
+          <button onClick={() => setActiveTab('Care & Companions')}
+            style={{flex: 1, padding: '9px', borderRadius: '24px', border: 'none', background: activeTab === 'Care & Companions' ? 'white' : 'transparent', color: activeTab === 'Care & Companions' ? '#DC143C' : '#9CA3AF', fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif', boxShadow: activeTab === 'Care & Companions' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', cursor: 'pointer'}}>
+            Care & Companions
+          </button>
+          <button onClick={() => setActiveTab('Home Services')}
+            style={{flex: 1, padding: '9px', borderRadius: '24px', border: 'none', background: activeTab === 'Home Services' ? 'white' : 'transparent', color: activeTab === 'Home Services' ? '#DC143C' : '#9CA3AF', fontSize: '12px', fontWeight: 700, fontFamily: 'sans-serif', boxShadow: activeTab === 'Home Services' ? '0 1px 3px rgba(0,0,0,0.08)' : 'none', cursor: 'pointer'}}>
+            Home Services
+          </button>
         </div>
       </div>
 
@@ -82,7 +99,7 @@ export default function Dashboard() {
             {[
               {label: 'Family Room', meta: 'View now', path: '/family', bg: '#EFF6FF', color: '#2563EB', icon: 'home'},
               {label: 'Memory', meta: 'Share moment', path: '/memory', bg: '#FEF2F2', color: '#DC143C', icon: 'heart'},
-              {label: 'Wallet', meta: 'Manage funds', path: '/wallet', bg: '#ECFDF5', color: '#059669', icon: 'wallet'},
+              {label: 'Wallet', meta: 'Payments', path: '/wallet', bg: '#ECFDF5', color: '#059669', icon: 'wallet'},
             ].map((item) => (
               <Link key={item.path} href={item.path} style={{textDecoration: 'none', background: 'white', borderRadius: '14px', border: '1px solid #E9EAEC', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
                 <div style={{width: '36px', height: '36px', borderRadius: '8px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
@@ -99,38 +116,58 @@ export default function Dashboard() {
           </div>
         </div>
 
-        <div>
-          <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '11px'}}>
-            <p style={{fontSize: '17px', fontWeight: 800, color: '#111318'}}>Top Companions</p>
-            <span style={{fontSize: '12px', fontWeight: 700, color: '#DC143C'}}>View all</span>
-          </div>
-          <div style={{display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
-            {[
-              {name: 'Ananya Singh', role: 'Elder Care · Yoga', rate: '₹350/hr', rating: '4.9', initials: 'AS', color: '#DC143C'},
-              {name: 'Rajan Mehta', role: 'Child Care · Tutor', rate: '₹300/hr', rating: '4.8', initials: 'RM', color: '#2563EB'},
-              {name: 'Meera Kapoor', role: 'Cook · Companion', rate: '₹280/hr', rating: '5.0', initials: 'MK', color: '#059669'},
-            ].map((p) => (
-              <Link key={p.name} href="/professional" style={{textDecoration: 'none', flexShrink: 0, width: '152px', background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden'}}>
-                <div style={{height: '100px', background: `linear-gradient(135deg, ${p.color}22, ${p.color}44)`, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                  <div style={{width: '56px', height: '56px', borderRadius: '50%', background: `linear-gradient(135deg, ${p.color}, ${p.color}CC)`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '20px', fontWeight: 800}}>{p.initials}</div>
-                </div>
-                <div style={{padding: '10px 12px'}}>
-                  <p style={{fontSize: '13px', fontWeight: 800, color: '#111318'}}>{p.name}</p>
-                  <p style={{fontSize: '11px', color: '#9CA3AF', marginTop: '1px'}}>{p.role}</p>
-                  <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '8px'}}>
-                    <span style={{fontSize: '12px', fontWeight: 700, color: '#374151'}}>{p.rate}</span>
-                    <span style={{fontSize: '11px', color: '#9CA3AF'}}>⭐ {p.rating}</span>
+        {activeTab === 'Care & Companions' && (
+          <div>
+            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '11px'}}>
+              <p style={{fontSize: '17px', fontWeight: 800, color: '#111318'}}>Top Companions</p>
+              <span style={{fontSize: '12px', fontWeight: 700, color: '#DC143C', cursor: 'pointer'}}>View all</span>
+            </div>
+            <div style={{display: 'flex', gap: '12px', overflowX: 'auto', paddingBottom: '4px'}}>
+              {companions.map((p) => (
+                <Link key={p.name} href={`/professional?name=${encodeURIComponent(p.name)}&role=${encodeURIComponent(p.role)}&rate=${p.rate}`}
+                  style={{textDecoration: 'none', flexShrink: 0, width: '152px', background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden'}}>
+                  <div style={{height: '100px', background: `linear-gradient(135deg, ${p.color}22, ${p.color}44)`, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                    <div style={{width: '56px', height: '56px', borderRadius: '50%', background: `linear-gradient(135deg, ${p.color}, ${p.color}CC)`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '20px', fontWeight: 800}}>{p.initials}</div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div style={{padding: '10px 12px'}}>
+                    <p style={{fontSize: '13px', fontWeight: 800, color: '#111318'}}>{p.name}</p>
+                    <p style={{fontSize: '11px', color: '#9CA3AF', marginTop: '1px'}}>{p.role}</p>
+                    <div style={{display: 'flex', justifyContent: 'space-between', marginTop: '8px'}}>
+                      <span style={{fontSize: '12px', fontWeight: 700, color: '#374151'}}>NPR {p.rate}/hr</span>
+                      <span style={{fontSize: '11px', color: '#9CA3AF'}}>★ {p.rating}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === 'Home Services' && (
+          <div>
+            <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '11px'}}>
+              <p style={{fontSize: '17px', fontWeight: 800, color: '#111318'}}>Home Services</p>
+              <Link href="/services" style={{fontSize: '12px', fontWeight: 700, color: '#DC143C', textDecoration: 'none'}}>View all</Link>
+            </div>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
+              {homeServices.map((s) => (
+                <Link key={s.name} href="/services" style={{textDecoration: 'none', background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                  <div style={{fontSize: '28px'}}>{s.icon}</div>
+                  <p style={{fontSize: '14px', fontWeight: 800, color: '#111318'}}>{s.name}</p>
+                  <p style={{fontSize: '12px', fontWeight: 600, color: '#DC143C'}}>{s.rate}</p>
+                </Link>
+              ))}
+            </div>
+            <Link href="/services" style={{textDecoration: 'none', display: 'block', marginTop: '10px', padding: '14px', background: 'white', border: '1px solid #E9EAEC', borderRadius: '14px', textAlign: 'center', fontSize: '14px', fontWeight: 700, color: '#DC143C'}}>
+              See All Home Services →
+            </Link>
+          </div>
+        )}
 
         <div style={{borderRadius: '20px', padding: '20px', background: 'linear-gradient(135deg, #0A0A1A, #1C0008)', position: 'relative', overflow: 'hidden'}}>
           <div style={{position: 'absolute', top: '-20px', right: '-20px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(220,20,60,0.15)', pointerEvents: 'none'}}/>
           <p style={{fontSize: '10px', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(220,20,60,0.7)', marginBottom: '6px', position: 'relative', zIndex: 1}}>For Professionals</p>
-          <p style={{fontSize: '18px', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: '14px', position: 'relative', zIndex: 1}}>Earn ₹40,000+ a month on your own terms.</p>
+          <p style={{fontSize: '18px', fontWeight: 800, color: 'white', lineHeight: 1.3, marginBottom: '14px', position: 'relative', zIndex: 1}}>Earn NPR 40,000+ a month on your own terms.</p>
           <div style={{display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'white', borderRadius: '20px', padding: '9px 18px', position: 'relative', zIndex: 1, cursor: 'pointer'}}>
             <span style={{fontSize: '13px', fontWeight: 800, color: '#DC143C'}}>Join Free</span>
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#DC143C" strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>

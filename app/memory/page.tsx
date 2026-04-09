@@ -6,6 +6,8 @@ import BottomNav from '../components/BottomNav'
 export default function Memory() {
   const { data: session } = useSession()
   const [posts, setPosts] = useState<any[]>([])
+  const [filteredPosts, setFilteredPosts] = useState<any[]>([])
+  const [activeTab, setActiveTab] = useState('All Moments')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [content, setContent] = useState('')
@@ -25,11 +27,24 @@ export default function Memory() {
 
   useEffect(() => { fetchPosts() }, [])
 
+  useEffect(() => {
+    if (activeTab === 'All Moments') {
+      setFilteredPosts(posts)
+    } else if (activeTab === 'Care Stories') {
+      setFilteredPosts(posts.filter(p => p.category === 'Care moment'))
+    } else if (activeTab === 'Services') {
+      setFilteredPosts(posts.filter(p => p.category === 'Service story'))
+    } else if (activeTab === 'Community') {
+      setFilteredPosts(posts.filter(p => p.category === 'Community'))
+    }
+  }, [activeTab, posts])
+
   const fetchPosts = async () => {
     try {
       const res = await fetch('/api/posts')
       const data = await res.json()
       setPosts(data.posts || [])
+      setFilteredPosts(data.posts || [])
     } catch (e) { console.error(e) }
     setLoading(false)
   }
@@ -46,9 +61,7 @@ export default function Memory() {
       })
       const data = await res.json()
       if (res.ok) {
-        setPosts(prev => prev.map(p =>
-          p._id === postId ? { ...p, likes: data.likes, liked: data.liked } : p
-        ))
+        setPosts(prev => prev.map(p => p._id === postId ? { ...p, likes: data.likes, liked: data.liked } : p))
       }
     } catch (e) { console.error(e) }
     setLikingIds(prev => prev.filter(id => id !== postId))
@@ -85,9 +98,7 @@ export default function Memory() {
       const data = await res.json()
       if (res.ok) {
         setCommentText(prev => ({ ...prev, [postId]: '' }))
-        setPosts(prev => prev.map(p =>
-          p._id === postId ? { ...p, comments: [...(p.comments || []), data.comment] } : p
-        ))
+        setPosts(prev => prev.map(p => p._id === postId ? { ...p, comments: [...(p.comments || []), data.comment] } : p))
       }
     } catch (e) { console.error(e) }
     setSubmittingComment(prev => prev.filter(id => id !== postId))
@@ -95,10 +106,7 @@ export default function Memory() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    if (imagesRef.current.length + files.length > 4) {
-      setError('Maximum 4 photos allowed')
-      return
-    }
+    if (imagesRef.current.length + files.length > 4) { setError('Maximum 4 photos allowed'); return }
     setUploading(true)
     setError('')
     for (const file of files) {
@@ -107,10 +115,7 @@ export default function Memory() {
       try {
         const res = await fetch('/api/upload', { method: 'POST', body: formData })
         const data = await res.json()
-        if (data.url) {
-          imagesRef.current = [...imagesRef.current, data.url]
-          setImagePreview([...imagesRef.current])
-        }
+        if (data.url) { imagesRef.current = [...imagesRef.current, data.url]; setImagePreview([...imagesRef.current]) }
       } catch (e) { setError('Failed to upload image') }
     }
     setUploading(false)
@@ -123,7 +128,7 @@ export default function Memory() {
 
   const handlePost = async () => {
     if (!content.trim()) return
-    if (!session?.user) { setError('Please log in to share a moment'); return }
+    if (!session?.user) { setError('Please log in'); return }
     setPosting(true)
     setError('')
     try {
@@ -134,11 +139,7 @@ export default function Memory() {
       })
       const data = await res.json()
       if (res.ok) {
-        setContent('')
-        imagesRef.current = []
-        setImagePreview([])
-        setShowForm(false)
-        fetchPosts()
+        setContent(''); imagesRef.current = []; setImagePreview([]); setShowForm(false); fetchPosts()
       } else { setError(data.error || 'Failed to post') }
     } catch (e) { setError('Something went wrong') }
     setPosting(false)
@@ -160,15 +161,16 @@ export default function Memory() {
     'Community': { bg: '#EFF6FF', color: '#2563EB' },
   }
 
+  const tabs = ['All Moments', 'Care Stories', 'Services', 'Community']
+
   return (
     <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', paddingBottom: '80px'}}>
 
-      {/* Delete confirmation modal */}
       {confirmDelete && (
         <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'}}>
           <div style={{background: 'white', borderRadius: '20px', padding: '24px', width: '100%', maxWidth: '320px'}}>
             <h3 style={{fontSize: '18px', fontWeight: 800, color: '#111318', marginBottom: '8px'}}>Delete moment?</h3>
-            <p style={{fontSize: '14px', color: '#6B7280', marginBottom: '20px', lineHeight: 1.5}}>This cannot be undone. The moment will be gone forever.</p>
+            <p style={{fontSize: '14px', color: '#6B7280', marginBottom: '20px', lineHeight: 1.5}}>This cannot be undone.</p>
             <div style={{display: 'flex', gap: '10px'}}>
               <button onClick={() => setConfirmDelete(null)} style={{flex: 1, padding: '12px', background: '#F5F6F8', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif', color: '#6B7280'}}>Cancel</button>
               <button onClick={() => handleDelete(confirmDelete)} disabled={deletingIds.includes(confirmDelete)}
@@ -191,8 +193,11 @@ export default function Memory() {
           </button>
         </div>
         <div style={{display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '12px'}}>
-          {['All Moments', 'Care Stories', 'Services', 'Community'].map((tab, i) => (
-            <button key={tab} style={{flexShrink: 0, padding: '7px 15px', borderRadius: '20px', border: 'none', background: i === 0 ? '#DC143C' : '#F5F6F8', color: i === 0 ? 'white' : '#6B7280', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>{tab}</button>
+          {tabs.map((tab) => (
+            <button key={tab} onClick={() => setActiveTab(tab)}
+              style={{flexShrink: 0, padding: '7px 15px', borderRadius: '20px', border: 'none', background: activeTab === tab ? '#DC143C' : '#F5F6F8', color: activeTab === tab ? 'white' : '#6B7280', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
+              {tab}
+            </button>
           ))}
         </div>
       </div>
@@ -213,8 +218,8 @@ export default function Memory() {
             <div style={{display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap'}}>
               {imagePreview.map((url, i) => (
                 <div key={i} style={{position: 'relative', width: '72px', height: '72px'}}>
-                  <img src={url} style={{width: '72px', height: '72px', objectFit: 'cover', borderRadius: '10px', border: '1px solid #E9EAEC'}} alt="upload"/>
-                  <button onClick={() => removeImage(i)} style={{position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', borderRadius: '50%', background: '#DC143C', border: 'none', color: 'white', fontSize: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800}}>x</button>
+                  <img src={url} style={{width: '72px', height: '72px', objectFit: 'cover', borderRadius: '10px'}} alt="upload"/>
+                  <button onClick={() => removeImage(i)} style={{position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', borderRadius: '50%', background: '#DC143C', border: 'none', color: 'white', fontSize: '12px', cursor: 'pointer', fontWeight: 800}}>x</button>
                 </div>
               ))}
             </div>
@@ -222,7 +227,8 @@ export default function Memory() {
           {imagePreview.length < 4 && (
             <div style={{marginTop: '10px'}}>
               <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} style={{display: 'none'}}/>
-              <button onClick={() => fileInputRef.current?.click()} disabled={uploading} style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#F5F6F8', border: '1px dashed #D1D5DB', borderRadius: '10px', fontSize: '12px', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'sans-serif'}}>
+              <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
+                style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#F5F6F8', border: '1px dashed #D1D5DB', borderRadius: '10px', fontSize: '12px', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'sans-serif'}}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                 {uploading ? 'Uploading...' : `Add Photos (${imagePreview.length}/4)`}
               </button>
@@ -230,12 +236,17 @@ export default function Memory() {
           )}
           <div style={{display: 'flex', gap: '8px', marginTop: '10px', marginBottom: '12px'}}>
             {['Care moment', 'Service story', 'Community'].map((cat) => (
-              <button key={cat} onClick={() => setCategory(cat)} style={{padding: '5px 10px', borderRadius: '20px', border: `1.5px solid ${category === cat ? '#DC143C' : '#E9EAEC'}`, background: category === cat ? 'rgba(220,20,60,0.08)' : 'white', color: category === cat ? '#DC143C' : '#9CA3AF', fontSize: '11px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>{cat}</button>
+              <button key={cat} onClick={() => setCategory(cat)}
+                style={{padding: '5px 10px', borderRadius: '20px', border: `1.5px solid ${category === cat ? '#DC143C' : '#E9EAEC'}`, background: category === cat ? 'rgba(220,20,60,0.08)' : 'white', color: category === cat ? '#DC143C' : '#9CA3AF', fontSize: '11px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
+                {cat}
+              </button>
             ))}
           </div>
           <div style={{display: 'flex', gap: '8px'}}>
-            <button onClick={() => { setShowForm(false); imagesRef.current = []; setImagePreview([]); setError('') }} style={{flex: 1, padding: '11px', background: '#F5F6F8', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif', color: '#6B7280'}}>Cancel</button>
-            <button onClick={handlePost} disabled={posting || !content.trim()} style={{flex: 2, padding: '11px', background: posting ? 'rgba(220,20,60,0.5)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', fontFamily: 'sans-serif', color: 'white'}}>
+            <button onClick={() => { setShowForm(false); imagesRef.current = []; setImagePreview([]); setError('') }}
+              style={{flex: 1, padding: '11px', background: '#F5F6F8', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif', color: '#6B7280'}}>Cancel</button>
+            <button onClick={handlePost} disabled={posting || !content.trim()}
+              style={{flex: 2, padding: '11px', background: posting ? 'rgba(220,20,60,0.5)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', fontFamily: 'sans-serif', color: 'white'}}>
               {posting ? 'Posting...' : 'Share Moment'}
             </button>
           </div>
@@ -243,7 +254,26 @@ export default function Memory() {
       )}
 
       <div style={{padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
+
+        {/* Empty state for filtered tabs */}
+        {!loading && filteredPosts.length === 0 && activeTab !== 'All Moments' && (
+          <div style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '40px 20px', textAlign: 'center'}}>
+            <div style={{fontSize: '40px', marginBottom: '12px'}}>
+              {activeTab === 'Care Stories' ? '❤️' : activeTab === 'Services' ? '🔧' : '🤝'}
+            </div>
+            <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '6px'}}>No {activeTab} yet</p>
+            <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '16px'}}>
+              {activeTab === 'Care Stories' ? 'Share a care moment with your family.' : activeTab === 'Services' ? 'Share a service story.' : 'Share something with the community.'}
+            </p>
+            <button onClick={() => { setCategory(activeTab === 'Care Stories' ? 'Care moment' : activeTab === 'Services' ? 'Service story' : 'Community'); setShowForm(true) }}
+              style={{padding: '10px 20px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', fontFamily: 'sans-serif'}}>
+              + Share Now
+            </button>
+          </div>
+        )}
+
         {loading && <div style={{textAlign: 'center', padding: '40px', color: '#9CA3AF', fontSize: '14px'}}>Loading moments...</div>}
+
         {!loading && posts.length === 0 && (
           <div style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '40px 20px', textAlign: 'center'}}>
             <div style={{fontSize: '48px', marginBottom: '12px'}}>🌱</div>
@@ -251,7 +281,8 @@ export default function Memory() {
             <p style={{fontSize: '13px', color: '#9CA3AF'}}>Be the first to share a moment.</p>
           </div>
         )}
-        {posts.map((post) => (
+
+        {filteredPosts.map((post) => (
           <div key={post._id} style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)'}}>
             <div style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 16px 10px'}}>
               <div style={{width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', flexShrink: 0}}>
@@ -265,17 +296,15 @@ export default function Memory() {
                 <div style={{padding: '3px 9px', borderRadius: '20px', background: categoryColor[post.category]?.bg || '#F5F6F8', fontSize: '10px', fontWeight: 700, color: categoryColor[post.category]?.color || '#9CA3AF'}}>
                   {post.category}
                 </div>
-                {(session?.user?.email === post.authorEmail || session?.user?.name === post.authorName || session?.user?.name === post.authorName) && (
+                {(session?.user?.email === post.authorEmail || session?.user?.name === post.authorName) && (
                   <button onClick={() => setConfirmDelete(post._id)}
-                    style={{width: '28px', height: '28px', borderRadius: '8px', background: '#FEF2F2', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0}}>
+                    style={{width: '28px', height: '28px', borderRadius: '8px', background: '#FEF2F2', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'}}>
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC143C" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                   </button>
                 )}
               </div>
             </div>
-            {post.content && (
-              <div style={{padding: '0 16px 12px', fontSize: '14px', color: '#374151', lineHeight: 1.7}}>{post.content}</div>
-            )}
+            {post.content && <div style={{padding: '0 16px 12px', fontSize: '14px', color: '#374151', lineHeight: 1.7}}>{post.content}</div>}
             {post.images && post.images.length > 0 && (
               <div style={{padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: '6px'}}>
                 {post.images.slice(0, 4).map((url: string, i: number) => (
@@ -286,9 +315,7 @@ export default function Memory() {
             <div style={{display: 'flex', borderTop: '1px solid #F0F1F3'}}>
               <button onClick={() => handleLike(post._id)} disabled={likingIds.includes(post._id)}
                 style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: post.liked ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill={post.liked ? '#DC143C' : 'none'} stroke={post.liked ? '#DC143C' : '#6B7280'} strokeWidth="2" strokeLinecap="round">
-                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill={post.liked ? '#DC143C' : 'none'} stroke={post.liked ? '#DC143C' : '#6B7280'} strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                 {post.likes || 0}
               </button>
               <button onClick={() => setOpenComments(prev => prev.includes(post._id) ? prev.filter(id => id !== post._id) : [...prev, post._id])}
@@ -303,7 +330,7 @@ export default function Memory() {
                 {post.comments && post.comments.length > 0 && (
                   <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '12px'}}>
                     {post.comments.map((comment: any, i: number) => (
-                      <div key={i} style={{display: 'flex', gap: '8px', alignItems: 'flex-start'}}>
+                      <div key={i} style={{display: 'flex', gap: '8px'}}>
                         <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>
                           {initials(comment.authorName)}
                         </div>
@@ -315,9 +342,7 @@ export default function Memory() {
                     ))}
                   </div>
                 )}
-                {!post.comments?.length && (
-                  <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '12px', textAlign: 'center'}}>No comments yet. Be the first.</p>
-                )}
+                {!post.comments?.length && <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '12px', textAlign: 'center'}}>No comments yet.</p>}
                 <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
                   <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>
                     {initials(session?.user?.name || '')}
@@ -336,7 +361,8 @@ export default function Memory() {
             )}
           </div>
         ))}
-        {!loading && posts.length > 0 && (
+
+        {!loading && filteredPosts.length > 0 && (
           <div style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '24px 20px', textAlign: 'center'}}>
             <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '6px'}}>You are all caught up.</p>
             <p style={{fontSize: '13px', color: '#6B7280'}}>Now go call someone you love.</p>

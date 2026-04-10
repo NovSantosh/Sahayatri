@@ -2,12 +2,13 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BottomNav from '../components/BottomNav'
+import { DS } from '../design-system'
 
 export default function Memory() {
   const { data: session } = useSession()
   const [posts, setPosts] = useState<any[]>([])
   const [filteredPosts, setFilteredPosts] = useState<any[]>([])
-  const [activeTab, setActiveTab] = useState('All Moments')
+  const [activeTab, setActiveTab] = useState('All')
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [content, setContent] = useState('')
@@ -22,21 +23,15 @@ export default function Memory() {
   const [openComments, setOpenComments] = useState<string[]>([])
   const [commentText, setCommentText] = useState<{[key: string]: string}>({})
   const [submittingComment, setSubmittingComment] = useState<string[]>([])
-  const [deletingIds, setDeletingIds] = useState<string[]>([])
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
+  const [deletingIds, setDeletingIds] = useState<string[]>([])
 
   useEffect(() => { fetchPosts() }, [])
 
   useEffect(() => {
-    if (activeTab === 'All Moments') {
-      setFilteredPosts(posts)
-    } else if (activeTab === 'Care Stories') {
-      setFilteredPosts(posts.filter(p => p.category === 'Care moment'))
-    } else if (activeTab === 'Services') {
-      setFilteredPosts(posts.filter(p => p.category === 'Service story'))
-    } else if (activeTab === 'Community') {
-      setFilteredPosts(posts.filter(p => p.category === 'Community'))
-    }
+    const map: any = { 'All': null, 'Care': 'Care moment', 'Services': 'Service story', 'Community': 'Community' }
+    const cat = map[activeTab]
+    setFilteredPosts(cat ? posts.filter(p => p.category === cat) : posts)
   }, [activeTab, posts])
 
   const fetchPosts = async () => {
@@ -44,57 +39,36 @@ export default function Memory() {
       const res = await fetch('/api/posts')
       const data = await res.json()
       setPosts(data.posts || [])
-      setFilteredPosts(data.posts || [])
     } catch (e) { console.error(e) }
     setLoading(false)
   }
 
   const handleLike = async (postId: string) => {
-    if (!session?.user?.email) return
-    if (likingIds.includes(postId)) return
+    if (!session?.user?.email || likingIds.includes(postId)) return
     setLikingIds(prev => [...prev, postId])
     try {
-      const res = await fetch('/api/posts/like', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, userEmail: session.user.email }),
-      })
+      const res = await fetch('/api/posts/like', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postId, userEmail: session.user.email }) })
       const data = await res.json()
-      if (res.ok) {
-        setPosts(prev => prev.map(p => p._id === postId ? { ...p, likes: data.likes, liked: data.liked } : p))
-      }
+      if (res.ok) setPosts(prev => prev.map(p => p._id === postId ? { ...p, likes: data.likes, liked: data.liked } : p))
     } catch (e) { console.error(e) }
     setLikingIds(prev => prev.filter(id => id !== postId))
   }
 
   const handleDelete = async (postId: string) => {
-    if (!session?.user?.email) return
     setDeletingIds(prev => [...prev, postId])
     try {
-      const res = await fetch('/api/posts/delete', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, userEmail: session.user.email }),
-      })
-      if (res.ok) {
-        setPosts(prev => prev.filter(p => p._id !== postId))
-        setConfirmDelete(null)
-      }
+      const res = await fetch('/api/posts/delete', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postId, userEmail: session?.user?.email }) })
+      if (res.ok) { setPosts(prev => prev.filter(p => p._id !== postId)); setConfirmDelete(null) }
     } catch (e) { console.error(e) }
     setDeletingIds(prev => prev.filter(id => id !== postId))
   }
 
   const handleComment = async (postId: string) => {
-    if (!session?.user?.email) return
     const text = commentText[postId]?.trim()
-    if (!text) return
+    if (!text || !session?.user?.email) return
     setSubmittingComment(prev => [...prev, postId])
     try {
-      const res = await fetch('/api/posts/comment', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ postId, userEmail: session.user.email, text }),
-      })
+      const res = await fetch('/api/posts/comment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postId, userEmail: session.user.email, text }) })
       const data = await res.json()
       if (res.ok) {
         setCommentText(prev => ({ ...prev, [postId]: '' }))
@@ -106,9 +80,8 @@ export default function Memory() {
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
-    if (imagesRef.current.length + files.length > 4) { setError('Maximum 4 photos allowed'); return }
+    if (imagesRef.current.length + files.length > 4) { setError('Maximum 4 photos'); return }
     setUploading(true)
-    setError('')
     for (const file of files) {
       const formData = new FormData()
       formData.append('file', file)
@@ -116,259 +89,281 @@ export default function Memory() {
         const res = await fetch('/api/upload', { method: 'POST', body: formData })
         const data = await res.json()
         if (data.url) { imagesRef.current = [...imagesRef.current, data.url]; setImagePreview([...imagesRef.current]) }
-      } catch (e) { setError('Failed to upload image') }
+      } catch (e) { setError('Failed to upload') }
     }
     setUploading(false)
   }
 
-  const removeImage = (index: number) => {
-    imagesRef.current = imagesRef.current.filter((_, i) => i !== index)
-    setImagePreview([...imagesRef.current])
-  }
-
   const handlePost = async () => {
-    if (!content.trim()) return
-    if (!session?.user) { setError('Please log in'); return }
+    if (!content.trim() || !session?.user) return
     setPosting(true)
     setError('')
     try {
-      const res = await fetch('/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, category, authorEmail: session.user.email, images: [...imagesRef.current] }),
-      })
-      const data = await res.json()
-      if (res.ok) {
-        setContent(''); imagesRef.current = []; setImagePreview([]); setShowForm(false); fetchPosts()
-      } else { setError(data.error || 'Failed to post') }
+      const res = await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, category, authorEmail: session.user.email, images: [...imagesRef.current] }) })
+      if (res.ok) { setContent(''); imagesRef.current = []; setImagePreview([]); setShowForm(false); fetchPosts() }
+      else { const d = await res.json(); setError(d.error || 'Failed') }
     } catch (e) { setError('Something went wrong') }
     setPosting(false)
   }
 
   const timeAgo = (date: string) => {
-    const s = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000)
+    const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
     if (s < 60) return 'just now'
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-    return `${Math.floor(s / 86400)}d ago`
+    if (s < 3600) return `${Math.floor(s / 60)}m`
+    if (s < 86400) return `${Math.floor(s / 3600)}h`
+    return `${Math.floor(s / 86400)}d`
   }
 
   const initials = (name: string) => name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
 
-  const categoryColor: any = {
-    'Care moment': { bg: '#ECFDF5', color: '#059669' },
-    'Service story': { bg: '#FFFBEB', color: '#D97706' },
-    'Community': { bg: '#EFF6FF', color: '#2563EB' },
+  const categoryStyle: any = {
+    'Care moment': { bg: '#ECFDF5', color: '#059669', label: 'Care' },
+    'Service story': { bg: '#FFFBEB', color: '#D97706', label: 'Service' },
+    'Community': { bg: '#EFF6FF', color: '#2563EB', label: 'Community' },
   }
 
-  const tabs = ['All Moments', 'Care Stories', 'Services', 'Community']
+  const tabs = ['All', 'Care', 'Services', 'Community']
 
   return (
-    <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', paddingBottom: '80px'}}>
+    <div style={{minHeight: '100vh', background: DS.colors.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px'}}>
 
+      {/* Delete modal */}
       {confirmDelete && (
-        <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px'}}>
-          <div style={{background: 'white', borderRadius: '20px', padding: '24px', width: '100%', maxWidth: '320px'}}>
-            <h3 style={{fontSize: '18px', fontWeight: 800, color: '#111318', marginBottom: '8px'}}>Delete moment?</h3>
-            <p style={{fontSize: '14px', color: '#6B7280', marginBottom: '20px', lineHeight: 1.5}}>This cannot be undone.</p>
+        <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(4px)'}}>
+          <div style={{background: 'white', borderRadius: '24px', padding: '28px 24px', width: '100%', maxWidth: '380px'}}>
+            <div style={{width: '52px', height: '52px', borderRadius: '50%', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px'}}>🗑️</div>
+            <h3 style={{...DS.font.h3, color: DS.colors.text1, textAlign: 'center', marginBottom: '8px'}}>Delete this moment?</h3>
+            <p style={{...DS.font.bodySm, color: DS.colors.text2, textAlign: 'center', marginBottom: '24px'}}>This cannot be undone.</p>
             <div style={{display: 'flex', gap: '10px'}}>
-              <button onClick={() => setConfirmDelete(null)} style={{flex: 1, padding: '12px', background: '#F5F6F8', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif', color: '#6B7280'}}>Cancel</button>
+              <button onClick={() => setConfirmDelete(null)} style={{flex: 1, padding: '14px', background: DS.colors.pageBg, border: 'none', borderRadius: DS.radius.button, fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: DS.colors.text2}}>Cancel</button>
               <button onClick={() => handleDelete(confirmDelete)} disabled={deletingIds.includes(confirmDelete)}
-                style={{flex: 1, padding: '12px', background: '#DC143C', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif', color: 'white'}}>
-                {deletingIds.includes(confirmDelete) ? 'Deleting...' : 'Delete'}
+                style={{flex: 1, padding: '14px', background: DS.gradient.primary, border: 'none', borderRadius: DS.radius.button, fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: 'white', boxShadow: DS.shadow.primary}}>
+                {deletingIds.includes(confirmDelete) ? 'Deleting…' : 'Delete'}
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <div style={{background: 'white', padding: '52px 20px 0', borderBottom: '1px solid #F0F1F3', position: 'sticky', top: 0, zIndex: 50}}>
-        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px'}}>
+      {/* Header */}
+      <div style={{background: DS.colors.cardBg, padding: '52px 20px 0', borderBottom: `1px solid ${DS.colors.border}`, position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 1px 12px rgba(0,0,0,0.04)'}}>
+        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px'}}>
           <div>
-            <h1 style={{fontSize: '26px', fontWeight: 800, color: '#111318', letterSpacing: '-0.5px'}}>Memory</h1>
-            <p style={{fontSize: '12px', color: '#9CA3AF', marginTop: '2px', fontWeight: 500}}>Real moments · Real people</p>
+            <h1 style={{...DS.font.h2, color: DS.colors.text1}}>Memory</h1>
+            <p style={{...DS.font.caption, color: DS.colors.text3, marginTop: '3px'}}>Real moments · Real people</p>
           </div>
-          <button onClick={() => setShowForm(!showForm)} style={{padding: '8px 14px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '20px', color: 'white', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
-            + Share
+          <button onClick={() => setShowForm(!showForm)}
+            style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 18px', background: showForm ? DS.colors.pageBg : DS.gradient.primary, border: showForm ? `1px solid ${DS.colors.borderStrong}` : 'none', borderRadius: DS.radius.pill, color: showForm ? DS.colors.text2 : 'white', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: showForm ? 'none' : DS.shadow.primary}}>
+            {showForm ? (
+              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancel</>
+            ) : (
+              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Share</>
+            )}
           </button>
         </div>
-        <div style={{display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '12px'}}>
+
+        {/* Tabs */}
+        <div style={{display: 'flex', gap: '6px', paddingBottom: '14px', overflowX: 'auto', scrollbarWidth: 'none'}}>
           {tabs.map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              style={{flexShrink: 0, padding: '7px 15px', borderRadius: '20px', border: 'none', background: activeTab === tab ? '#DC143C' : '#F5F6F8', color: activeTab === tab ? 'white' : '#6B7280', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
+              style={{flexShrink: 0, padding: '7px 18px', borderRadius: DS.radius.pill, border: 'none', background: activeTab === tab ? DS.colors.primary : DS.colors.pageBg, color: activeTab === tab ? 'white' : DS.colors.text3, fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
               {tab}
             </button>
           ))}
         </div>
       </div>
 
+      {/* Compose form */}
       {showForm && (
-        <div style={{margin: '14px 16px 0', background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '16px'}}>
-          {error && <div style={{background: '#FEF2F2', border: '1px solid rgba(220,20,60,0.2)', borderRadius: '10px', padding: '10px 14px', marginBottom: '10px', fontSize: '13px', color: '#DC143C', fontWeight: 600}}>{error}</div>}
+        <div style={{margin: '16px 16px 0', background: DS.colors.cardBg, borderRadius: DS.radius.card, border: `1px solid ${DS.colors.borderStrong}`, padding: '20px', boxShadow: DS.shadow.card}}>
+          {error && <div style={{background: DS.colors.primaryLight, border: `1px solid ${DS.colors.primaryBorder}`, borderRadius: DS.radius.sm, padding: '10px 14px', marginBottom: '12px', fontSize: '13px', color: DS.colors.primary, fontWeight: 600}}>{error}</div>}
+
           {session?.user && (
-            <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'}}>
-              <div style={{width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 800}}>{initials(session.user.name || '')}</div>
-              <span style={{fontSize: '14px', fontWeight: 700, color: '#111318'}}>{session.user.name}</span>
+            <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px'}}>
+              <div style={{width: '36px', height: '36px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '13px', fontWeight: 800, flexShrink: 0}}>{initials(session.user.name || '')}</div>
+              <div>
+                <p style={{...DS.font.h4, color: DS.colors.text1}}>{session.user.name}</p>
+                <p style={{...DS.font.caption, color: DS.colors.text3}}>Sharing a moment</p>
+              </div>
             </div>
           )}
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="What happened today? Share a real moment..." rows={3}
-            style={{width: '100%', background: '#F5F6F8', border: '1px solid #E9EAEC', borderRadius: '12px', padding: '12px', fontSize: '14px', color: '#374151', outline: 'none', fontFamily: 'sans-serif', resize: 'none', boxSizing: 'border-box', lineHeight: 1.6}}
+
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="What happened today? Share a real moment with your family…" rows={4}
+            style={{width: '100%', background: DS.colors.pageBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.sm, padding: '14px', fontSize: '15px', color: DS.colors.text1, outline: 'none', fontFamily: 'Inter, sans-serif', resize: 'none', boxSizing: 'border-box', lineHeight: 1.6}}
           />
+
           {imagePreview.length > 0 && (
-            <div style={{display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap'}}>
+            <div style={{display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap'}}>
               {imagePreview.map((url, i) => (
-                <div key={i} style={{position: 'relative', width: '72px', height: '72px'}}>
-                  <img src={url} style={{width: '72px', height: '72px', objectFit: 'cover', borderRadius: '10px'}} alt="upload"/>
-                  <button onClick={() => removeImage(i)} style={{position: 'absolute', top: '-6px', right: '-6px', width: '20px', height: '20px', borderRadius: '50%', background: '#DC143C', border: 'none', color: 'white', fontSize: '12px', cursor: 'pointer', fontWeight: 800}}>x</button>
+                <div key={i} style={{position: 'relative'}}>
+                  <img src={url} style={{width: '80px', height: '80px', objectFit: 'cover', borderRadius: '12px'}} alt="upload"/>
+                  <button onClick={() => { imagesRef.current = imagesRef.current.filter((_, j) => j !== i); setImagePreview([...imagesRef.current]) }}
+                    style={{position: 'absolute', top: '-6px', right: '-6px', width: '22px', height: '22px', borderRadius: '50%', background: DS.colors.primary, border: 'none', color: 'white', fontSize: '13px', cursor: 'pointer', fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>×</button>
                 </div>
               ))}
             </div>
           )}
-          {imagePreview.length < 4 && (
-            <div style={{marginTop: '10px'}}>
+
+          <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '14px', flexWrap: 'wrap', gap: '10px'}}>
+            <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap'}}>
+              {['Care moment', 'Service story', 'Community'].map((cat) => (
+                <button key={cat} onClick={() => setCategory(cat)}
+                  style={{padding: '5px 12px', borderRadius: DS.radius.pill, border: `1.5px solid ${category === cat ? DS.colors.primary : DS.colors.borderStrong}`, background: category === cat ? DS.colors.primaryLight : 'transparent', color: category === cat ? DS.colors.primary : DS.colors.text3, fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                  {cat}
+                </button>
+              ))}
+            </div>
+            <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
               <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} style={{display: 'none'}}/>
-              <button onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: '#F5F6F8', border: '1px dashed #D1D5DB', borderRadius: '10px', fontSize: '12px', fontWeight: 600, color: '#6B7280', cursor: 'pointer', fontFamily: 'sans-serif'}}>
+              <button onClick={() => fileInputRef.current?.click()} disabled={uploading || imagePreview.length >= 4}
+                style={{padding: '8px 14px', background: DS.colors.pageBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.button, fontSize: '12px', fontWeight: 600, color: DS.colors.text2, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '5px'}}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                {uploading ? 'Uploading...' : `Add Photos (${imagePreview.length}/4)`}
+                {uploading ? 'Uploading…' : 'Photo'}
+              </button>
+              <button onClick={handlePost} disabled={posting || !content.trim()}
+                style={{padding: '10px 20px', background: !content.trim() ? 'rgba(220,20,60,0.3)' : DS.gradient.primary, border: 'none', borderRadius: DS.radius.button, fontSize: '14px', fontWeight: 800, cursor: !content.trim() ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', color: 'white', boxShadow: content.trim() ? DS.shadow.primary : 'none'}}>
+                {posting ? 'Posting…' : 'Post'}
               </button>
             </div>
-          )}
-          <div style={{display: 'flex', gap: '8px', marginTop: '10px', marginBottom: '12px'}}>
-            {['Care moment', 'Service story', 'Community'].map((cat) => (
-              <button key={cat} onClick={() => setCategory(cat)}
-                style={{padding: '5px 10px', borderRadius: '20px', border: `1.5px solid ${category === cat ? '#DC143C' : '#E9EAEC'}`, background: category === cat ? 'rgba(220,20,60,0.08)' : 'white', color: category === cat ? '#DC143C' : '#9CA3AF', fontSize: '11px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
-                {cat}
-              </button>
-            ))}
-          </div>
-          <div style={{display: 'flex', gap: '8px'}}>
-            <button onClick={() => { setShowForm(false); imagesRef.current = []; setImagePreview([]); setError('') }}
-              style={{flex: 1, padding: '11px', background: '#F5F6F8', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif', color: '#6B7280'}}>Cancel</button>
-            <button onClick={handlePost} disabled={posting || !content.trim()}
-              style={{flex: 2, padding: '11px', background: posting ? 'rgba(220,20,60,0.5)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', fontFamily: 'sans-serif', color: 'white'}}>
-              {posting ? 'Posting...' : 'Share Moment'}
-            </button>
           </div>
         </div>
       )}
 
-      <div style={{padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
+      {/* Feed */}
+      <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
 
-        {/* Empty state for filtered tabs */}
-        {!loading && filteredPosts.length === 0 && activeTab !== 'All Moments' && (
-          <div style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '40px 20px', textAlign: 'center'}}>
-            <div style={{fontSize: '40px', marginBottom: '12px'}}>
-              {activeTab === 'Care Stories' ? '❤️' : activeTab === 'Services' ? '🔧' : '🤝'}
+        {loading && (
+          <div style={{textAlign: 'center', padding: '60px 20px'}}>
+            <div style={{width: '36px', height: '36px', border: `3px solid ${DS.colors.borderStrong}`, borderTop: `3px solid ${DS.colors.primary}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px'}}/>
+            <p style={{...DS.font.bodySm, color: DS.colors.text3}}>Loading moments…</p>
+          </div>
+        )}
+
+        {!loading && filteredPosts.length === 0 && (
+          <div style={{background: DS.colors.cardBg, borderRadius: DS.radius.card, border: `1px solid ${DS.colors.borderStrong}`, padding: '48px 24px', textAlign: 'center', boxShadow: DS.shadow.card}}>
+            <div style={{fontSize: '52px', marginBottom: '16px'}}>
+              {activeTab === 'Care' ? '❤️' : activeTab === 'Services' ? '🔧' : activeTab === 'Community' ? '🤝' : '🌱'}
             </div>
-            <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '6px'}}>No {activeTab} yet</p>
-            <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '16px'}}>
-              {activeTab === 'Care Stories' ? 'Share a care moment with your family.' : activeTab === 'Services' ? 'Share a service story.' : 'Share something with the community.'}
-            </p>
-            <button onClick={() => { setCategory(activeTab === 'Care Stories' ? 'Care moment' : activeTab === 'Services' ? 'Service story' : 'Community'); setShowForm(true) }}
-              style={{padding: '10px 20px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '13px', cursor: 'pointer', fontFamily: 'sans-serif'}}>
-              + Share Now
+            <h3 style={{...DS.font.h3, color: DS.colors.text1, marginBottom: '8px'}}>
+              {activeTab === 'All' ? 'No moments yet' : `No ${activeTab} moments yet`}
+            </h3>
+            <p style={{...DS.font.bodySm, color: DS.colors.text3, marginBottom: '20px'}}>Be the first to share something meaningful.</p>
+            <button onClick={() => { setCategory(activeTab === 'Care' ? 'Care moment' : activeTab === 'Services' ? 'Service story' : 'Community'); setShowForm(true) }}
+              style={{padding: '12px 24px', background: DS.gradient.primary, border: 'none', borderRadius: DS.radius.button, color: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: DS.shadow.primary}}>
+              Share a Moment
             </button>
           </div>
         )}
 
-        {loading && <div style={{textAlign: 'center', padding: '40px', color: '#9CA3AF', fontSize: '14px'}}>Loading moments...</div>}
+        {filteredPosts.map((post) => {
+          const catStyle = categoryStyle[post.category] || categoryStyle['Community']
+          const isOwn = session?.user?.email === post.authorEmail || session?.user?.name === post.authorName
+          const isCommenting = openComments.includes(post._id)
 
-        {!loading && posts.length === 0 && (
-          <div style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '40px 20px', textAlign: 'center'}}>
-            <div style={{fontSize: '48px', marginBottom: '12px'}}>🌱</div>
-            <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '6px'}}>No moments yet</p>
-            <p style={{fontSize: '13px', color: '#9CA3AF'}}>Be the first to share a moment.</p>
-          </div>
-        )}
+          return (
+            <div key={post._id} style={{background: DS.colors.cardBg, borderRadius: DS.radius.card, border: `1px solid ${DS.colors.border}`, overflow: 'hidden', boxShadow: DS.shadow.card}}>
 
-        {filteredPosts.map((post) => (
-          <div key={post._id} style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,0.06)'}}>
-            <div style={{display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 16px 10px'}}>
-              <div style={{width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', flexShrink: 0}}>
-                {initials(post.authorName)}
-              </div>
-              <div style={{flex: 1}}>
-                <p style={{fontSize: '14px', fontWeight: 800, color: '#111318'}}>{post.authorName}</p>
-                <p style={{fontSize: '11px', color: '#9CA3AF', marginTop: '1px', fontWeight: 500}}>{timeAgo(post.createdAt)}</p>
-              </div>
-              <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                <div style={{padding: '3px 9px', borderRadius: '20px', background: categoryColor[post.category]?.bg || '#F5F6F8', fontSize: '10px', fontWeight: 700, color: categoryColor[post.category]?.color || '#9CA3AF'}}>
-                  {post.category}
+              {/* Post header */}
+              <div style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 16px 12px'}}>
+                <div style={{width: '44px', height: '44px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '15px', flexShrink: 0, boxShadow: DS.shadow.primary}}>
+                  {initials(post.authorName)}
                 </div>
-                {(session?.user?.email === post.authorEmail || session?.user?.name === post.authorName) && (
+                <div style={{flex: 1}}>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
+                    <p style={{...DS.font.h4, color: DS.colors.text1}}>{post.authorName}</p>
+                    <div style={{padding: '2px 8px', borderRadius: DS.radius.pill, background: catStyle.bg}}>
+                      <span style={{fontSize: '10px', fontWeight: 700, color: catStyle.color}}>{catStyle.label}</span>
+                    </div>
+                  </div>
+                  <p style={{...DS.font.caption, color: DS.colors.text3, marginTop: '2px'}}>{timeAgo(post.createdAt)} ago</p>
+                </div>
+                {isOwn && (
                   <button onClick={() => setConfirmDelete(post._id)}
-                    style={{width: '28px', height: '28px', borderRadius: '8px', background: '#FEF2F2', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'}}>
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#DC143C" strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    style={{width: '32px', height: '32px', borderRadius: '10px', background: '#FEF2F2', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'}}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.colors.primary} strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
                   </button>
                 )}
               </div>
-            </div>
-            {post.content && <div style={{padding: '0 16px 12px', fontSize: '14px', color: '#374151', lineHeight: 1.7}}>{post.content}</div>}
-            {post.images && post.images.length > 0 && (
-              <div style={{padding: '0 16px 12px', display: 'flex', flexDirection: 'column', gap: '6px'}}>
-                {post.images.slice(0, 4).map((url: string, i: number) => (
-                  <img key={i} src={url} alt="moment" style={{width: '100%', height: 'auto', borderRadius: '12px', display: 'block', maxHeight: '500px', objectFit: 'contain', background: '#F5F6F8'}}/>
-                ))}
-              </div>
-            )}
-            <div style={{display: 'flex', borderTop: '1px solid #F0F1F3'}}>
-              <button onClick={() => handleLike(post._id)} disabled={likingIds.includes(post._id)}
-                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: post.liked ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill={post.liked ? '#DC143C' : 'none'} stroke={post.liked ? '#DC143C' : '#6B7280'} strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                {post.likes || 0}
-              </button>
-              <button onClick={() => setOpenComments(prev => prev.includes(post._id) ? prev.filter(id => id !== post._id) : [...prev, post._id])}
-                style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px', padding: '11px', border: 'none', background: 'transparent', borderRight: '1px solid #F0F1F3', cursor: 'pointer', color: openComments.includes(post._id) ? '#DC143C' : '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                {post.comments?.length || 0}
-              </button>
-              <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '11px', border: 'none', background: 'transparent', cursor: 'pointer', color: '#6B7280', fontWeight: 700, fontSize: '12px', fontFamily: 'sans-serif'}}>Share</button>
-            </div>
-            {openComments.includes(post._id) && (
-              <div style={{borderTop: '1px solid #F0F1F3', padding: '12px 16px', background: '#FAFAFA'}}>
-                {post.comments && post.comments.length > 0 && (
-                  <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '12px'}}>
-                    {post.comments.map((comment: any, i: number) => (
-                      <div key={i} style={{display: 'flex', gap: '8px'}}>
-                        <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>
-                          {initials(comment.authorName)}
-                        </div>
-                        <div style={{flex: 1, background: 'white', borderRadius: '10px', padding: '8px 10px', border: '1px solid #E9EAEC'}}>
-                          <p style={{fontSize: '12px', fontWeight: 700, color: '#111318', marginBottom: '2px'}}>{comment.authorName}</p>
-                          <p style={{fontSize: '13px', color: '#374151', lineHeight: 1.5}}>{comment.text}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {!post.comments?.length && <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '12px', textAlign: 'center'}}>No comments yet.</p>}
-                <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-                  <div style={{width: '28px', height: '28px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>
-                    {initials(session?.user?.name || '')}
-                  </div>
-                  <input value={commentText[post._id] || ''} onChange={(e) => setCommentText(prev => ({ ...prev, [post._id]: e.target.value }))}
-                    onKeyDown={(e) => e.key === 'Enter' && handleComment(post._id)}
-                    placeholder="Write a comment..."
-                    style={{flex: 1, background: 'white', border: '1px solid #E9EAEC', borderRadius: '20px', padding: '8px 14px', fontSize: '13px', color: '#374151', outline: 'none', fontFamily: 'sans-serif'}}
-                  />
-                  <button onClick={() => handleComment(post._id)} disabled={submittingComment.includes(post._id) || !commentText[post._id]?.trim()}
-                    style={{width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0}}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                  </button>
+
+              {/* Content */}
+              {post.content && (
+                <p style={{...DS.font.bodyMd, color: DS.colors.text1, lineHeight: 1.7, padding: '0 16px 14px'}}>{post.content}</p>
+              )}
+
+              {/* Images */}
+              {post.images && post.images.length > 0 && (
+                <div style={{padding: '0 16px 14px', display: 'flex', flexDirection: 'column', gap: '6px'}}>
+                  {post.images.slice(0, 4).map((url: string, i: number) => (
+                    <img key={i} src={url} alt="moment" style={{width: '100%', borderRadius: '14px', display: 'block', maxHeight: '400px', objectFit: 'cover'}}/>
+                  ))}
                 </div>
+              )}
+
+              {/* Actions */}
+              <div style={{display: 'flex', borderTop: `1px solid ${DS.colors.border}`, padding: '4px 8px'}}>
+                <button onClick={() => handleLike(post._id)} disabled={likingIds.includes(post._id)}
+                  style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', color: post.liked ? DS.colors.primary : DS.colors.text3, fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s ease'}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill={post.liked ? DS.colors.primary : 'none'} stroke={post.liked ? DS.colors.primary : DS.colors.text3} strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                  {post.likes > 0 && <span>{post.likes}</span>}
+                </button>
+                <button onClick={() => setOpenComments(prev => prev.includes(post._id) ? prev.filter(id => id !== post._id) : [...prev, post._id])}
+                  style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', color: isCommenting ? DS.colors.primary : DS.colors.text3, fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s ease'}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                  {post.comments?.length > 0 && <span>{post.comments.length}</span>}
+                </button>
+                <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', color: DS.colors.text3, fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif'}}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                </button>
               </div>
-            )}
-          </div>
-        ))}
+
+              {/* Comments */}
+              {isCommenting && (
+                <div style={{borderTop: `1px solid ${DS.colors.border}`, padding: '14px 16px', background: DS.colors.pageBg}}>
+                  {post.comments?.length > 0 && (
+                    <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '14px'}}>
+                      {post.comments.map((c: any, i: number) => (
+                        <div key={i} style={{display: 'flex', gap: '10px'}}>
+                          <div style={{width: '30px', height: '30px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>{initials(c.authorName)}</div>
+                          <div style={{flex: 1, background: DS.colors.cardBg, borderRadius: '12px', padding: '10px 12px', border: `1px solid ${DS.colors.border}`}}>
+                            <p style={{...DS.font.caption, color: DS.colors.text1, fontWeight: 700, marginBottom: '3px'}}>{c.authorName}</p>
+                            <p style={{...DS.font.bodySm, color: DS.colors.text2, lineHeight: 1.5}}>{c.text}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {!post.comments?.length && <p style={{...DS.font.bodySm, color: DS.colors.text3, textAlign: 'center', marginBottom: '12px'}}>No comments yet. Be the first.</p>}
+                  <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                    <div style={{width: '30px', height: '30px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '10px', fontWeight: 800, flexShrink: 0}}>{initials(session?.user?.name || '')}</div>
+                    <input value={commentText[post._id] || ''} onChange={(e) => setCommentText(prev => ({ ...prev, [post._id]: e.target.value }))}
+                      onKeyDown={(e) => e.key === 'Enter' && handleComment(post._id)}
+                      placeholder="Write a comment…"
+                      style={{flex: 1, background: DS.colors.cardBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.pill, padding: '10px 16px', fontSize: '13px', color: DS.colors.text1, outline: 'none', fontFamily: 'Inter, sans-serif'}}
+                    />
+                    <button onClick={() => handleComment(post._id)} disabled={!commentText[post._id]?.trim() || submittingComment.includes(post._id)}
+                      style={{width: '36px', height: '36px', borderRadius: '50%', background: commentText[post._id]?.trim() ? DS.gradient.primary : DS.colors.pageBg, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: commentText[post._id]?.trim() ? 'pointer' : 'not-allowed', flexShrink: 0, boxShadow: commentText[post._id]?.trim() ? DS.shadow.primary : 'none'}}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={commentText[post._id]?.trim() ? 'white' : DS.colors.text3} strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
 
         {!loading && filteredPosts.length > 0 && (
-          <div style={{background: 'white', borderRadius: '20px', border: '1px solid #E9EAEC', padding: '24px 20px', textAlign: 'center'}}>
-            <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '6px'}}>You are all caught up.</p>
-            <p style={{fontSize: '13px', color: '#6B7280'}}>Now go call someone you love.</p>
+          <div style={{textAlign: 'center', padding: '24px 20px'}}>
+            <p style={{...DS.font.h4, color: DS.colors.text1, marginBottom: '6px'}}>You are all caught up.</p>
+            <p style={{...DS.font.bodySm, color: DS.colors.text3}}>Now go call someone you love. ❤️</p>
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        ::-webkit-scrollbar { display: none; }
+      `}</style>
+
       <BottomNav />
     </div>
   )

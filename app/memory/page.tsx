@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BottomNav from '../components/BottomNav'
 import { DS } from '../design-system'
+import { HeartIcon, CommentIcon, ShareIcon, TrashIcon, CameraIcon, SendIcon, PlusIcon } from '../components/Icons'
 
 export default function Memory() {
   const { data: session } = useSession()
@@ -50,7 +51,7 @@ export default function Memory() {
       const res = await fetch('/api/posts/like', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postId, userEmail: session.user.email }) })
       const data = await res.json()
       if (res.ok) setPosts(prev => prev.map(p => p._id === postId ? { ...p, likes: data.likes, liked: data.liked } : p))
-    } catch (e) { console.error(e) }
+    } catch (e) {}
     setLikingIds(prev => prev.filter(id => id !== postId))
   }
 
@@ -59,7 +60,7 @@ export default function Memory() {
     try {
       const res = await fetch('/api/posts/delete', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ postId, userEmail: session?.user?.email }) })
       if (res.ok) { setPosts(prev => prev.filter(p => p._id !== postId)); setConfirmDelete(null) }
-    } catch (e) { console.error(e) }
+    } catch (e) {}
     setDeletingIds(prev => prev.filter(id => id !== postId))
   }
 
@@ -74,7 +75,7 @@ export default function Memory() {
         setCommentText(prev => ({ ...prev, [postId]: '' }))
         setPosts(prev => prev.map(p => p._id === postId ? { ...p, comments: [...(p.comments || []), data.comment] } : p))
       }
-    } catch (e) { console.error(e) }
+    } catch (e) {}
     setSubmittingComment(prev => prev.filter(id => id !== postId))
   }
 
@@ -96,8 +97,7 @@ export default function Memory() {
 
   const handlePost = async () => {
     if (!content.trim() || !session?.user) return
-    setPosting(true)
-    setError('')
+    setPosting(true); setError('')
     try {
       const res = await fetch('/api/posts', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content, category, authorEmail: session.user.email, images: [...imagesRef.current] }) })
       if (res.ok) { setContent(''); imagesRef.current = []; setImagePreview([]); setShowForm(false); fetchPosts() }
@@ -122,8 +122,6 @@ export default function Memory() {
     'Community': { bg: '#EFF6FF', color: '#2563EB', label: 'Community' },
   }
 
-  const tabs = ['All', 'Care', 'Services', 'Community']
-
   return (
     <div style={{minHeight: '100vh', background: DS.colors.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px'}}>
 
@@ -131,7 +129,9 @@ export default function Memory() {
       {confirmDelete && (
         <div style={{position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(4px)'}}>
           <div style={{background: 'white', borderRadius: '24px', padding: '28px 24px', width: '100%', maxWidth: '380px'}}>
-            <div style={{width: '52px', height: '52px', borderRadius: '50%', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', fontSize: '24px'}}>🗑️</div>
+            <div style={{width: '52px', height: '52px', borderRadius: '50%', background: '#FEF2F2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px'}}>
+              <TrashIcon size={24} color={DS.colors.primary} strokeWidth={2}/>
+            </div>
             <h3 style={{...DS.font.h3, color: DS.colors.text1, textAlign: 'center', marginBottom: '8px'}}>Delete this moment?</h3>
             <p style={{...DS.font.bodySm, color: DS.colors.text2, textAlign: 'center', marginBottom: '24px'}}>This cannot be undone.</p>
             <div style={{display: 'flex', gap: '10px'}}>
@@ -154,17 +154,14 @@ export default function Memory() {
           </div>
           <button onClick={() => setShowForm(!showForm)}
             style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 18px', background: showForm ? DS.colors.pageBg : DS.gradient.primary, border: showForm ? `1px solid ${DS.colors.borderStrong}` : 'none', borderRadius: DS.radius.pill, color: showForm ? DS.colors.text2 : 'white', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: showForm ? 'none' : DS.shadow.primary}}>
-            {showForm ? (
-              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancel</>
-            ) : (
-              <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Share</>
-            )}
+            {showForm ?
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> :
+              <PlusIcon size={14} color="white" strokeWidth={2.5}/>}
+            {showForm ? 'Cancel' : 'Share'}
           </button>
         </div>
-
-        {/* Tabs */}
         <div style={{display: 'flex', gap: '6px', paddingBottom: '14px', overflowX: 'auto', scrollbarWidth: 'none'}}>
-          {tabs.map((tab) => (
+          {['All', 'Care', 'Services', 'Community'].map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)}
               style={{flexShrink: 0, padding: '7px 18px', borderRadius: DS.radius.pill, border: 'none', background: activeTab === tab ? DS.colors.primary : DS.colors.pageBg, color: activeTab === tab ? 'white' : DS.colors.text3, fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
               {tab}
@@ -173,11 +170,10 @@ export default function Memory() {
         </div>
       </div>
 
-      {/* Compose form */}
+      {/* Compose */}
       {showForm && (
         <div style={{margin: '16px 16px 0', background: DS.colors.cardBg, borderRadius: DS.radius.card, border: `1px solid ${DS.colors.borderStrong}`, padding: '20px', boxShadow: DS.shadow.card}}>
           {error && <div style={{background: DS.colors.primaryLight, border: `1px solid ${DS.colors.primaryBorder}`, borderRadius: DS.radius.sm, padding: '10px 14px', marginBottom: '12px', fontSize: '13px', color: DS.colors.primary, fontWeight: 600}}>{error}</div>}
-
           {session?.user && (
             <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px'}}>
               <div style={{width: '36px', height: '36px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '13px', fontWeight: 800, flexShrink: 0}}>{initials(session.user.name || '')}</div>
@@ -187,11 +183,8 @@ export default function Memory() {
               </div>
             </div>
           )}
-
-          <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="What happened today? Share a real moment with your family…" rows={4}
-            style={{width: '100%', background: DS.colors.pageBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.sm, padding: '14px', fontSize: '15px', color: DS.colors.text1, outline: 'none', fontFamily: 'Inter, sans-serif', resize: 'none', boxSizing: 'border-box', lineHeight: 1.6}}
-          />
-
+          <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="What happened today? Share a real moment…" rows={4}
+            style={{width: '100%', background: DS.colors.pageBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.sm, padding: '14px', fontSize: '15px', color: DS.colors.text1, outline: 'none', fontFamily: 'Inter, sans-serif', resize: 'none', boxSizing: 'border-box', lineHeight: 1.6}}/>
           {imagePreview.length > 0 && (
             <div style={{display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap'}}>
               {imagePreview.map((url, i) => (
@@ -203,7 +196,6 @@ export default function Memory() {
               ))}
             </div>
           )}
-
           <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '14px', flexWrap: 'wrap', gap: '10px'}}>
             <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap'}}>
               {['Care moment', 'Service story', 'Community'].map((cat) => (
@@ -216,12 +208,13 @@ export default function Memory() {
             <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
               <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleImageUpload} style={{display: 'none'}}/>
               <button onClick={() => fileInputRef.current?.click()} disabled={uploading || imagePreview.length >= 4}
-                style={{padding: '8px 14px', background: DS.colors.pageBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.button, fontSize: '12px', fontWeight: 600, color: DS.colors.text2, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '5px'}}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                style={{padding: '8px 14px', background: DS.colors.pageBg, border: `1px solid ${DS.colors.borderStrong}`, borderRadius: DS.radius.button, fontSize: '12px', fontWeight: 600, color: DS.colors.text2, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <CameraIcon size={14} color={DS.colors.text2} strokeWidth={2}/>
                 {uploading ? 'Uploading…' : 'Photo'}
               </button>
               <button onClick={handlePost} disabled={posting || !content.trim()}
-                style={{padding: '10px 20px', background: !content.trim() ? 'rgba(220,20,60,0.3)' : DS.gradient.primary, border: 'none', borderRadius: DS.radius.button, fontSize: '14px', fontWeight: 800, cursor: !content.trim() ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', color: 'white', boxShadow: content.trim() ? DS.shadow.primary : 'none'}}>
+                style={{padding: '10px 20px', background: !content.trim() ? 'rgba(220,20,60,0.3)' : DS.gradient.primary, border: 'none', borderRadius: DS.radius.button, fontSize: '14px', fontWeight: 800, cursor: !content.trim() ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', color: 'white', boxShadow: content.trim() ? DS.shadow.primary : 'none', display: 'flex', alignItems: 'center', gap: '6px'}}>
+                <SendIcon size={14} color="white" strokeWidth={2}/>
                 {posting ? 'Posting…' : 'Post'}
               </button>
             </div>
@@ -231,7 +224,6 @@ export default function Memory() {
 
       {/* Feed */}
       <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
-
         {loading && (
           <div style={{textAlign: 'center', padding: '60px 20px'}}>
             <div style={{width: '36px', height: '36px', border: `3px solid ${DS.colors.borderStrong}`, borderTop: `3px solid ${DS.colors.primary}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px'}}/>
@@ -241,14 +233,12 @@ export default function Memory() {
 
         {!loading && filteredPosts.length === 0 && (
           <div style={{background: DS.colors.cardBg, borderRadius: DS.radius.card, border: `1px solid ${DS.colors.borderStrong}`, padding: '48px 24px', textAlign: 'center', boxShadow: DS.shadow.card}}>
-            <div style={{fontSize: '52px', marginBottom: '16px'}}>
-              {activeTab === 'Care' ? '❤️' : activeTab === 'Services' ? '🔧' : activeTab === 'Community' ? '🤝' : '🌱'}
+            <div style={{width: '64px', height: '64px', borderRadius: '50%', background: DS.colors.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px'}}>
+              <HeartIcon size={32} color={DS.colors.primary} strokeWidth={1.5}/>
             </div>
-            <h3 style={{...DS.font.h3, color: DS.colors.text1, marginBottom: '8px'}}>
-              {activeTab === 'All' ? 'No moments yet' : `No ${activeTab} moments yet`}
-            </h3>
+            <h3 style={{...DS.font.h3, color: DS.colors.text1, marginBottom: '8px'}}>No moments yet</h3>
             <p style={{...DS.font.bodySm, color: DS.colors.text3, marginBottom: '20px'}}>Be the first to share something meaningful.</p>
-            <button onClick={() => { setCategory(activeTab === 'Care' ? 'Care moment' : activeTab === 'Services' ? 'Service story' : 'Community'); setShowForm(true) }}
+            <button onClick={() => setShowForm(true)}
               style={{padding: '12px 24px', background: DS.gradient.primary, border: 'none', borderRadius: DS.radius.button, color: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: DS.shadow.primary}}>
               Share a Moment
             </button>
@@ -262,8 +252,6 @@ export default function Memory() {
 
           return (
             <div key={post._id} style={{background: DS.colors.cardBg, borderRadius: DS.radius.card, border: `1px solid ${DS.colors.border}`, overflow: 'hidden', boxShadow: DS.shadow.card}}>
-
-              {/* Post header */}
               <div style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '16px 16px 12px'}}>
                 <div style={{width: '44px', height: '44px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '15px', flexShrink: 0, boxShadow: DS.shadow.primary}}>
                   {initials(post.authorName)}
@@ -280,17 +268,13 @@ export default function Memory() {
                 {isOwn && (
                   <button onClick={() => setConfirmDelete(post._id)}
                     style={{width: '32px', height: '32px', borderRadius: '10px', background: '#FEF2F2', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'}}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={DS.colors.primary} strokeWidth="2" strokeLinecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                    <TrashIcon size={14} color={DS.colors.primary} strokeWidth={2}/>
                   </button>
                 )}
               </div>
 
-              {/* Content */}
-              {post.content && (
-                <p style={{...DS.font.bodyMd, color: DS.colors.text1, lineHeight: 1.7, padding: '0 16px 14px'}}>{post.content}</p>
-              )}
+              {post.content && <p style={{...DS.font.bodyMd, color: DS.colors.text1, lineHeight: 1.7, padding: '0 16px 14px'}}>{post.content}</p>}
 
-              {/* Images */}
               {post.images && post.images.length > 0 && (
                 <div style={{padding: '0 16px 14px', display: 'flex', flexDirection: 'column', gap: '6px'}}>
                   {post.images.slice(0, 4).map((url: string, i: number) => (
@@ -299,24 +283,22 @@ export default function Memory() {
                 </div>
               )}
 
-              {/* Actions */}
               <div style={{display: 'flex', borderTop: `1px solid ${DS.colors.border}`, padding: '4px 8px'}}>
                 <button onClick={() => handleLike(post._id)} disabled={likingIds.includes(post._id)}
                   style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', color: post.liked ? DS.colors.primary : DS.colors.text3, fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s ease'}}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill={post.liked ? DS.colors.primary : 'none'} stroke={post.liked ? DS.colors.primary : DS.colors.text3} strokeWidth="2" strokeLinecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                  {post.likes > 0 && <span>{post.likes}</span>}
+                  <HeartIcon size={18} color={post.liked ? DS.colors.primary : DS.colors.text3} strokeWidth={2} filled={post.liked}/>
+                  {post.likes > 0 && <span style={{color: post.liked ? DS.colors.primary : DS.colors.text3}}>{post.likes}</span>}
                 </button>
                 <button onClick={() => setOpenComments(prev => prev.includes(post._id) ? prev.filter(id => id !== post._id) : [...prev, post._id])}
-                  style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', color: isCommenting ? DS.colors.primary : DS.colors.text3, fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s ease'}}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  {post.comments?.length > 0 && <span>{post.comments.length}</span>}
+                  style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif', transition: 'all 0.15s ease'}}>
+                  <CommentIcon size={18} color={isCommenting ? DS.colors.primary : DS.colors.text3} strokeWidth={2}/>
+                  {post.comments?.length > 0 && <span style={{color: isCommenting ? DS.colors.primary : DS.colors.text3}}>{post.comments.length}</span>}
                 </button>
-                <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', color: DS.colors.text3, fontWeight: 700, fontSize: '13px', fontFamily: 'Inter, sans-serif'}}>
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <button style={{flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '10px', border: 'none', background: 'transparent', borderRadius: '12px', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                  <ShareIcon size={18} color={DS.colors.text3} strokeWidth={2}/>
                 </button>
               </div>
 
-              {/* Comments */}
               {isCommenting && (
                 <div style={{borderTop: `1px solid ${DS.colors.border}`, padding: '14px 16px', background: DS.colors.pageBg}}>
                   {post.comments?.length > 0 && (
@@ -342,7 +324,7 @@ export default function Memory() {
                     />
                     <button onClick={() => handleComment(post._id)} disabled={!commentText[post._id]?.trim() || submittingComment.includes(post._id)}
                       style={{width: '36px', height: '36px', borderRadius: '50%', background: commentText[post._id]?.trim() ? DS.gradient.primary : DS.colors.pageBg, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: commentText[post._id]?.trim() ? 'pointer' : 'not-allowed', flexShrink: 0, boxShadow: commentText[post._id]?.trim() ? DS.shadow.primary : 'none'}}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={commentText[post._id]?.trim() ? 'white' : DS.colors.text3} strokeWidth="2.5" strokeLinecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                      <SendIcon size={14} color={commentText[post._id]?.trim() ? 'white' : DS.colors.text3} strokeWidth={2}/>
                     </button>
                   </div>
                 </div>
@@ -354,7 +336,7 @@ export default function Memory() {
         {!loading && filteredPosts.length > 0 && (
           <div style={{textAlign: 'center', padding: '24px 20px'}}>
             <p style={{...DS.font.h4, color: DS.colors.text1, marginBottom: '6px'}}>You are all caught up.</p>
-            <p style={{...DS.font.bodySm, color: DS.colors.text3}}>Now go call someone you love. ❤️</p>
+            <p style={{...DS.font.bodySm, color: DS.colors.text3}}>Now go call someone you love.</p>
           </div>
         )}
       </div>

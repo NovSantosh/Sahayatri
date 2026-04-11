@@ -357,6 +357,7 @@ export default function Dashboard() {
           <h3 style={{fontSize: '17px', fontWeight: 700, color: t.text1, letterSpacing: '-0.3px', marginBottom: '12px', transition: 'color 0.3s ease'}}>Quick Actions</h3>
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
             {[
+              { id: 'qa0', Icon: HeartIcon, label: 'Book Care', sub: 'For family in Nepal', path: '/care', color: brand.primary, bg: brand.primaryLight },
               { id: 'qa1', Icon: CameraIcon, label: 'Share a Moment', sub: 'Post to Memory', path: '/memory', color: brand.primary, bg: brand.primaryLight },
               { id: 'qa2', Icon: FamilyIcon, label: 'Family Room', sub: 'Stay connected', path: '/family', color: brand.info, bg: brand.infoBg },
               { id: 'qa3', Icon: WalletIcon, label: 'Payments', sub: 'eSewa · Khalti', path: '/wallet', color: brand.success, bg: brand.successBg },

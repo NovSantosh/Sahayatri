@@ -1,274 +1,125 @@
 'use client'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { brand } from './design-system'
+import { HeartIcon, SparkleIcon, SahayatriLogo } from './components/Icons'
 
-export default function Welcome() {
-  const [loaded, setLoaded] = useState(false)
-
-  useEffect(() => {
-    setTimeout(() => setLoaded(true), 100)
-  }, [])
+export default function Landing() {
+  const router = useRouter()
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#06040C',
-      fontFamily: 'Inter, -apple-system, sans-serif',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
+    <div style={{minHeight: '100vh', background: '#06040C', fontFamily: 'Inter, -apple-system, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden'}}>
 
-      {/* ── Deep background layers ── */}
-      <div style={{position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% -10%, rgba(139,0,30,0.45) 0%, transparent 70%)', pointerEvents: 'none'}}/>
-      <div style={{position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 60% 50% at 80% 80%, rgba(30,0,60,0.6) 0%, transparent 70%)', pointerEvents: 'none'}}/>
-      <div style={{position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 50% 40% at 20% 60%, rgba(0,30,80,0.4) 0%, transparent 70%)', pointerEvents: 'none'}}/>
+      {/* Background glows */}
+      <div style={{position: 'absolute', top: '-80px', left: '50%', transform: 'translateX(-50%)', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,0,30,0.25) 0%, transparent 70%)', pointerEvents: 'none'}}/>
+      <div style={{position: 'absolute', bottom: '-100px', right: '-100px', width: '400px', height: '400px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(93,45,145,0.15) 0%, transparent 70%)', pointerEvents: 'none'}}/>
 
-      {/* ── Floating particles ── */}
-      {[
-        {top: '15%', left: '10%', size: 3, delay: '0s', dur: '4s'},
-        {top: '25%', left: '85%', size: 2, delay: '1s', dur: '5s'},
-        {top: '45%', left: '5%', size: 2, delay: '2s', dur: '3.5s'},
-        {top: '60%', left: '90%', size: 3, delay: '0.5s', dur: '4.5s'},
-        {top: '75%', left: '15%', size: 2, delay: '1.5s', dur: '5s'},
-        {top: '35%', left: '75%', size: 1.5, delay: '3s', dur: '4s'},
-        {top: '80%', left: '70%', size: 2, delay: '2s', dur: '3s'},
-      ].map((p, i) => (
-        <div key={i} style={{
-          position: 'absolute',
-          top: p.top,
-          left: p.left,
-          width: `${p.size}px`,
-          height: `${p.size}px`,
-          borderRadius: '50%',
-          background: 'rgba(220,20,60,0.6)',
-          animation: `float ${p.dur} ease-in-out ${p.delay} infinite`,
-          pointerEvents: 'none',
-        }}/>
-      ))}
-
-      {/* ── Top nav ── */}
-      <div style={{padding: '56px 24px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'relative', zIndex: 10}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-          {/* Logo mark */}
-          <div style={{width: '32px', height: '32px', borderRadius: '10px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(220,20,60,0.4)'}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.759 3.8 1 7.2 1c1.98 0 3.72.99 4.8 2.52C13.08 1.99 14.82 1 16.8 1 20.2 1 23 3.759 23 7.191c0 4.105-5.37 8.863-11 14.402z" fill="white"/>
-            </svg>
-          </div>
-          <span style={{fontSize: '18px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>Sahayatri</span>
+      {/* Logo */}
+      <div style={{padding: '64px 28px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1}}>
+        <div style={{width: '72px', height: '72px', borderRadius: '24px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 8px 32px rgba(220,20,60,0.4)', marginBottom: '20px'}}>
+          <SahayatriLogo size={42} color="white"/>
         </div>
-        <Link href="/login" style={{fontSize: '13px', fontWeight: 600, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', padding: '8px 16px', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', backdropFilter: 'blur(10px)'}}>
-          Sign in
-        </Link>
+        <h1 style={{fontSize: '34px', fontWeight: 900, color: 'white', letterSpacing: '-1.5px', marginBottom: '8px', textAlign: 'center'}}>Sahayatri</h1>
+        <p style={{fontSize: '15px', color: 'rgba(255,255,255,0.4)', textAlign: 'center', lineHeight: 1.6, maxWidth: '240px'}}>
+          Companion in life's journey.<br/>Care for your family from anywhere.
+        </p>
       </div>
 
-      {/* ── Hero ── */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '40px 24px 0',
-        position: 'relative',
-        zIndex: 10,
-        opacity: loaded ? 1 : 0,
-        transform: loaded ? 'translateY(0)' : 'translateY(20px)',
-        transition: 'opacity 0.8s ease, transform 0.8s ease',
-      }}>
+      {/* Two paths */}
+      <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '40px 24px', gap: '14px', position: 'relative', zIndex: 1}}>
 
-        {/* Badge */}
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          background: 'rgba(220,20,60,0.12)',
-          border: '1px solid rgba(220,20,60,0.25)',
-          borderRadius: '20px',
-          padding: '6px 14px',
-          marginBottom: '32px',
-        }}>
-          <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#DC143C', boxShadow: '0 0 8px rgba(220,20,60,0.8)', animation: 'pulse 2s ease infinite'}}/>
-          <span style={{fontSize: '11px', fontWeight: 700, color: 'rgba(220,20,60,0.9)', letterSpacing: '1px', textTransform: 'uppercase'}}>For Nepali Families Worldwide</span>
-        </div>
-
-        {/* Main headline */}
-        <h1 style={{
-          fontSize: '52px',
-          fontWeight: 900,
-          color: 'white',
-          textAlign: 'center',
-          lineHeight: 1.05,
-          letterSpacing: '-2.5px',
-          marginBottom: '20px',
-          maxWidth: '340px',
-        }}>
-          Feel
-          <span style={{
-            display: 'block',
-            background: 'linear-gradient(135deg, #FF4060, #DC143C, #FF6B35)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-          }}>Present.</span>
-          Always.
-        </h1>
-
-        {/* Sub */}
-        <p style={{
-          fontSize: '16px',
-          color: 'rgba(255,255,255,0.38)',
-          textAlign: 'center',
-          lineHeight: 1.7,
-          marginBottom: '48px',
-          maxWidth: '280px',
-          fontWeight: 400,
-        }}>
-          Care, connection and community — for every Nepali family, wherever you are in the world.
+        <p style={{fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.2)', textTransform: 'uppercase', letterSpacing: '2px', textAlign: 'center', marginBottom: '8px'}}>
+          How would you like to join?
         </p>
 
-        {/* Social proof */}
-        <div style={{display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px'}}>
-          <div style={{display: 'flex'}}>
-            {['KP','SR','AM','BT'].map((init, i) => (
-              <div key={i} style={{
-                width: '28px',
-                height: '28px',
-                borderRadius: '50%',
-                background: `hsl(${i * 40 + 340}, 70%, 45%)`,
-                border: '2px solid #06040C',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '9px',
-                fontWeight: 800,
-                color: 'white',
-                marginLeft: i > 0 ? '-8px' : '0',
-              }}>{init}</div>
-            ))}
-          </div>
-          <div>
-            <div style={{display: 'flex', gap: '1px', marginBottom: '2px'}}>
-              {[1,2,3,4,5].map(s => <span key={s} style={{fontSize: '10px', color: '#F59E0B'}}>★</span>)}
+        {/* Path 1 — Find care */}
+        <div onClick={() => router.push('/home')}
+          style={{background: 'linear-gradient(135deg, #DC143C 0%, #A50E2D 100%)', borderRadius: '24px', padding: '26px', cursor: 'pointer', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 40px rgba(220,20,60,0.4)', border: '1px solid rgba(255,255,255,0.1)', transition: 'transform 0.15s ease'}}
+          onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+          onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+          onTouchStart={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+          onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; router.push('/home') }}>
+          <div style={{position: 'absolute', top: '-30px', right: '-30px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none'}}/>
+          <div style={{position: 'relative', zIndex: 1}}>
+            <div style={{width: '52px', height: '52px', borderRadius: '18px', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', border: '1px solid rgba(255,255,255,0.2)'}}>
+              <HeartIcon size={28} color="white" filled strokeWidth={0}/>
             </div>
-            <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 500}}>Loved by families in 12 countries</p>
+            <h2 style={{fontSize: '22px', fontWeight: 800, color: 'white', marginBottom: '8px', letterSpacing: '-0.5px', lineHeight: 1.2}}>
+              I need care<br/>for my family
+            </h2>
+            <p style={{fontSize: '14px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginBottom: '20px'}}>
+              Book verified companions for your parents in Nepal. Get photo updates every day from anywhere in the world.
+            </p>
+            <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px'}}>
+              {['Daily check-ins', 'Medical escort', 'Home repairs', 'Meal service'].map((tag, i) => (
+                <div key={i} style={{background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '9999px', padding: '4px 12px'}}>
+                  <span style={{fontSize: '11px', fontWeight: 600, color: 'white'}}>{tag}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+              <span style={{fontSize: '15px', fontWeight: 800, color: 'white'}}>Get started free</span>
+              <div style={{width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* CTA Buttons */}
-        <div style={{display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: '320px'}}>
-          <Link href="/signup" style={{
-            textDecoration: 'none',
-            display: 'block',
-            width: '100%',
-            padding: '17px',
-            background: 'linear-gradient(135deg, #DC143C 0%, #A50E2D 100%)',
-            color: 'white',
-            borderRadius: '16px',
-            fontSize: '16px',
-            fontWeight: 800,
-            textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(220,20,60,0.4), 0 2px 8px rgba(220,20,60,0.2)',
-            letterSpacing: '-0.3px',
-            boxSizing: 'border-box',
-          } as any}>
-            Get Started — It's Free
-          </Link>
-
-          <Link href="/login" style={{
-            textDecoration: 'none',
-            display: 'block',
-            width: '100%',
-            padding: '17px',
-            background: 'rgba(255,255,255,0.06)',
-            color: 'rgba(255,255,255,0.8)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            borderRadius: '16px',
-            fontSize: '15px',
-            fontWeight: 600,
-            textAlign: 'center',
-            backdropFilter: 'blur(10px)',
-            boxSizing: 'border-box',
-          } as any}>
-            I already have an account
-          </Link>
+        {/* Path 2 — Provide care */}
+        <div onClick={() => router.push('/join-professional')}
+          style={{background: 'rgba(255,255,255,0.05)', borderRadius: '24px', padding: '26px', cursor: 'pointer', position: 'relative', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)', transition: 'transform 0.15s ease'}}
+          onMouseDown={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+          onMouseUp={e => (e.currentTarget.style.transform = 'scale(1)')}
+          onTouchStart={e => (e.currentTarget.style.transform = 'scale(0.97)')}
+          onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; router.push('/join-professional') }}>
+          <div style={{position: 'absolute', top: '-30px', right: '-30px', width: '140px', height: '140px', borderRadius: '50%', background: 'rgba(124,58,237,0.15)', pointerEvents: 'none'}}/>
+          <div style={{position: 'relative', zIndex: 1}}>
+            <div style={{width: '52px', height: '52px', borderRadius: '18px', background: 'rgba(124,58,237,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px', border: '1px solid rgba(124,58,237,0.3)'}}>
+              <SparkleIcon size={26} color="#A78BFA" strokeWidth={2}/>
+            </div>
+            <h2 style={{fontSize: '22px', fontWeight: 800, color: 'white', marginBottom: '8px', letterSpacing: '-0.5px', lineHeight: 1.2}}>
+              I want to<br/>provide care
+            </h2>
+            <p style={{fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, marginBottom: '20px'}}>
+              Join as a verified companion or service professional. Earn NPR 25,000–40,000 per month on your own schedule.
+            </p>
+            <div style={{display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '20px'}}>
+              {['Elder care', 'Home cook', 'Electrician', 'Plumber'].map((tag, i) => (
+                <div key={i} style={{background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '9999px', padding: '4px 12px'}}>
+                  <span style={{fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.6)'}}>{tag}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+              <span style={{fontSize: '15px', fontWeight: 800, color: 'rgba(255,255,255,0.7)'}}>Apply now — free</span>
+              <div style={{width: '38px', height: '38px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+            </div>
+          </div>
         </div>
+
+        {/* Sign in link */}
+        <div style={{textAlign: 'center', paddingTop: '4px'}}>
+          <span style={{fontSize: '14px', color: 'rgba(255,255,255,0.3)'}}>Already have an account? </span>
+          <span onClick={() => router.push('/login')}
+            style={{fontSize: '14px', fontWeight: 700, color: brand.primary, cursor: 'pointer'}}>
+            Sign in
+          </span>
+        </div>
+
       </div>
 
-      {/* ── Feature pills scrolling row ── */}
-      <div style={{
-        padding: '40px 0 0',
-        position: 'relative',
-        zIndex: 10,
-        opacity: loaded ? 1 : 0,
-        transition: 'opacity 1.2s ease 0.3s',
-        overflow: 'hidden',
-      }}>
-        <div style={{display: 'flex', gap: '10px', paddingLeft: '24px', overflowX: 'auto', scrollbarWidth: 'none', paddingBottom: '0'}}>
-          {[
-            {icon: '🤖', label: 'Sathi AI Companion'},
-            {icon: '❤️', label: 'Memory Feed'},
-            {icon: '👨‍👩‍👧', label: 'Family Room'},
-            {icon: '📅', label: 'Book Companions'},
-            {icon: '💳', label: 'eSewa · Khalti'},
-            {icon: '🔔', label: 'Real Notifications'},
-            {icon: '🇳🇵', label: 'Nepal-First'},
-          ].map((f, i) => (
-            <div key={i} style={{
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.08)',
-              borderRadius: '20px',
-              padding: '8px 14px',
-              backdropFilter: 'blur(10px)',
-            }}>
-              <span style={{fontSize: '14px'}}>{f.icon}</span>
-              <span style={{fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap'}}>{f.label}</span>
-            </div>
-          ))}
-          <div style={{width: '24px', flexShrink: 0}}/>
-        </div>
-      </div>
-
-      {/* ── Bottom trust bar ── */}
-      <div style={{
-        padding: '28px 24px 48px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '20px',
-        position: 'relative',
-        zIndex: 10,
-        opacity: loaded ? 1 : 0,
-        transition: 'opacity 1.4s ease 0.5s',
-      }}>
-        {[
-          {icon: '🔒', label: 'Private & Secure'},
-          {icon: '🚫', label: 'No Ads. Ever.'},
-          {icon: '🇳🇵', label: 'Built for Nepal', href: '/about'},
-        ].map((t, i) => (
-          <div key={i} onClick={() => t.href && (window.location.href = t.href)} style={{display: 'flex', alignItems: 'center', gap: '5px', cursor: t.href ? 'pointer' : 'default'}}> 
-            <span style={{fontSize: '12px'}}>{t.icon}</span>
-            <span style={{fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.25)'}}>{t.label}</span>
-          </div>
-        ))}
+      {/* Footer */}
+      <div style={{padding: '0 24px 40px', textAlign: 'center', position: 'relative', zIndex: 1}}>
+        <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.15)', lineHeight: 1.8}}>
+          Built for the Nepali community · 100% ad-free · Your data stays private
+        </p>
       </div>
 
       <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); opacity: 0.4; }
-          50% { transform: translateY(-12px); opacity: 0.9; }
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.6; transform: scale(0.85); }
-        }
         ::-webkit-scrollbar { display: none; }
+        * { -webkit-tap-highlight-color: transparent; }
       `}</style>
     </div>
   )

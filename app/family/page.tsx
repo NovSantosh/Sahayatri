@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BottomNav from '../components/BottomNav'
-import { DS } from '../design-system'
+import { brand, light, dark } from '../design-system'
 import {
   HeartIcon, LampIcon, MoonIcon, FestivalIcon, QuoteIcon, WordIcon,
   FeelingHappyIcon, FeelingOkayIcon, FeelingSadIcon, MicIcon,
@@ -186,7 +186,7 @@ export default function Family() {
   if (loading) return (
     <div style={{minHeight: '100vh', background: '#06040C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif'}}>
       <div style={{textAlign: 'center'}}>
-        <div style={{width: '48px', height: '48px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: DS.shadow.primary}}>
+        <div style={{width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
           <FamilyIcon size={24} color="white" strokeWidth={1.8}/>
         </div>
         <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 500}}>Opening Family Room…</p>
@@ -251,13 +251,13 @@ export default function Family() {
           {error && <div style={{background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.25)', borderRadius: '14px', padding: '13px 16px', fontSize: '13px', color: '#DC143C', fontWeight: 600}}>{error}</div>}
           <div style={{textAlign: 'center', padding: '48px 20px 32px'}}>
             <div style={{width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px'}}>
-              <FamilyIcon size={40} color={DS.colors.primary} strokeWidth={1.5}/>
+              <FamilyIcon size={40} color={brand.primary} strokeWidth={1.5}/>
             </div>
             <h2 style={{fontSize: '24px', fontWeight: 800, color: 'white', marginBottom: '10px', letterSpacing: '-0.6px'}}>Create Your Family Room</h2>
             <p style={{fontSize: '15px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, marginBottom: '32px', maxWidth: '280px', margin: '0 auto 32px'}}>One place for your whole family. Stay close no matter how far.</p>
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '320px', margin: '0 auto'}}>
               <button onClick={() => { setShowCreate(true); setShowJoin(false) }}
-                style={{width: '100%', padding: '16px', background: DS.gradient.primary, color: 'white', border: 'none', borderRadius: '16px', fontSize: '15px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: DS.shadow.primary}}>
+                style={{width: '100%', padding: '16px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '16px', fontSize: '15px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                 Create Family Room
               </button>
               <button onClick={() => { setShowJoin(true); setShowCreate(false) }}
@@ -273,7 +273,7 @@ export default function Family() {
               <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder={`${session?.user?.name?.split(' ')[0]}'s Family`}
                 style={{width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px 16px', fontSize: '15px', color: 'white', outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', marginBottom: '12px'}}/>
               <button onClick={handleCreate} disabled={submitting}
-                style={{width: '100%', padding: '14px', background: DS.gradient.primary, color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: DS.shadow.primary}}>
+                style={{width: '100%', padding: '14px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                 {submitting ? 'Creating…' : 'Create Room'}
               </button>
             </div>
@@ -285,7 +285,7 @@ export default function Family() {
               <input value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder="ABC123" maxLength={6}
                 style={{width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', fontSize: '28px', color: 'white', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box', marginBottom: '12px', letterSpacing: '8px', textAlign: 'center', fontWeight: 800}}/>
               <button onClick={handleJoin} disabled={submitting || joinCode.length < 6}
-                style={{width: '100%', padding: '14px', background: joinCode.length >= 6 ? DS.gradient.primary : 'rgba(220,20,60,0.3)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: joinCode.length >= 6 ? 'pointer' : 'not-allowed', fontFamily: 'Inter, sans-serif'}}>
+                style={{width: '100%', padding: '14px', background: joinCode.length >= 6 ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'rgba(220,20,60,0.3)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: joinCode.length >= 6 ? 'pointer' : 'not-allowed', fontFamily: 'Inter, sans-serif'}}>
                 {submitting ? 'Joining…' : 'Join Family Room'}
               </button>
             </div>
@@ -305,7 +305,7 @@ export default function Family() {
                 { id: 'members', label: 'Family', Icon: FamilyIcon },
               ].map((tab) => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
-                  style={{flex: 1, padding: '10px 4px', borderRadius: '12px', border: 'none', background: activeTab === tab.id ? DS.gradient.primary : 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: activeTab === tab.id ? DS.shadow.primary : 'none', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}}>
+                  style={{flex: 1, padding: '10px 4px', borderRadius: '12px', border: 'none', background: activeTab === tab.id ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: activeTab === tab.id ? '0 4px 16px rgba(220,20,60,0.35)' : 'none', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}}>
                   <tab.Icon size={14} color={activeTab === tab.id ? 'white' : 'rgba(255,255,255,0.4)'} strokeWidth={2}/>
                   <span style={{fontSize: '12px', fontWeight: 700, color: activeTab === tab.id ? 'white' : 'rgba(255,255,255,0.4)'}}>
                     {tab.label}
@@ -367,7 +367,7 @@ export default function Family() {
 
                 {/* Send Maya */}
                 <button onClick={sendMaya}
-                  style={{width: '100%', padding: '20px', background: mayaSent ? 'linear-gradient(135deg, #7B0021, #DC143C)' : DS.gradient.primary, border: 'none', borderRadius: '20px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: DS.shadow.primary, animation: 'mayaGlow 2.5s ease infinite', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px'}}>
+                  style={{width: '100%', padding: '20px', background: mayaSent ? 'linear-gradient(135deg, #7B0021, #DC143C)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '20px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.35)', animation: 'mayaGlow 2.5s ease infinite', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px'}}>
                   <div style={{animation: mayaSent ? 'heartPulse 0.8s ease infinite' : 'none'}}>
                     <HeartIcon size={32} color="white" filled strokeWidth={0}/>
                   </div>
@@ -384,7 +384,7 @@ export default function Family() {
                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
                       <div style={{display: 'flex', alignItems: 'center', gap: '14px'}}>
                         <div style={{width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(220,20,60,0.15)', border: '1px solid rgba(220,20,60,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                          <FestivalIcon size={28} color={DS.colors.primary} strokeWidth={1.8}/>
+                          <FestivalIcon size={28} color={brand.primary} strokeWidth={1.8}/>
                         </div>
                         <div>
                           <p style={{fontSize: '20px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px'}}>{nextFestival.name}</p>
@@ -392,7 +392,7 @@ export default function Family() {
                         </div>
                       </div>
                       <div style={{textAlign: 'right'}}>
-                        <p style={{fontSize: '48px', fontWeight: 900, color: DS.colors.primary, letterSpacing: '-3px', lineHeight: 1}}>{nextFestival.days}</p>
+                        <p style={{fontSize: '48px', fontWeight: 900, color: brand.primary, letterSpacing: '-3px', lineHeight: 1}}>{nextFestival.days}</p>
                         <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, marginTop: '4px'}}>days away</p>
                       </div>
                     </div>
@@ -406,12 +406,12 @@ export default function Family() {
                     <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px'}}>Word of the Day · आजको शब्द</p>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
-                    <div style={{width: '64px', height: '64px', borderRadius: '18px', background: DS.colors.primaryLight, border: `1px solid ${DS.colors.primaryBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                      <p style={{fontSize: '30px', fontWeight: 800, color: DS.colors.primary}}>{todayWord.word[0]}</p>
+                    <div style={{width: '64px', height: '64px', borderRadius: '18px', background: brand.primaryLight, border: `1px solid ${brand.primaryBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                      <p style={{fontSize: '30px', fontWeight: 800, color: brand.primary}}>{todayWord.word[0]}</p>
                     </div>
                     <div>
                       <p style={{fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>{todayWord.word}</p>
-                      <p style={{fontSize: '13px', color: DS.colors.primary, fontWeight: 600, marginBottom: '3px'}}>{todayWord.roman}</p>
+                      <p style={{fontSize: '13px', color: brand.primary, fontWeight: 600, marginBottom: '3px'}}>{todayWord.roman}</p>
                       <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.5}}>{todayWord.meaning}</p>
                     </div>
                   </div>
@@ -455,7 +455,7 @@ export default function Family() {
                       onTouchStart={(e) => { e.preventDefault(); startRecording() }}
                       onTouchEnd={(e) => { e.preventDefault(); stopRecording() }}
                       disabled={uploading}
-                      style={{width: '84px', height: '84px', borderRadius: '50%', background: recording ? DS.gradient.primary : uploading ? 'rgba(255,255,255,0.1)' : DS.gradient.primary, border: 'none', cursor: uploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: recording ? '0 0 0 16px rgba(220,20,60,0.15), 0 0 0 32px rgba(220,20,60,0.07)' : DS.shadow.primary, animation: recording ? 'recordPulse 1s ease infinite' : 'none', transition: 'all 0.2s ease'}}>
+                      style={{width: '84px', height: '84px', borderRadius: '50%', background: recording ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : uploading ? 'rgba(255,255,255,0.1)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', cursor: uploading ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: recording ? '0 0 0 16px rgba(220,20,60,0.15), 0 0 0 32px rgba(220,20,60,0.07)' : '0 4px 16px rgba(220,20,60,0.35)', animation: recording ? 'recordPulse 1s ease infinite' : 'none', transition: 'all 0.2s ease'}}>
                       {uploading ?
                         <div style={{width: '24px', height: '24px', border: '3px solid rgba(255,255,255,0.3)', borderTop: '3px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite'}}/> :
                         recording ?
@@ -465,8 +465,8 @@ export default function Family() {
                   </div>
                   {recording && (
                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px'}}>
-                      <div style={{width: '8px', height: '8px', borderRadius: '50%', background: DS.colors.primary, animation: 'blink 1s ease infinite'}}/>
-                      <span style={{fontSize: '18px', fontWeight: 700, color: DS.colors.primary, fontFamily: 'monospace'}}>{formatTime(recordingTime)}</span>
+                      <div style={{width: '8px', height: '8px', borderRadius: '50%', background: brand.primary, animation: 'blink 1s ease infinite'}}/>
+                      <span style={{fontSize: '18px', fontWeight: 700, color: brand.primary, fontFamily: 'monospace'}}>{formatTime(recordingTime)}</span>
                     </div>
                   )}
                   {!recording && !uploading && <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.2)', marginTop: '10px'}}>Hold to record · Release to send</p>}
@@ -487,7 +487,7 @@ export default function Family() {
                 <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
                   {voiceMessages.map((msg) => (
                     <div key={msg._id} style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
-                      <div style={{width: '44px', height: '44px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', flexShrink: 0, boxShadow: DS.shadow.primary}}>
+                      <div style={{width: '44px', height: '44px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', flexShrink: 0, boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                         {initials(msg.senderName)}
                       </div>
                       <div style={{flex: 1}}>
@@ -497,14 +497,14 @@ export default function Family() {
                         </div>
                         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                           <button onClick={() => playVoice(msg)}
-                            style={{width: '36px', height: '36px', borderRadius: '50%', background: DS.gradient.primary, border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: DS.shadow.primary}}>
+                            style={{width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                             {playingId === msg._id ?
                               <PauseIcon size={14} color="white" strokeWidth={0}/> :
                               <PlayIcon size={12} color="white" strokeWidth={0}/>}
                           </button>
                           <div style={{flex: 1, display: 'flex', alignItems: 'center', gap: '2px', height: '24px'}}>
                             {Array.from({length: 26}).map((_, i) => (
-                              <div key={i} style={{width: '3px', height: `${Math.max(4, Math.sin(i * 0.9) * 8 + 10)}px`, background: playingId === msg._id ? DS.colors.primary : 'rgba(255,255,255,0.15)', borderRadius: '2px', transition: 'background 0.3s ease'}}/>
+                              <div key={i} style={{width: '3px', height: `${Math.max(4, Math.sin(i * 0.9) * 8 + 10)}px`, background: playingId === msg._id ? brand.primary : 'rgba(255,255,255,0.15)', borderRadius: '2px', transition: 'background 0.3s ease'}}/>
                             ))}
                           </div>
                         </div>
@@ -531,13 +531,13 @@ export default function Family() {
                       <div style={{position: 'relative', flexShrink: 0}}>
                         {member.avatar ?
                           <img src={member.avatar} alt={member.name} style={{width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover'}}/> :
-                          <div style={{width: '48px', height: '48px', borderRadius: '50%', background: DS.gradient.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '16px', boxShadow: DS.shadow.primary}}>{initials(member.name)}</div>}
+                          <div style={{width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '16px', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>{initials(member.name)}</div>}
                         <div style={{position: 'absolute', bottom: '1px', right: '1px', width: '12px', height: '12px', borderRadius: '50%', background: isOnline(member.lastActive) ? '#22C55E' : 'rgba(255,255,255,0.2)', border: '2px solid #06040C', boxShadow: isOnline(member.lastActive) ? '0 0 6px rgba(34,197,94,0.6)' : 'none'}}/>
                       </div>
                       <div style={{flex: 1}}>
                         <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
                           <p style={{fontSize: '15px', fontWeight: 700, color: 'white'}}>{member.name}</p>
-                          {family.admin?.toString() === member.user?.toString() && <span style={{fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '20px', background: 'rgba(220,20,60,0.15)', color: DS.colors.primary, border: `1px solid ${DS.colors.primaryBorder}`}}>Admin</span>}
+                          {family.admin?.toString() === member.user?.toString() && <span style={{fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '20px', background: 'rgba(220,20,60,0.15)', color: brand.primary, border: `1px solid ${brand.primaryBorder}`}}>Admin</span>}
                         </div>
                         <p style={{fontSize: '12px', color: isOnline(member.lastActive) ? '#22C55E' : 'rgba(255,255,255,0.3)', marginTop: '2px', fontWeight: 500}}>
                           {isOnline(member.lastActive) ? '● Active now' : `Last seen ${timeAgo(member.lastActive)}`}
@@ -558,7 +558,7 @@ export default function Family() {
                       <p style={{fontSize: '30px', fontWeight: 800, color: 'white', letterSpacing: '8px', fontFamily: 'monospace'}}>{family.code}</p>
                     </div>
                     <button onClick={copyCode}
-                      style={{padding: '11px 18px', background: copied ? 'rgba(34,197,94,0.15)' : DS.gradient.primary, color: copied ? '#22C55E' : 'white', border: copied ? '1px solid rgba(34,197,94,0.3)' : 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0, boxShadow: copied ? 'none' : DS.shadow.primary, transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px'}}>
+                      style={{padding: '11px 18px', background: copied ? 'rgba(34,197,94,0.15)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', color: copied ? '#22C55E' : 'white', border: copied ? '1px solid rgba(34,197,94,0.3)' : 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0, boxShadow: copied ? 'none' : '0 4px 16px rgba(220,20,60,0.35)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px'}}>
                       {copied ? <CheckIcon size={14} color="#22C55E" strokeWidth={2.5}/> : <PlusIcon size={14} color="white" strokeWidth={2.5}/>}
                       {copied ? 'Copied' : 'Copy'}
                     </button>

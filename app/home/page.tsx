@@ -3,6 +3,8 @@ import { useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import SOSButton from '../components/SOSButton'
+import ModeSwitch from '../components/ModeSwitch'
 import BottomNav from '../components/BottomNav'
 import InlineSearch from '../components/InlineSearch'
 import ThemeToggle from '../components/ThemeToggle'
@@ -152,7 +154,7 @@ export default function Dashboard() {
             </h1>
           </div>
           <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-            <ThemeToggle />
+            <ModeSwitch /><SOSButton /><ThemeToggle />
             <Link href="/notifications" style={{width: '40px', height: '40px', borderRadius: '12px', border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', textDecoration: 'none', background: t.cardBg}}>
               <BellIcon size={18} color={t.text2} strokeWidth={1.8}/>
               <div style={{position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', borderRadius: '50%', background: brand.primary, border: `2px solid ${t.pageBg}`}}/>

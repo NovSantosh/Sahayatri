@@ -3,12 +3,13 @@ import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import BottomNav from '../components/BottomNav'
+import PaymentSheet from '../components/PaymentSheet'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import {
   HeartIcon, CheckIcon, ArrowLeftIcon,
-  ClockIcon, StarIcon, CalendarIcon, FamilyIcon,
-  MicIcon, SparkleIcon
+  ClockIcon, StarIcon, CalendarIcon,
+  LocationIcon, SparkleIcon
 } from '../components/Icons'
 
 const CARE_TYPES = [
@@ -27,7 +28,7 @@ const CARE_TYPES = [
     includes: ['Morning visit every day', 'Photo sent to you', 'Voice note update', 'Medicine reminder', 'Immediate alert if anything wrong'],
     icon: () => (
       <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={brand.primary} strokeWidth="1.8" strokeLinecap="round">
-        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.19 12 19.79 19.79 0 0 1 1.07 3.18 2 2 0 0 1 3.05 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
     ),
   },
@@ -141,70 +142,42 @@ const CARE_TYPES = [
 
 const COMPANIONS = [
   {
-    id: 'p1',
-    name: 'Sita Sharma',
-    experience: '6 years',
-    rating: 4.9,
-    reviews: 87,
-    location: 'Kathmandu',
-    languages: ['Nepali', 'Hindi'],
-    speciality: 'Elder care · Medical escort',
-    completedJobs: 312,
-    bio: 'Former nurse with deep experience in elder care. Gentle, patient and trustworthy. Many families call me their second daughter.',
-    initials: 'SS',
-    color: '#7C3AED',
-    available: true,
+    id: 'p1', name: 'Sita Sharma', experience: '6 years', rating: 4.9, reviews: 87,
+    location: 'Kathmandu', languages: ['Nepali', 'Hindi'], speciality: 'Elder care · Medical escort',
+    completedJobs: 312, bio: 'Former nurse with deep experience in elder care. Gentle, patient and trustworthy.',
+    initials: 'SS', color: '#7C3AED', available: true,
   },
   {
-    id: 'p2',
-    name: 'Ram Bahadur KC',
-    experience: '4 years',
-    rating: 4.8,
-    reviews: 64,
-    location: 'Lalitpur',
-    languages: ['Nepali', 'English'],
-    speciality: 'Companionship · Errands',
-    completedJobs: 198,
-    bio: 'Retired teacher who found purpose in caring for elders. I treat every parent like my own. Reliable, kind and always on time.',
-    initials: 'RK',
-    color: '#059669',
-    available: true,
+    id: 'p2', name: 'Ram Bahadur KC', experience: '4 years', rating: 4.8, reviews: 64,
+    location: 'Lalitpur', languages: ['Nepali', 'English'], speciality: 'Companionship · Errands',
+    completedJobs: 198, bio: 'Retired teacher who found purpose in caring for elders. Reliable, kind and always on time.',
+    initials: 'RK', color: '#059669', available: true,
   },
   {
-    id: 'p3',
-    name: 'Meena Thapa',
-    experience: '5 years',
-    rating: 4.9,
-    reviews: 112,
-    location: 'Bhaktapur',
-    languages: ['Nepali'],
-    speciality: 'Cooking · Daily care',
-    completedJobs: 445,
-    bio: 'Passionate about feeding people with love. I cook traditional Nepali meals and make sure every elder feels at home.',
-    initials: 'MT',
-    color: '#D97706',
-    available: false,
+    id: 'p3', name: 'Meena Thapa', experience: '5 years', rating: 4.9, reviews: 112,
+    location: 'Bhaktapur', languages: ['Nepali'], speciality: 'Cooking · Daily care',
+    completedJobs: 445, bio: 'Passionate about feeding people with love. I cook traditional Nepali meals.',
+    initials: 'MT', color: '#D97706', available: false,
   },
 ]
 
-type Step = 'home' | 'care-type' | 'companion' | 'details' | 'confirm' | 'booked'
+type Step = 'home' | 'care-type' | 'companion' | 'details' | 'confirm' | 'payment' | 'booked'
 
 export default function Care() {
   const { t } = useTheme()
   const router = useRouter()
+  const { data: session } = useSession()
   const [step, setStep] = useState<Step>('home')
   const [selectedCare, setSelectedCare] = useState<typeof CARE_TYPES[0] | null>(null)
   const [selectedCompanion, setSelectedCompanion] = useState<typeof COMPANIONS[0] | null>(null)
   const [expanded, setExpanded] = useState<string | null>(null)
-  const [forSelf, setForSelf] = useState(false)
   const [familyName, setFamilyName] = useState('')
   const [familyPhone, setFamilyPhone] = useState('')
   const [familyAddress, setFamilyAddress] = useState('')
-  const [familyAge, setFamilyAge] = useState('')
   const [notes, setNotes] = useState('')
-  const [preferredTime, setPreferredTime] = useState('')
   const [frequency, setFrequency] = useState('once')
-  const [booking, setBooking] = useState(false)
+  const [showPaymentSheet, setShowPaymentSheet] = useState(false)
+  const [bookingId] = useState(`CARE-${Date.now()}`)
 
   const card = {
     background: t.cardBg,
@@ -212,13 +185,6 @@ export default function Care() {
     border: `1px solid ${t.border}`,
     boxShadow: t.shadow,
     transition: 'background 0.3s ease' as const,
-  }
-
-  const handleBook = async () => {
-    setBooking(true)
-    await new Promise(r => setTimeout(r, 1800))
-    setBooking(false)
-    setStep('booked')
   }
 
   const Header = ({ title, sub, back }: { title: string, sub: string, back: () => void }) => (
@@ -242,22 +208,23 @@ export default function Care() {
         <div style={{width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 32px rgba(220,20,60,0.35)', animation: 'breathe 2s ease infinite'}}>
           <CheckIcon size={36} color="white" strokeWidth={2.5}/>
         </div>
-        <h1 style={{fontSize: '26px', fontWeight: 900, color: t.text1, letterSpacing: '-0.8px', marginBottom: '10px'}}>Care Booked!</h1>
-        <p style={{fontSize: '15px', color: t.text2, lineHeight: 1.6, marginBottom: '6px'}}>{selectedCompanion?.name} will care for {familyName || 'your family member'}.</p>
-        <p style={{fontSize: '13px', color: t.text3, lineHeight: 1.6, marginBottom: '32px'}}>You will receive a confirmation shortly. Photo updates after every visit.</p>
+        <h1 style={{fontSize: '26px', fontWeight: 900, color: t.text1, letterSpacing: '-0.8px', marginBottom: '10px'}}>Booking Confirmed!</h1>
+        <p style={{fontSize: '15px', color: t.text2, lineHeight: 1.6, marginBottom: '6px'}}>{selectedCompanion?.name} will care for {familyName}.</p>
+        <p style={{fontSize: '13px', color: t.text3, lineHeight: 1.6, marginBottom: '32px'}}>Payment received. Photo updates after every visit.</p>
 
         <div style={{...card, padding: '20px', marginBottom: '16px', textAlign: 'left'}}>
           <p style={{fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px'}}>Booking Summary</p>
           {[
             { label: 'Service', value: selectedCare?.title },
             { label: 'Companion', value: selectedCompanion?.name },
-            { label: 'For', value: familyName || 'Family member' },
+            { label: 'For', value: familyName },
             { label: 'Frequency', value: frequency },
-            { label: 'Amount', value: `NPR ${selectedCare?.rate.toLocaleString()} ${selectedCare?.rateUnit}` },
+            { label: 'Amount paid', value: `NPR ${selectedCare?.rate.toLocaleString()} ${selectedCare?.rateUnit}` },
+            { label: 'Booking ID', value: bookingId },
           ].map((item, i, arr) => (
-            <div key={i} style={{display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${t.border}` : 'none'}}>
-              <p style={{fontSize: '13px', color: t.text3}}>{item.label}</p>
-              <p style={{fontSize: '13px', fontWeight: 700, color: t.text1}}>{item.value}</p>
+            <div key={i} style={{display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${t.border}` : 'none', gap: '12px'}}>
+              <p style={{fontSize: '13px', color: t.text3, flexShrink: 0}}>{item.label}</p>
+              <p style={{fontSize: '13px', fontWeight: 700, color: t.text1, textAlign: 'right'}}>{item.value}</p>
             </div>
           ))}
         </div>
@@ -272,10 +239,108 @@ export default function Care() {
     </div>
   )
 
+  // PAYMENT STEP
+  if (step === 'payment') return (
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+      <Header title="Pay to Confirm" sub="Payment required to confirm booking" back={() => setStep('confirm')}/>
+      <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
+
+        {/* Why pay now */}
+        <div style={{background: 'linear-gradient(135deg, #0E0B18, #1A0A16)', borderRadius: '20px', padding: '20px', border: '1px solid rgba(255,255,255,0.06)'}}>
+          <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px'}}>
+            <div style={{width: '32px', height: '32px', borderRadius: '10px', background: brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+              <CheckIcon size={15} color={brand.primary} strokeWidth={2.5}/>
+            </div>
+            <p style={{fontSize: '14px', fontWeight: 700, color: 'white'}}>Why we collect payment now</p>
+          </div>
+          <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6}}>
+            Advance payment ensures your companion is reserved and committed to your booking. Your companion gets paid within 24 hours of completing the service. Full refund if cancelled before the visit.
+          </p>
+        </div>
+
+        {/* Booking summary */}
+        <div style={{...card, padding: '20px'}}>
+          <p style={{fontSize: '13px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '14px'}}>What you are paying for</p>
+          {[
+            { label: 'Service', value: selectedCare?.title || '' },
+            { label: 'Companion', value: selectedCompanion?.name || '' },
+            { label: 'For', value: familyName },
+            { label: 'Frequency', value: frequency },
+          ].map((item, i, arr) => (
+            <div key={i} style={{display: 'flex', justifyContent: 'space-between', padding: '9px 0', borderBottom: i < arr.length - 1 ? `1px solid ${t.border}` : 'none', gap: '12px'}}>
+              <p style={{fontSize: '13px', color: t.text3, flexShrink: 0}}>{item.label}</p>
+              <p style={{fontSize: '13px', fontWeight: 600, color: t.text1, textAlign: 'right'}}>{item.value}</p>
+            </div>
+          ))}
+          <div style={{marginTop: '14px', paddingTop: '14px', borderTop: `1px solid ${t.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <p style={{fontSize: '14px', fontWeight: 700, color: t.text1}}>Total</p>
+            <p style={{fontSize: '22px', fontWeight: 900, color: brand.primary, letterSpacing: '-1px'}}>NPR {selectedCare?.rate.toLocaleString()}</p>
+          </div>
+          <p style={{fontSize: '11px', color: t.text3, marginTop: '4px', textAlign: 'right'}}>{selectedCare?.rateUnit}</p>
+        </div>
+
+        {/* Payment methods */}
+        <div style={{...card, padding: '20px'}}>
+          <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '16px'}}>Choose payment method</p>
+          {[
+            { id: 'esewa', name: 'eSewa', desc: 'Most popular in Nepal', color: '#60BB46', bg: 'rgba(96,187,70,0.08)', border: 'rgba(96,187,70,0.25)', initial: 'e' },
+            { id: 'khalti', name: 'Khalti', desc: 'Fast digital wallet', color: '#5C2D91', bg: 'rgba(92,45,145,0.08)', border: 'rgba(92,45,145,0.25)', initial: 'K' },
+            { id: 'connectips', name: 'ConnectIPS', desc: 'Direct bank transfer', color: '#1A56DB', bg: 'rgba(26,86,219,0.08)', border: 'rgba(26,86,219,0.25)', initial: 'C' },
+          ].map((method) => (
+            <div key={method.id}
+              onClick={() => {
+                setShowPaymentSheet(false)
+                // Redirect to payment
+                fetch('/api/payment/initiate', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    method: method.id,
+                    amount: selectedCare?.rate,
+                    bookingId,
+                    userEmail: session?.user?.email,
+                    serviceName: selectedCare?.title,
+                  })
+                })
+                  .then(r => r.json())
+                  .then(data => {
+                    if (data.redirectUrl) {
+                      window.location.href = data.redirectUrl
+                    }
+                  })
+              }}
+              style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: '14px', border: `1px solid ${t.border}`, background: t.inputBg, cursor: 'pointer', marginBottom: '10px', transition: 'all 0.2s ease'}}>
+              <div style={{width: '42px', height: '42px', borderRadius: '12px', background: method.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                <span style={{fontSize: '14px', fontWeight: 900, color: 'white'}}>{method.initial}</span>
+              </div>
+              <div style={{flex: 1}}>
+                <p style={{fontSize: '15px', fontWeight: 700, color: t.text1, marginBottom: '2px'}}>{method.name}</p>
+                <p style={{fontSize: '12px', color: t.text3}}>{method.desc}</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.text3} strokeWidth="2" strokeLinecap="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </div>
+          ))}
+        </div>
+
+        <div style={{...card, padding: '16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
+          <div style={{width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(5,150,105,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+            <CheckIcon size={15} color="#059669" strokeWidth={2.5}/>
+          </div>
+          <p style={{fontSize: '12px', color: t.text3, lineHeight: 1.5}}>
+            <strong style={{color: t.text1}}>100% refund</strong> if cancelled before first visit · Secure payment via eSewa, Khalti or bank transfer
+          </p>
+        </div>
+      </div>
+      <BottomNav/>
+    </div>
+  )
+
   // CONFIRM
   if (step === 'confirm') return (
     <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
-      <Header title="Confirm Booking" sub="Review before confirming" back={() => setStep('details')}/>
+      <Header title="Review Booking" sub="Check details before paying" back={() => setStep('details')}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
         <div style={{...card, padding: '20px'}}>
@@ -324,30 +389,31 @@ export default function Care() {
           ))}
         </div>
 
+        {/* Amount */}
         <div style={{background: 'linear-gradient(135deg, #0E0B18, #1A0A16)', borderRadius: '20px', padding: '22px', border: '1px solid rgba(255,255,255,0.06)'}}>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px'}}>
             <p style={{fontSize: '14px', color: 'rgba(255,255,255,0.5)'}}>Service cost</p>
             <p style={{fontSize: '14px', fontWeight: 700, color: 'white'}}>NPR {selectedCare?.rate.toLocaleString()}</p>
           </div>
           <div style={{borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-            <p style={{fontSize: '16px', fontWeight: 800, color: 'white'}}>Total</p>
+            <p style={{fontSize: '16px', fontWeight: 800, color: 'white'}}>Total to pay now</p>
             <p style={{fontSize: '24px', fontWeight: 900, color: brand.primary, letterSpacing: '-1px'}}>NPR {selectedCare?.rate.toLocaleString()}</p>
           </div>
-          <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '8px'}}>{selectedCare?.rateUnit} · No payment until service begins</p>
+          <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginTop: '8px'}}>{selectedCare?.rateUnit} · 100% refund if cancelled before first visit</p>
         </div>
 
-        <button onClick={handleBook} disabled={booking}
-          style={{width: '100%', padding: '18px', background: booking ? 'rgba(220,20,60,0.5)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: 'white', fontSize: '16px', fontWeight: 800, cursor: booking ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 6px 24px rgba(220,20,60,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
-          {booking ? (
-            <><div style={{width: '20px', height: '20px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite'}}/>Confirming…</>
-          ) : (
-            <><HeartIcon size={20} color="white" filled strokeWidth={0}/>Confirm and Book Care</>
-          )}
+        {/* Pay now button */}
+        <button onClick={() => setStep('payment')}
+          style={{width: '100%', padding: '18px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: 'white', fontSize: '16px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 6px 24px rgba(220,20,60,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px'}}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+            <line x1="1" y1="10" x2="23" y2="10"/>
+          </svg>
+          Pay NPR {selectedCare?.rate.toLocaleString()} to Confirm
         </button>
-        <p style={{fontSize: '12px', color: t.text3, textAlign: 'center'}}>Cancel anytime before first visit · Full refund guaranteed</p>
+        <p style={{fontSize: '12px', color: t.text3, textAlign: 'center'}}>Booking only confirmed after payment · Cancel anytime before first visit</p>
       </div>
       <BottomNav/>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
     </div>
   )
 
@@ -358,30 +424,13 @@ export default function Care() {
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
         <div style={{...card, padding: '20px'}}>
-          <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '14px'}}>Who needs care?</p>
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px'}}>
-            {[
-              { label: 'For my family', sub: 'I am booking from abroad', val: false },
-              { label: 'For myself', sub: 'I am in Nepal', val: true },
-            ].map((opt) => (
-              <button key={String(opt.val)} onClick={() => setForSelf(opt.val)}
-                style={{padding: '14px', borderRadius: '14px', border: `1.5px solid ${forSelf === opt.val ? brand.primary : t.border}`, background: forSelf === opt.val ? brand.primaryLight : 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', textAlign: 'left', transition: 'all 0.2s ease'}}>
-                <p style={{fontSize: '13px', fontWeight: 700, color: forSelf === opt.val ? brand.primary : t.text1, marginBottom: '3px'}}>{opt.label}</p>
-                <p style={{fontSize: '11px', color: t.text3}}>{opt.sub}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div style={{...card, padding: '20px'}}>
           <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '16px'}}>Their details</p>
           {[
             { label: 'Full name', val: familyName, set: setFamilyName, ph: 'e.g. Shanti Devi' },
-            { label: 'Age', val: familyAge, set: setFamilyAge, ph: 'e.g. 72' },
             { label: 'Phone number in Nepal', val: familyPhone, set: setFamilyPhone, ph: '98XXXXXXXX' },
             { label: 'Full address', val: familyAddress, set: setFamilyAddress, ph: 'e.g. Baluwatar, Kathmandu' },
           ].map((field, i) => (
-            <div key={i} style={{marginBottom: i < 3 ? '14px' : '0'}}>
+            <div key={i} style={{marginBottom: i < 2 ? '14px' : '0'}}>
               <p style={{fontSize: '12px', fontWeight: 600, color: t.text3, marginBottom: '6px'}}>{field.label}</p>
               <input value={field.val} onChange={e => field.set(e.target.value)} placeholder={field.ph}
                 style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '13px 16px', fontSize: '15px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' as const}}/>
@@ -394,8 +443,8 @@ export default function Care() {
           {[
             { id: 'once', label: 'One time only', sub: 'Single visit' },
             { id: 'weekly', label: 'Weekly', sub: 'Same day every week' },
-            { id: 'daily', label: 'Daily', sub: 'Every morning — best for check-ins' },
-            { id: 'monthly', label: 'Monthly subscription', sub: 'Full care — best value' },
+            { id: 'daily', label: 'Daily', sub: 'Every morning' },
+            { id: 'monthly', label: 'Monthly subscription', sub: 'Best value' },
           ].map((opt) => (
             <button key={opt.id} onClick={() => setFrequency(opt.id)}
               style={{width: '100%', padding: '13px 16px', borderRadius: '14px', border: `1.5px solid ${frequency === opt.id ? brand.primary : t.border}`, background: frequency === opt.id ? brand.primaryLight : 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', transition: 'all 0.2s ease'}}>
@@ -408,17 +457,13 @@ export default function Care() {
               </div>
             </button>
           ))}
-
-          <p style={{fontSize: '12px', fontWeight: 600, color: t.text3, marginBottom: '6px', marginTop: '8px'}}>Preferred visit time</p>
-          <input value={preferredTime} onChange={e => setPreferredTime(e.target.value)} placeholder="e.g. 8:00 AM – 10:00 AM"
-            style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '13px 16px', fontSize: '15px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' as const}}/>
         </div>
 
         <div style={{...card, padding: '20px'}}>
           <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '6px'}}>Special notes</p>
-          <p style={{fontSize: '13px', color: t.text3, marginBottom: '12px'}}>Medical conditions, dietary needs, language preferences, anything the companion should know.</p>
+          <p style={{fontSize: '13px', color: t.text3, marginBottom: '12px'}}>Medical conditions, dietary needs, language preferences.</p>
           <textarea value={notes} onChange={e => setNotes(e.target.value)}
-            placeholder="e.g. Has diabetes. Speaks only Nepali. Prefers female companion. Do not ring loudly."
+            placeholder="e.g. Has diabetes. Speaks only Nepali. Prefers female companion."
             rows={4}
             style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '13px 16px', fontSize: '14px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' as const, resize: 'none' as const, lineHeight: 1.6}}/>
         </div>
@@ -519,7 +564,6 @@ export default function Care() {
                     <span style={{fontSize: '10px', fontWeight: 700, color: care.tagColor}}>{care.tag}</span>
                   </div>
                 </div>
-                <p style={{fontSize: '11px', color: t.text3, marginBottom: '4px'}}>{care.nepali}</p>
                 <p style={{fontSize: '13px', color: t.text2, lineHeight: 1.5}}>{care.desc}</p>
               </div>
             </div>
@@ -536,7 +580,6 @@ export default function Care() {
 
             {expanded === care.id && (
               <div style={{marginTop: '14px', paddingTop: '14px', borderTop: `1px solid ${t.border}`}}>
-                <p style={{fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px'}}>What is included</p>
                 {care.includes.map((item, i) => (
                   <div key={i} style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px'}}>
                     <div style={{width: '20px', height: '20px', borderRadius: '6px', background: brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
@@ -572,13 +615,12 @@ export default function Care() {
           </button>
           <div>
             <h1 style={{fontSize: '22px', fontWeight: 900, color: t.text1, letterSpacing: '-0.6px'}}>Elder Care</h1>
-            <p style={{fontSize: '12px', color: t.text3}}>Care for your loved ones · From anywhere in the world</p>
+            <p style={{fontSize: '12px', color: t.text3}}>Care for your loved ones · From anywhere</p>
           </div>
         </div>
       </div>
 
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px'}}>
-
         {/* Hero */}
         <div style={{background: 'linear-gradient(135deg, #0E0B18 0%, #1A0A16 50%, #0A0E1A 100%)', borderRadius: '24px', padding: '24px', position: 'relative', overflow: 'hidden', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.06)'}}>
           <div style={{position: 'absolute', top: '-40px', right: '-30px', width: '180px', height: '180px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,20,60,0.2), transparent 70%)', pointerEvents: 'none'}}/>
@@ -591,13 +633,17 @@ export default function Care() {
               Be there for your family<br/>even when you cannot be.
             </h2>
             <p style={{fontSize: '14px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.7, marginBottom: '22px'}}>
-              Book verified companions who care for your parents in Nepal. You get photo and voice updates after every single visit.
+              Book verified companions who care for your parents in Nepal. Photo and voice updates after every visit.
             </p>
-            <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
-              {['Verified companions', 'Photo updates', 'Cancel anytime'].map((b, i) => (
-                <div key={i} style={{display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '9999px', padding: '4px 12px'}}>
-                  <div style={{width: '4px', height: '4px', borderRadius: '50%', background: brand.primary}}/>
-                  <span style={{fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.65)'}}>{b}</span>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px'}}>
+              {[
+                { val: '500+', label: 'Families', color: brand.primary },
+                { val: '4.9', label: 'Avg rating', color: brand.warning },
+                { val: '98%', label: 'Satisfaction', color: '#059669' },
+              ].map((s, i) => (
+                <div key={i} style={{background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '10px 6px', textAlign: 'center'}}>
+                  <p style={{fontSize: '18px', fontWeight: 900, color: s.color, letterSpacing: '-0.5px', marginBottom: '2px'}}>{s.val}</p>
+                  <p style={{fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontWeight: 600}}>{s.label}</p>
                 </div>
               ))}
             </div>
@@ -608,10 +654,10 @@ export default function Care() {
         <div style={{...card, padding: '22px'}}>
           <p style={{fontSize: '16px', fontWeight: 800, color: t.text1, marginBottom: '18px', letterSpacing: '-0.3px'}}>How it works</p>
           {[
-            { step: '1', title: 'You book from anywhere', desc: 'Choose care type, pick a companion, enter your parent\'s address. Takes 3 minutes.', color: brand.primary },
-            { step: '2', title: 'Companion visits your family', desc: 'Our verified companion arrives at your parent\'s home at the scheduled time.', color: '#7C3AED' },
-            { step: '3', title: 'You get a real update', desc: 'Photo, voice note and report sent to you after every single visit.', color: '#059669' },
-            { step: '4', title: 'Your family feels loved', desc: 'Your parent knows you care, even from far away. That is everything.', color: '#D97706' },
+            { step: '1', title: 'Choose care type', desc: 'Daily check-in, companionship, medical escort and more.', color: brand.primary },
+            { step: '2', title: 'Pick a companion', desc: 'All verified, rated and background checked.', color: '#7C3AED' },
+            { step: '3', title: 'Pay to confirm', desc: 'Secure advance payment via eSewa or Khalti.', color: '#059669' },
+            { step: '4', title: 'Get photo updates', desc: 'After every single visit, directly to your phone.', color: '#D97706' },
           ].map((item, i) => (
             <div key={i} style={{display: 'flex', gap: '14px', alignItems: 'flex-start', marginBottom: i < 3 ? '18px' : '0', position: 'relative'}}>
               {i < 3 && <div style={{position: 'absolute', left: '15px', top: '34px', width: '2px', height: '22px', background: t.border}}/>}
@@ -626,23 +672,9 @@ export default function Care() {
           ))}
         </div>
 
-        {/* Stats */}
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px'}}>
-          {[
-            { val: '500+', label: 'Families served', color: brand.primary },
-            { val: '4.9', label: 'Avg rating', color: brand.warning },
-            { val: '98%', label: 'Satisfaction', color: '#059669' },
-          ].map((s, i) => (
-            <div key={i} style={{...card, padding: '16px 8px', textAlign: 'center'}}>
-              <p style={{fontSize: '22px', fontWeight: 900, color: s.color, letterSpacing: '-1px', marginBottom: '4px'}}>{s.val}</p>
-              <p style={{fontSize: '10px', fontWeight: 600, color: t.text3, lineHeight: 1.3}}>{s.label}</p>
-            </div>
-          ))}
-        </div>
-
         {/* Testimonials */}
         <div style={{...card, padding: '22px'}}>
-          <p style={{fontSize: '16px', fontWeight: 800, color: t.text1, marginBottom: '16px', letterSpacing: '-0.3px'}}>What families say</p>
+          <p style={{fontSize: '16px', fontWeight: 800, color: t.text1, marginBottom: '16px'}}>What families say</p>
           {[
             { name: 'Rajesh K.', location: 'Vancouver, Canada', text: 'I was so worried about my mother living alone in Kathmandu. Sahayatri sends me a photo of her every morning. I can finally sleep properly.', initials: 'RK', color: '#2563EB' },
             { name: 'Priya S.', location: 'London, UK', text: 'My father needed someone to take him to his monthly checkup. The companion sent me the full doctor report. Incredible service.', initials: 'PS', color: '#7C3AED' },
@@ -665,7 +697,6 @@ export default function Care() {
           ))}
         </div>
 
-        {/* CTA */}
         <button onClick={() => setStep('care-type')}
           style={{width: '100%', padding: '18px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '18px', color: 'white', fontSize: '16px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 8px 32px rgba(220,20,60,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', letterSpacing: '-0.3px'}}>
           <HeartIcon size={22} color="white" filled strokeWidth={0}/>
@@ -673,15 +704,15 @@ export default function Care() {
         </button>
 
         <p style={{fontSize: '12px', color: t.text3, textAlign: 'center', lineHeight: 1.6}}>
-          No payment until service begins · Cancel anytime · 100% refund guaranteed
+          Pay securely via eSewa or Khalti · Cancel anytime · 100% refund before first visit
         </p>
-
       </div>
 
       <BottomNav/>
       <style>{`
         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
         ::-webkit-scrollbar{display:none}
+        input::placeholder,textarea::placeholder{color:${t.text3}}
       `}</style>
     </div>
   )

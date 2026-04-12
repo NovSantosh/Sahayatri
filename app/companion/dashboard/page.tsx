@@ -1,4 +1,5 @@
 'use client'
+import ModeSwitch from '../../components/ModeSwitch'
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
@@ -283,6 +284,7 @@ export default function CompanionDashboard() {
               </div>
             ))}
           </div>
+          <div style={{marginTop: "14px"}}><ModeSwitch/></div>
         </div>
       </div>
 

@@ -2,14 +2,16 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import BottomNav from '../components/BottomNav'
-import { brand, light, dark } from '../design-system'
+import { useTheme } from '../context/ThemeContext'
+import { brand } from '../design-system'
+import { SearchIcon, ArrowLeftIcon, HeartIcon, StarIcon } from '../components/Icons'
 
 export default function Search() {
   const router = useRouter()
+  const { t } = useTheme()
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const inputRef = useState<any>(null)
 
   const search = async (q: string) => {
     if (!q.trim()) { setResults(null); return }
@@ -22,79 +24,80 @@ export default function Search() {
     setLoading(false)
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value)
-    const t = setTimeout(() => search(e.target.value), 400)
-    return () => clearTimeout(t)
+  const card = {
+    background: t.cardBg,
+    borderRadius: '16px',
+    border: `1px solid ${t.border}`,
+    boxShadow: t.shadow,
   }
-
-  const initials = (name: string) => name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
-
-  const timeAgo = (date: string) => {
-    const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-    return `${Math.floor(s / 86400)}d ago`
-  }
-
-  const suggestions = ['Elder Care', 'Yoga & Wellness', 'Cooking', 'Family Room', 'Memory', 'Sathi AI']
 
   return (
-    <div style={{minHeight: '100vh', background: brand.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px'}}>
+    <div style={{ minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px', transition: 'background 0.3s ease' }}>
 
       {/* Header */}
-      <div style={{background: brand.cardBg, padding: '52px 20px 16px', borderBottom: `1px solid ${brand.border}`, position: 'sticky', top: 0, zIndex: 50, boxShadow: '0 1px 12px rgba(0,0,0,0.04)'}}>
-        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-          <button onClick={() => router.back()} style={{width: '40px', height: '40px', borderRadius: brand.radius.icon, background: brand.pageBg, border: `1px solid ${brand.borderStrong}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0}}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={brand.text2} strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      <div style={{ background: t.headerBg, backdropFilter: 'blur(20px)', padding: '52px 16px 16px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => router.back()}
+            style={{ width: '40px', height: '40px', borderRadius: '12px', background: t.inputBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}>
+            <ArrowLeftIcon size={18} color={t.text2} strokeWidth={2}/>
           </button>
-          <div style={{flex: 1, position: 'relative'}}>
-            <div style={{position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)'}}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={brand.text3} strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <div style={{ flex: 1, position: 'relative' }}>
+            <div style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+              <SearchIcon size={16} color={t.text3} strokeWidth={2}/>
             </div>
-            <input autoFocus value={query} onChange={handleChange} placeholder="Search people, moments, services…"
-              style={{width: '100%', background: brand.pageBg, border: `1px solid ${brand.borderStrong}`, borderRadius: brand.radius.pill, padding: '12px 16px 12px 44px', fontSize: '15px', color: brand.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box'}}
-            />
-            {loading && <div style={{position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', border: `2px solid ${brand.borderStrong}`, borderTop: `2px solid ${brand.primary}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite'}}/>}
+            <input
+              autoFocus
+              value={query}
+              onChange={e => { setQuery(e.target.value); search(e.target.value) }}
+              placeholder="Search people, moments, services…"
+              style={{ width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '12px 16px 12px 42px', fontSize: '15px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', transition: 'all 0.2s ease' }}/>
           </div>
         </div>
       </div>
 
-      <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '20px'}}>
+      <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-        {/* Suggestions */}
-        {!query && (
-          <div>
-            <p style={{...brand.font.label, color: brand.text3, marginBottom: '12px'}}>Popular Searches</p>
-            <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px'}}>
-              {suggestions.map((s) => (
-                <button key={s} onClick={() => { setQuery(s); search(s) }}
-                  style={{padding: '8px 16px', background: brand.cardBg, border: `1px solid ${brand.borderStrong}`, borderRadius: brand.radius.pill, fontSize: '13px', fontWeight: 600, color: brand.text2, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)"}}>
-                  {s}
-                </button>
-              ))}
+        {/* Empty state */}
+        {!query && !results && (
+          <div style={{ textAlign: 'center', padding: '60px 24px' }}>
+            <div style={{ width: '64px', height: '64px', borderRadius: '20px', background: brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <SearchIcon size={28} color={brand.primary} strokeWidth={1.8}/>
             </div>
+            <p style={{ fontSize: '18px', fontWeight: 700, color: t.text1, marginBottom: '8px' }}>Search Sahayatri</p>
+            <p style={{ fontSize: '14px', color: t.text3, lineHeight: 1.6 }}>Find family members, memories, companions and services</p>
+          </div>
+        )}
+
+        {/* Loading */}
+        {loading && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[1,2,3].map(i => (
+              <div key={i} style={{ ...card, padding: '16px', display: 'flex', gap: '12px', alignItems: 'center' }}>
+                <div className="skeleton" style={{ width: '44px', height: '44px', borderRadius: '50%', flexShrink: 0 }}/>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div className="skeleton" style={{ height: '14px', width: '60%' }}/>
+                  <div className="skeleton" style={{ height: '12px', width: '40%' }}/>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
         {/* Results */}
-        {results && (
+        {!loading && results && (
           <>
-            {results.users?.length > 0 && (
+            {results.people?.length > 0 && (
               <div>
-                <p style={{...brand.font.label, color: brand.text3, marginBottom: '12px'}}>People</p>
-                <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
-                  {results.users.map((user: any) => (
-                    <div key={user._id} style={{background: brand.cardBg, borderRadius: '16px', border: `1px solid ${brand.border}`, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)"}}>
-                      {user.avatar ?
-                        <img src={user.avatar} alt={user.name} style={{width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0}}/> :
-                        <div style={{width: '48px', height: '48px', borderRadius: '50%', background: linear-gradient(135deg, #DC143C, #A50E2D), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '16px', flexShrink: 0, boxShadow: 0 4px 16px rgba(220,20,60,0.35)}}>{initials(user.name)}</div>}
-                      <div style={{flex: 1}}>
-                        <p style={{...brand.font.h4, color: brand.text1}}>{user.name}</p>
-                        <p style={{...brand.font.caption, color: brand.text3, marginTop: '2px'}}>{user.role} {user.location ? `· ${user.location}` : ''}</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px' }}>People</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {results.people.map((p: any) => (
+                    <div key={p._id} style={{ ...card, padding: '14px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                      <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: brand.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '16px', flexShrink: 0 }}>
+                        {p.name?.[0]?.toUpperCase() || '?'}
                       </div>
-                      <div style={{padding: '4px 12px', background: brand.primaryLight, borderRadius: brand.radius.pill, border: `1px solid ${brand.primaryBorder}`}}>
-                        <span style={{fontSize: '11px', fontWeight: 700, color: brand.primary}}>{user.role}</span>
+                      <div>
+                        <p style={{ fontSize: '15px', fontWeight: 700, color: t.text1, marginBottom: '2px' }}>{p.name}</p>
+                        <p style={{ fontSize: '12px', color: t.text3 }}>{p.email}</p>
                       </div>
                     </div>
                   ))}
@@ -104,37 +107,29 @@ export default function Search() {
 
             {results.posts?.length > 0 && (
               <div>
-                <p style={{...brand.font.label, color: brand.text3, marginBottom: '12px'}}>Moments</p>
-                <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
-                  {results.posts.map((post: any) => (
-                    <div key={post._id} onClick={() => router.push('/memory')} style={{background: brand.cardBg, borderRadius: '16px', border: `1px solid ${brand.border}`, padding: '14px 16px', cursor: 'pointer', boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)"}}>
-                      <div style={{display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px'}}>
-                        <div style={{width: '32px', height: '32px', borderRadius: '50%', background: linear-gradient(135deg, #DC143C, #A50E2D), display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '11px', flexShrink: 0}}>{initials(post.authorName)}</div>
-                        <div style={{flex: 1}}>
-                          <p style={{...brand.font.caption, color: brand.text1, fontWeight: 700}}>{post.authorName}</p>
-                          <p style={{fontSize: '10px', color: brand.text3}}>{timeAgo(post.createdAt)}</p>
-                        </div>
-                      </div>
-                      <p style={{...brand.font.bodySm, color: brand.text2, lineHeight: 1.5}}>{post.content?.slice(0, 100)}{post.content?.length > 100 ? '…' : ''}</p>
+                <p style={{ fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px' }}>Moments</p>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {results.posts.map((p: any) => (
+                    <div key={p._id} style={{ ...card, padding: '14px', cursor: 'pointer' }}>
+                      <p style={{ fontSize: '14px', color: t.text1, lineHeight: 1.5 }}>{p.content?.slice(0, 100)}…</p>
+                      <p style={{ fontSize: '11px', color: t.text3, marginTop: '6px' }}>{new Date(p.createdAt).toLocaleDateString()}</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {results.users?.length === 0 && results.posts?.length === 0 && (
-              <div style={{background: brand.cardBg, borderRadius: brand.radius.card, border: `1px solid ${brand.borderStrong}`, padding: '48px 24px', textAlign: 'center', boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)"}}>
-                <div style={{fontSize: '40px', marginBottom: '12px'}}>🔍</div>
-                <h3 style={{...brand.font.h3, color: brand.text1, marginBottom: '8px'}}>No results for "{query}"</h3>
-                <p style={{...brand.font.bodySm, color: brand.text3}}>Try a different search term.</p>
+            {!results.people?.length && !results.posts?.length && (
+              <div style={{ textAlign: 'center', padding: '48px 24px' }}>
+                <p style={{ fontSize: '16px', fontWeight: 700, color: t.text1, marginBottom: '8px' }}>No results for "{query}"</p>
+                <p style={{ fontSize: '14px', color: t.text3 }}>Try a different search term</p>
               </div>
             )}
           </>
         )}
       </div>
-
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      <BottomNav />
+      <BottomNav/>
+      <style>{`input::placeholder{color:${t.text3}}`}</style>
     </div>
   )
 }

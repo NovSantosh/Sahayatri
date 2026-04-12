@@ -3,15 +3,27 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import BottomNav from '../components/BottomNav'
+import { useTheme } from '../context/ThemeContext'
+import { brand } from '../design-system'
+import { ArrowLeftIcon, CheckIcon } from '../components/Icons'
+
+const PAYMENT_APPS = [
+  { id: 'esewa', name: 'eSewa', color: '#60BB46', desc: 'Most popular in Nepal', url: 'https://esewa.com.np', initial: 'e' },
+  { id: 'khalti', name: 'Khalti', color: '#5C2D91', desc: 'Fast digital wallet', url: 'https://khalti.com', initial: 'K' },
+  { id: 'connectips', name: 'ConnectIPS', color: '#1A56DB', desc: 'Direct bank transfer', url: 'https://connectips.com', initial: 'C' },
+  { id: 'ime', name: 'IME Pay', color: '#E4001B', desc: 'Popular for remittances', url: 'https://imepay.com.np', initial: 'I' },
+]
 
 export default function Wallet() {
   const { data: session } = useSession()
   const router = useRouter()
+  const { t } = useTheme()
   const [bookings, setBookings] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     if (session?.user?.email) fetchBookings()
+    else setLoading(false)
   }, [session])
 
   const fetchBookings = async () => {
@@ -19,135 +31,118 @@ export default function Wallet() {
       const res = await fetch(`/api/bookings?email=${session?.user?.email}`)
       const data = await res.json()
       setBookings(data.bookings || [])
-    } catch (e) { console.error(e) }
+    } catch (e) {}
     setLoading(false)
   }
 
-  const totalSpent = bookings.filter(b => b.paymentStatus === 'paid').reduce((sum, b) => sum + b.total, 0)
-  const pending = bookings.filter(b => b.paymentStatus === 'unpaid').reduce((sum, b) => sum + b.total, 0)
-
-  const paymentColor: any = {
-    esewa: { bg: 'rgba(96,187,70,0.1)', color: '#60BB46', label: 'eSewa' },
-    khalti: { bg: 'rgba(92,45,145,0.1)', color: '#5C2D91', label: 'Khalti' },
-    bank: { bg: 'rgba(37,99,235,0.1)', color: '#2563EB', label: 'Bank' },
-    pending: { bg: '#F5F6F8', color: '#9CA3AF', label: 'Pending' },
+  const card = {
+    background: t.cardBg,
+    borderRadius: '20px',
+    border: `1px solid ${t.border}`,
+    boxShadow: t.shadow,
   }
 
-  const statusColor: any = {
-    pending: '#D97706',
-    confirmed: '#059669',
-    cancelled: '#DC143C',
-    completed: '#2563EB',
-  }
-
-  const timeAgo = (date: string) => {
-    const s = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000)
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-    return `${Math.floor(s / 86400)}d ago`
-  }
+  const unpaidBookings = bookings.filter(b => b.status === 'unpaid' || b.status === 'pending')
+  const totalUnpaid = unpaidBookings.reduce((s: number, b: any) => s + (b.amount || 0), 0)
 
   return (
-    <div style={{minHeight: '100vh', background: '#F5F6F8', fontFamily: 'sans-serif', paddingBottom: '80px'}}>
+    <div style={{ minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px', transition: 'background 0.3s ease' }}>
 
       {/* Header */}
-      <div style={{background: 'linear-gradient(135deg, #0A1628, #1C0008)', padding: '52px 20px 28px', position: 'relative', overflow: 'hidden'}}>
-        <div style={{position: 'absolute', top: '-40px', right: '-40px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(220,20,60,0.15)', pointerEvents: 'none'}}/>
-        <div style={{position: 'relative', zIndex: 1}}>
-          <p style={{fontSize: '11px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px'}}>Payment Center</p>
-          <h1 style={{fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px', marginBottom: '4px'}}>NPR {totalSpent.toLocaleString()}</h1>
-          <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.45)'}}>Total paid · {bookings.filter(b => b.paymentStatus === 'paid').length} bookings</p>
-
-          {pending > 0 && (
-            <div style={{marginTop: '14px', display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(217,119,6,0.15)', border: '1px solid rgba(217,119,6,0.3)', borderRadius: '12px', padding: '8px 14px'}}>
-              <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#D97706'}}/>
-              <span style={{fontSize: '12px', fontWeight: 700, color: '#D97706'}}>NPR {pending.toLocaleString()} pending payment</span>
-            </div>
-          )}
+      <div style={{ background: t.headerBg, backdropFilter: 'blur(20px)', padding: '52px 20px 16px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => router.back()}
+            style={{ width: '40px', height: '40px', borderRadius: '12px', background: t.inputBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+            <ArrowLeftIcon size={18} color={t.text2} strokeWidth={2}/>
+          </button>
+          <div>
+            <h1 style={{ fontSize: '20px', fontWeight: 800, color: t.text1, letterSpacing: '-0.4px' }}>Payments</h1>
+            <p style={{ fontSize: '12px', color: t.text3 }}>Pay via trusted Nepali platforms</p>
+          </div>
         </div>
       </div>
 
-      <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px'}}>
+      <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        {/* No wallet notice */}
+        <div style={{ background: 'linear-gradient(135deg, #0E0B18, #1A0A16)', borderRadius: '20px', padding: '20px', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <p style={{ fontSize: '14px', fontWeight: 700, color: 'white', marginBottom: '8px' }}>We don't hold your money</p>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.5)', lineHeight: 1.6 }}>
+            Sahayatri uses trusted Nepali payment platforms you already use. No middleman wallet. Your money goes directly where it should.
+          </p>
+        </div>
+
+        {/* Unpaid bookings */}
+        {unpaidBookings.length > 0 && (
+          <div style={{ ...card, padding: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <p style={{ fontSize: '15px', fontWeight: 800, color: t.text1 }}>Pending payments</p>
+              <p style={{ fontSize: '16px', fontWeight: 900, color: brand.primary }}>NPR {totalUnpaid.toLocaleString()}</p>
+            </div>
+            {unpaidBookings.map((b: any, i: number) => (
+              <div key={b._id || i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: i < unpaidBookings.length - 1 ? `1px solid ${t.border}` : 'none' }}>
+                <div>
+                  <p style={{ fontSize: '14px', fontWeight: 600, color: t.text1, marginBottom: '2px' }}>{b.serviceName || 'Service'}</p>
+                  <p style={{ fontSize: '12px', color: t.text3 }}>{b.date || 'Pending'}</p>
+                </div>
+                <p style={{ fontSize: '14px', fontWeight: 700, color: brand.primary }}>NPR {b.amount?.toLocaleString()}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Payment methods */}
-        <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '16px'}}>
-          <p style={{fontSize: '15px', fontWeight: 800, color: '#111318', marginBottom: '14px'}}>Accepted Payment Methods</p>
-          <div style={{display: 'flex', gap: '10px'}}>
-            {[
-              {label: 'eSewa', color: '#60BB46', sub: 'Most popular'},
-              {label: 'Khalti', color: '#5C2D91', sub: 'Fast & secure'},
-              {label: 'Bank', color: '#2563EB', sub: 'Any Nepali bank'},
-            ].map((pm) => (
-              <div key={pm.label} style={{flex: 1, background: `${pm.color}10`, border: `1px solid ${pm.color}30`, borderRadius: '12px', padding: '12px', textAlign: 'center'}}>
-                <p style={{fontSize: '13px', fontWeight: 800, color: pm.color}}>{pm.label}</p>
-                <p style={{fontSize: '10px', color: '#9CA3AF', marginTop: '2px'}}>{pm.sub}</p>
+        <div style={{ ...card, padding: '20px' }}>
+          <p style={{ fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '6px' }}>Pay with</p>
+          <p style={{ fontSize: '13px', color: t.text3, marginBottom: '16px' }}>Tap to open your preferred payment app</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {PAYMENT_APPS.map((app) => (
+              <div key={app.id}
+                onClick={() => window.open(app.url, '_blank')}
+                style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: '14px', border: `1px solid ${t.border}`, background: t.inputBg, cursor: 'pointer', transition: 'all 0.2s ease' }}
+                className="pressable">
+                <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: app.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: `0 4px 12px ${app.color}40` }}>
+                  <span style={{ fontSize: '16px', fontWeight: 900, color: 'white' }}>{app.initial}</span>
+                </div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: '15px', fontWeight: 700, color: t.text1, marginBottom: '2px' }}>{app.name}</p>
+                  <p style={{ fontSize: '12px', color: t.text3 }}>{app.desc}</p>
+                </div>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.text3} strokeWidth="2" strokeLinecap="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Book a companion CTA */}
-        <div onClick={() => router.push('/home')} style={{background: 'linear-gradient(135deg, #DC143C, #A50E2D)', borderRadius: '16px', padding: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
-          <div>
-            <p style={{fontSize: '16px', fontWeight: 800, color: 'white', marginBottom: '4px'}}>Book a Companion</p>
-            <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.7)'}}>Starting from NPR 280/hr</p>
-          </div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        {/* Companion payout info */}
+        <div style={{ ...card, padding: '20px' }}>
+          <p style={{ fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '14px' }}>Companion payouts</p>
+          {[
+            { label: 'When companions are paid', value: 'Within 24hrs of job completion' },
+            { label: 'Platform commission', value: '15% per booking' },
+            { label: 'Payout method', value: 'eSewa or Khalti' },
+            { label: 'Minimum payout', value: 'NPR 500' },
+          ].map((item, i, arr) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: i < arr.length - 1 ? `1px solid ${t.border}` : 'none', gap: '12px' }}>
+              <p style={{ fontSize: '13px', color: t.text3 }}>{item.label}</p>
+              <p style={{ fontSize: '13px', fontWeight: 600, color: t.text1, textAlign: 'right' }}>{item.value}</p>
+            </div>
+          ))}
         </div>
 
-        {/* Transaction history */}
-        <div>
-          <p style={{fontSize: '17px', fontWeight: 800, color: '#111318', marginBottom: '12px'}}>
-            Transaction History {bookings.length > 0 && `(${bookings.length})`}
-          </p>
-
-          {loading && <div style={{textAlign: 'center', padding: '40px', color: '#9CA3AF'}}>Loading...</div>}
-
-          {!loading && bookings.length === 0 && (
-            <div style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', padding: '40px 20px', textAlign: 'center'}}>
-              <div style={{fontSize: '48px', marginBottom: '16px'}}>💳</div>
-              <p style={{fontSize: '16px', fontWeight: 800, color: '#111318', marginBottom: '8px'}}>No transactions yet</p>
-              <p style={{fontSize: '13px', color: '#9CA3AF', marginBottom: '20px'}}>Book a companion to see your payment history here.</p>
-              <button onClick={() => router.push('/home')}
-                style={{padding: '12px 24px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'sans-serif'}}>
-                Find Companions
-              </button>
-            </div>
-          )}
-
-          <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-            {bookings.map((booking) => {
-              const pm = paymentColor[booking.paymentMethod] || paymentColor.pending
-              return (
-                <div key={booking._id} style={{background: 'white', borderRadius: '16px', border: '1px solid #E9EAEC', overflow: 'hidden'}}>
-                  <div style={{padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
-                    <div style={{width: '44px', height: '44px', borderRadius: '12px', background: pm.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                      <span style={{fontSize: '13px', fontWeight: 800, color: pm.color}}>{pm.label[0]}</span>
-                    </div>
-                    <div style={{flex: 1}}>
-                      <p style={{fontSize: '14px', fontWeight: 800, color: '#111318'}}>{booking.companionName}</p>
-                      <p style={{fontSize: '12px', color: '#9CA3AF', marginTop: '2px'}}>{booking.service} · {timeAgo(booking.createdAt)}</p>
-                    </div>
-                    <div style={{textAlign: 'right'}}>
-                      <p style={{fontSize: '15px', fontWeight: 800, color: '#111318'}}>NPR {booking.total}</p>
-                      <p style={{fontSize: '11px', fontWeight: 700, color: booking.paymentStatus === 'paid' ? '#059669' : '#D97706', marginTop: '2px'}}>
-                        {booking.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
-                      </p>
-                    </div>
-                  </div>
-                  <div style={{padding: '8px 16px', background: '#F5F6F8', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <span style={{fontSize: '11px', color: '#9CA3AF'}}>Ref: {booking.confirmationCode}</span>
-                    <span style={{fontSize: '11px', fontWeight: 700, color: statusColor[booking.status] || '#9CA3AF', textTransform: 'capitalize'}}>
-                      {booking.status}
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
+        {/* Security */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 16px', background: 'rgba(16,185,129,0.06)', border: '1px solid rgba(16,185,129,0.15)', borderRadius: '14px' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <CheckIcon size={16} color="#10B981" strokeWidth={2.5}/>
           </div>
+          <p style={{ fontSize: '13px', color: '#10B981', lineHeight: 1.5, fontWeight: 500 }}>
+            All payments are processed by licensed Nepali payment providers. Sahayatri never stores your card or wallet details.
+          </p>
         </div>
       </div>
-      <BottomNav />
+      <BottomNav/>
     </div>
   )
 }

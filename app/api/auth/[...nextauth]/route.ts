@@ -14,12 +14,9 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
-
         await connectDB()
-
         const user = await User.findOne({ email: credentials.email })
         if (!user) return null
-
         const isValid = await bcrypt.compare(credentials.password, user.password)
         if (!isValid) return null
 
@@ -27,7 +24,11 @@ const handler = NextAuth({
           id: user._id.toString(),
           name: user.name,
           email: user.email,
-          role: user.role,
+          // Everyone starts as family
+          companionEnabled: user.companionProfile?.enabled || false,
+          companionAgreementSigned: user.companionProfile?.agreementSigned || false,
+          companionDocsUploaded: user.companionProfile?.docsUploaded || false,
+          companionVerified: user.companionProfile?.verificationStatus === 'verified',
         }
       }
     })
@@ -36,22 +37,26 @@ const handler = NextAuth({
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as any).role
         token.id = (user as any).id
+        token.companionEnabled = (user as any).companionEnabled || false
+        token.companionAgreementSigned = (user as any).companionAgreementSigned || false
+        token.companionDocsUploaded = (user as any).companionDocsUploaded || false
+        token.companionVerified = (user as any).companionVerified || false
       }
       return token
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).role = token.role
-        ;(session.user as any).id = token.id
+        (session.user as any).id = token.id
+        ;(session.user as any).companionEnabled = token.companionEnabled || false
+        ;(session.user as any).companionAgreementSigned = token.companionAgreementSigned || false
+        ;(session.user as any).companionDocsUploaded = token.companionDocsUploaded || false
+        ;(session.user as any).companionVerified = token.companionVerified || false
       }
       return session
     }
   },
-  pages: {
-    signIn: '/login',
-  },
+  pages: { signIn: '/login' },
   secret: process.env.NEXTAUTH_SECRET,
 })
 

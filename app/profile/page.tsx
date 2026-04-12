@@ -257,6 +257,7 @@ export default function Profile() {
           </div>
           {[
             { Icon: EditIcon, label: 'Edit Profile', sub: 'Name, photo, bio, location', path: '/edit-profile', color: brand.primary, bg: brand.primaryLight },
+            { Icon: SparkleIcon, label: 'Switch to Companion Mode', sub: 'Earn by providing care services', path: '/companion/setup', color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
             { Icon: BellIcon, label: 'Notifications', sub: 'Likes, comments, updates', path: '/notifications', color: brand.warning, bg: brand.warningBg },
             { Icon: SearchIcon, label: 'Search', sub: 'Find people and moments', path: '/search', color: brand.info, bg: brand.infoBg },
           ].map((item, i) => (

@@ -7,11 +7,18 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: '/',
-    },
+      authorized: ({ token, req }) => {
+        const pathname = req.nextUrl.pathname
+        const protectedPaths = [
+          '/home', '/family', '/memory', '/profile',
+          '/sathi', '/bookings', '/notifications',
+          '/care', '/companion',
+        ]
+        const isProtected = protectedPaths.some(p => pathname.startsWith(p))
+        if (isProtected) return !!token
+        return true
+      }
+    }
   }
 )
 
@@ -19,17 +26,12 @@ export const config = {
   matcher: [
     '/home/:path*',
     '/family/:path*',
-    '/sathi/:path*',
     '/memory/:path*',
     '/profile/:path*',
-    '/edit-profile/:path*',
-    '/notifications/:path*',
-    '/search/:path*',
-    '/wallet/:path*',
-    '/book/:path*',
-    '/book-service/:path*',
+    '/sathi/:path*',
     '/bookings/:path*',
-    '/professional/:path*',
-    '/services/:path*',
-  ],
+    '/notifications/:path*',
+    '/care/:path*',
+    '/companion/:path*',
+  ]
 }

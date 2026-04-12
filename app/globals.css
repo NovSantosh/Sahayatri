@@ -235,3 +235,26 @@ button, a, [role="button"] {
     --font-scale: 1.1;
   }
 }
+
+/* ── PREVENT ALL ZOOM ── */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  touch-action: manipulation;
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Every element uses manipulation — allows tap and scroll, blocks zoom */
+* {
+  touch-action: manipulation;
+}
+
+/* Only images can be pinch-zoomed */
+img {
+  touch-action: auto;
+}

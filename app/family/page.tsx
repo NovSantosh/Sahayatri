@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
 import BottomNav from '../components/BottomNav'
-import { brand, light, dark } from '../design-system'
+import { brand } from '../design-system'
+import { useTheme } from '../context/ThemeContext'
 import {
   HeartIcon, LampIcon, MoonIcon, FestivalIcon, QuoteIcon, WordIcon,
   FeelingHappyIcon, FeelingOkayIcon, FeelingSadIcon, MicIcon,
@@ -38,6 +39,8 @@ const QUOTES = [
 
 export default function Family() {
   const { data: session } = useSession()
+  const { t, theme } = useTheme()
+  const isDark = theme === "dark"
   const [family, setFamily] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -184,18 +187,18 @@ export default function Family() {
   const todayQuote = QUOTES[now.getDate() % QUOTES.length]
 
   if (loading) return (
-    <div style={{minHeight: '100vh', background: '#06040C', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif'}}>
       <div style={{textAlign: 'center'}}>
         <div style={{width: '48px', height: '48px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
           <FamilyIcon size={24} color="white" strokeWidth={1.8}/>
         </div>
-        <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.3)', fontWeight: 500}}>Opening Family Room…</p>
+        <p style={{fontSize: '13px', color: t.text3, fontWeight: 500}}>Opening Family Room…</p>
       </div>
     </div>
   )
 
   return (
-    <div style={{minHeight: '100vh', background: '#06040C', fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px'}}>
       <div style={{position: 'fixed', inset: 0, background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,0,30,0.25) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0}}/>
 
       {/* Maya animation */}
@@ -205,7 +208,7 @@ export default function Family() {
             <HeartIcon size={88} color="white" filled strokeWidth={0}/>
           </div>
           <h2 style={{fontSize: '36px', fontWeight: 800, color: 'white', marginTop: '24px', marginBottom: '10px', letterSpacing: '-1px'}}>माया पठाइयो!</h2>
-          <p style={{fontSize: '18px', color: 'rgba(255,255,255,0.6)'}}>Love sent to your family</p>
+          <p style={{fontSize: '18px', color: t.text2}}>Love sent to your family</p>
         </div>
       )}
 
@@ -214,7 +217,7 @@ export default function Family() {
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: family ? '16px' : '0'}}>
           <div>
             <h1 style={{fontSize: '22px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>Family Room</h1>
-            <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '3px', fontWeight: 500}}>{family ? family.name : 'Your family · All in one place'}</p>
+            <p style={{fontSize: '12px', color: t.text3, marginTop: '3px', fontWeight: 500}}>{family ? family.name : 'Your family · All in one place'}</p>
           </div>
           {family && (
             <button onClick={copyCode} style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', background: copied ? 'rgba(34,197,94,0.15)' : 'rgba(255,255,255,0.06)', border: `1px solid ${copied ? 'rgba(34,197,94,0.3)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '20px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
@@ -231,10 +234,10 @@ export default function Family() {
               { label: 'Vancouver', flag: 'CA', time: vancouver },
               { label: 'Kathmandu', flag: 'NP', time: kathmandu },
             ].map((t, i) => (
-              <div key={i} style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '14px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px'}}>
+              <div key={i} style={{background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '14px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px'}}>
                 <ClockIcon size={16} color="rgba(255,255,255,0.3)" strokeWidth={1.8}/>
                 <div>
-                  <p style={{fontSize: '10px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, marginBottom: '2px'}}>{t.label}</p>
+                  <p style={{fontSize: '10px', color: t.text3, fontWeight: 600, marginBottom: '2px'}}>{t.label}</p>
                   <p style={{fontSize: '16px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>
                     {t.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </p>
@@ -254,24 +257,24 @@ export default function Family() {
               <FamilyIcon size={40} color={brand.primary} strokeWidth={1.5}/>
             </div>
             <h2 style={{fontSize: '24px', fontWeight: 800, color: 'white', marginBottom: '10px', letterSpacing: '-0.6px'}}>Create Your Family Room</h2>
-            <p style={{fontSize: '15px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, marginBottom: '32px', maxWidth: '280px', margin: '0 auto 32px'}}>One place for your whole family. Stay close no matter how far.</p>
+            <p style={{fontSize: '15px', color: t.text3, lineHeight: 1.7, marginBottom: '32px', maxWidth: '280px', margin: '0 auto 32px'}}>One place for your whole family. Stay close no matter how far.</p>
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '320px', margin: '0 auto'}}>
               <button onClick={() => { setShowCreate(true); setShowJoin(false) }}
                 style={{width: '100%', padding: '16px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '16px', fontSize: '15px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                 Create Family Room
               </button>
               <button onClick={() => { setShowJoin(true); setShowCreate(false) }}
-                style={{width: '100%', padding: '16px', background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                style={{width: '100%', padding: '16px', background: t.inputBg, color: t.text2, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
                 Join with a Code
               </button>
             </div>
           </div>
 
           {showCreate && (
-            <div style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
+            <div style={{background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
               <p style={{fontSize: '15px', fontWeight: 800, color: 'white', marginBottom: '12px'}}>Name your Family Room</p>
               <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder={`${session?.user?.name?.split(' ')[0]}'s Family`}
-                style={{width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px 16px', fontSize: '15px', color: 'white', outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', marginBottom: '12px'}}/>
+                style={{width: '100%', background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px 16px', fontSize: '15px', color: 'white', outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', marginBottom: '12px'}}/>
               <button onClick={handleCreate} disabled={submitting}
                 style={{width: '100%', padding: '14px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                 {submitting ? 'Creating…' : 'Create Room'}
@@ -280,10 +283,10 @@ export default function Family() {
           )}
 
           {showJoin && (
-            <div style={{background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
+            <div style={{background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
               <p style={{fontSize: '15px', fontWeight: 800, color: 'white', marginBottom: '12px'}}>Enter Family Code</p>
               <input value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder="ABC123" maxLength={6}
-                style={{width: '100%', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', fontSize: '28px', color: 'white', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box', marginBottom: '12px', letterSpacing: '8px', textAlign: 'center', fontWeight: 800}}/>
+                style={{width: '100%', background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', fontSize: '28px', color: 'white', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box', marginBottom: '12px', letterSpacing: '8px', textAlign: 'center', fontWeight: 800}}/>
               <button onClick={handleJoin} disabled={submitting || joinCode.length < 6}
                 style={{width: '100%', padding: '14px', background: joinCode.length >= 6 ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'rgba(220,20,60,0.3)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: joinCode.length >= 6 ? 'pointer' : 'not-allowed', fontFamily: 'Inter, sans-serif'}}>
                 {submitting ? 'Joining…' : 'Join Family Room'}
@@ -298,7 +301,7 @@ export default function Family() {
         <div style={{position: 'relative', zIndex: 1}}>
           {/* Tabs */}
           <div style={{padding: '16px 16px 0'}}>
-            <div style={{display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '16px', padding: '4px', border: '1px solid rgba(255,255,255,0.08)'}}>
+            <div style={{display: 'flex', background: t.inputBg, borderRadius: '16px', padding: '4px', border: `1px solid ${t.border}`}}>
               {[
                 { id: 'home', label: 'Home', Icon: HomeIcon },
                 { id: 'voices', label: 'Voices', Icon: MicIcon },
@@ -336,7 +339,7 @@ export default function Family() {
                           <div style={{width: '32px', height: '32px', borderRadius: '50%', background: isOnline(m.lastActive) ? 'rgba(251,191,36,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${isOnline(m.lastActive) ? 'rgba(251,191,36,0.3)' : 'rgba(255,255,255,0.08)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 4px'}}>
                             <LampIcon size={16} color={isOnline(m.lastActive) ? '#F59E0B' : 'rgba(255,255,255,0.2)'} strokeWidth={2}/>
                           </div>
-                          <p style={{fontSize: '9px', color: 'rgba(255,255,255,0.3)', fontWeight: 600}}>{m.name.split(' ')[0]}</p>
+                          <p style={{fontSize: '9px', color: t.text3, fontWeight: 600}}>{m.name.split(' ')[0]}</p>
                         </div>
                       ))}
                     </div>
@@ -344,7 +347,7 @@ export default function Family() {
                 </div>
 
                 {/* Feeling */}
-                <div style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '20px'}}>
+                <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
                   <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px'}}>Today I am Feeling · आज म...</p>
                   <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px'}}>
                     {[
@@ -388,19 +391,19 @@ export default function Family() {
                         </div>
                         <div>
                           <p style={{fontSize: '20px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px'}}>{nextFestival.name}</p>
-                          <p style={{fontSize: '14px', color: 'rgba(255,255,255,0.4)', marginTop: '2px'}}>{nextFestival.nepali}</p>
+                          <p style={{fontSize: '14px', color: t.text3, marginTop: '2px'}}>{nextFestival.nepali}</p>
                         </div>
                       </div>
                       <div style={{textAlign: 'right'}}>
                         <p style={{fontSize: '48px', fontWeight: 900, color: brand.primary, letterSpacing: '-3px', lineHeight: 1}}>{nextFestival.days}</p>
-                        <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600, marginTop: '4px'}}>days away</p>
+                        <p style={{fontSize: '11px', color: t.text3, fontWeight: 600, marginTop: '4px'}}>days away</p>
                       </div>
                     </div>
                   </div>
                 )}
 
                 {/* Daily Word */}
-                <div style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '20px'}}>
+                <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px'}}>
                     <WordIcon size={14} color="rgba(255,255,255,0.25)" strokeWidth={2}/>
                     <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px'}}>Word of the Day · आजको शब्द</p>
@@ -418,7 +421,7 @@ export default function Family() {
                 </div>
 
                 {/* Quote */}
-                <div style={{background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '20px', padding: '20px'}}>
+                <div style={{background: 'rgba(255,255,255,0.03)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px'}}>
                     <QuoteIcon size={14} color="rgba(220,20,60,0.5)" strokeWidth={2}/>
                     <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(220,20,60,0.6)', textTransform: 'uppercase', letterSpacing: '1px'}}>आजको सोच</p>
@@ -434,7 +437,7 @@ export default function Family() {
                   </div>
                   <div style={{textAlign: 'left'}}>
                     <p style={{fontSize: '15px', fontWeight: 800, color: goodnight ? 'white' : 'rgba(255,255,255,0.6)'}}>{goodnight ? 'Goodnight sent · शुभरात्री!' : 'Say Goodnight to Family'}</p>
-                    <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginTop: '2px'}}>{goodnight ? 'Your family knows you are resting' : 'Let everyone know you are sleeping'}</p>
+                    <p style={{fontSize: '12px', color: t.text3, marginTop: '2px'}}>{goodnight ? 'Your family knows you are resting' : 'Let everyone know you are sleeping'}</p>
                   </div>
                 </button>
               </>
@@ -445,7 +448,7 @@ export default function Family() {
               <>
                 {error && <div style={{background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.25)', borderRadius: '14px', padding: '12px 16px', fontSize: '13px', color: '#DC143C', fontWeight: 600}}>{error}</div>}
 
-                <div style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '24px', padding: '28px 20px', textAlign: 'center'}}>
+                <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '24px', padding: '28px 20px', textAlign: 'center'}}>
                   <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px'}}>
                     {recording ? `Recording ${formatTime(recordingTime)}` : uploading ? 'Sending to family…' : 'Leave a voice for your family'}
                   </p>
@@ -472,21 +475,21 @@ export default function Family() {
                   {!recording && !uploading && <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.2)', marginTop: '10px'}}>Hold to record · Release to send</p>}
                 </div>
 
-                <p style={{fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.5)'}}>Family Voices {voiceMessages.length > 0 && `(${voiceMessages.length})`}</p>
+                <p style={{fontSize: '13px', fontWeight: 700, color: t.text3}}>Family Voices {voiceMessages.length > 0 && `(${voiceMessages.length})`}</p>
 
                 {voiceMessages.length === 0 && (
-                  <div style={{background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '20px', padding: '40px 20px', textAlign: 'center'}}>
-                    <div style={{width: '56px', height: '56px', borderRadius: '50%', background: 'rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px'}}>
+                  <div style={{background: 'rgba(255,255,255,0.03)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '40px 20px', textAlign: 'center'}}>
+                    <div style={{width: '56px', height: '56px', borderRadius: '50%', background: t.inputBg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px'}}>
                       <MicIcon size={28} color="rgba(255,255,255,0.2)" strokeWidth={1.5}/>
                     </div>
-                    <p style={{fontSize: '15px', fontWeight: 700, color: 'rgba(255,255,255,0.5)', marginBottom: '6px'}}>No voices yet</p>
+                    <p style={{fontSize: '15px', fontWeight: 700, color: t.text3, marginBottom: '6px'}}>No voices yet</p>
                     <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.25)'}}>Be the first to leave a voice for your family.</p>
                   </div>
                 )}
 
                 <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
                   {voiceMessages.map((msg) => (
-                    <div key={msg._id} style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '18px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
+                    <div key={msg._id} style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '18px', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
                       <div style={{width: '44px', height: '44px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', flexShrink: 0, boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                         {initials(msg.senderName)}
                       </div>
@@ -518,7 +521,7 @@ export default function Family() {
             {/* MEMBERS TAB */}
             {activeTab === 'members' && (
               <>
-                <div style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', overflow: 'hidden'}}>
+                <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', overflow: 'hidden'}}>
                   <div style={{padding: '16px 16px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <p style={{fontSize: '15px', fontWeight: 800, color: 'white'}}>Family ({family.members.length})</p>
                     <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
@@ -543,16 +546,16 @@ export default function Family() {
                           {isOnline(member.lastActive) ? '● Active now' : `Last seen ${timeAgo(member.lastActive)}`}
                         </p>
                       </div>
-                      <div style={{padding: '4px 10px', borderRadius: '20px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.35)'}}>{member.role}</div>
+                      <div style={{padding: '4px 10px', borderRadius: '20px', background: t.inputBg, border: `1px solid ${t.border}`, fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.35)'}}>{member.role}</div>
                     </div>
                   ))}
                 </div>
 
                 {/* Invite */}
-                <div style={{background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '20px', padding: '20px'}}>
+                <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
                   <p style={{fontSize: '15px', fontWeight: 800, color: 'white', marginBottom: '6px'}}>Invite Family Members</p>
-                  <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.3)', marginBottom: '16px', lineHeight: 1.5}}>Share this code with your family to join your room.</p>
-                  <div style={{display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.06)', borderRadius: '16px', padding: '16px 18px'}}>
+                  <p style={{fontSize: '13px', color: t.text3, marginBottom: '16px', lineHeight: 1.5}}>Share this code with your family to join your room.</p>
+                  <div style={{display: 'flex', alignItems: 'center', gap: '12px', background: t.inputBg, borderRadius: '16px', padding: '16px 18px'}}>
                     <div style={{flex: 1}}>
                       <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px'}}>Family Code</p>
                       <p style={{fontSize: '30px', fontWeight: 800, color: 'white', letterSpacing: '8px', fontFamily: 'monospace'}}>{family.code}</p>

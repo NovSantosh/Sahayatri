@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'sahayatri-v' + Date.now()
+const CACHE_VERSION = "sahayatri-" + Date.now()
 const CACHE_NAME = CACHE_VERSION
 
 // On install — take control immediately, don't cache anything on install

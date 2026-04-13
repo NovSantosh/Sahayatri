@@ -377,9 +377,9 @@ export default function Services() {
           {/* Trust badges */}
           <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px'}}>
             {[
-              { label: 'Verified', sub: 'Background checked', color: brand.success, bg: brand.successBg },
-              { label: 'Insured', sub: 'Work guaranteed', color: brand.info, bg: brand.infoBg },
-              { label: 'Rated', sub: `${selectedService.rating} stars`, color: brand.warning, bg: brand.warningBg },
+              { label: 'Verified', sub: 'Background checked', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
+              { label: 'Insured', sub: 'Work guaranteed', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
+              { label: 'Rated', sub: `${selectedService.rating} stars`, color: brand.warning, bg: 'rgba(245,158,11,0.1)' },
             ].map((b, i) => (
               <div key={i} style={{...card, padding: '12px 8px', textAlign: 'center'}}>
                 <div style={{width: '32px', height: '32px', borderRadius: '10px', background: b.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 8px'}}>
@@ -462,15 +462,15 @@ export default function Services() {
 
         {/* Location notice */}
         <div style={{...card, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
-          <div style={{width: '38px', height: '38px', borderRadius: '12px', background: brand.infoBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-            <LocationIcon size={18} color={brand.info} strokeWidth={2}/>
+          <div style={{width: '38px', height: '38px', borderRadius: '12px', background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+            <LocationIcon size={18} color={'#3B82F6'} strokeWidth={2}/>
           </div>
           <div style={{flex: 1}}>
             <p style={{fontSize: '13px', fontWeight: 700, color: t.text1, marginBottom: '2px', transition: 'color 0.3s ease'}}>Serving Kathmandu Valley</p>
             <p style={{fontSize: '12px', color: t.text3}}>Bhaktapur · Lalitpur · Pokhara expanding soon</p>
           </div>
-          <div style={{padding: '4px 10px', background: brand.infoBg, borderRadius: '9999px'}}>
-            <span style={{fontSize: '11px', fontWeight: 700, color: brand.info}}>Change</span>
+          <div style={{padding: '4px 10px', background: 'rgba(59,130,246,0.1)', borderRadius: '9999px'}}>
+            <span style={{fontSize: '11px', fontWeight: 700, color: '#3B82F6'}}>Change</span>
           </div>
         </div>
 

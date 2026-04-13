@@ -233,13 +233,13 @@ export default function Family() {
             {[
               { label: 'Vancouver', flag: 'CA', time: vancouver },
               { label: 'Kathmandu', flag: 'NP', time: kathmandu },
-            ].map((t, i) => (
+            ].map((city, i) => (
               <div key={i} style={{background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '14px', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '10px'}}>
                 <ClockIcon size={16} color="rgba(255,255,255,0.3)" strokeWidth={1.8}/>
                 <div>
-                  <p style={{fontSize: '10px', color: t.text3, fontWeight: 600, marginBottom: '2px'}}>{t.label}</p>
+                  <p style={{fontSize: '10px', color: t.text3, fontWeight: 600, marginBottom: '2px'}}>{city.label}</p>
                   <p style={{fontSize: '16px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>
-                    {t.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                    {city.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </p>
                 </div>
               </div>

@@ -120,8 +120,8 @@ export default function Memory() {
 
   const categoryStyle: any = {
     'Care moment':    { bg: brand.primaryLight,  color: brand.primary,  label: 'Care' },
-    'Service story':  { bg: brand.warningBg,     color: brand.warning,  label: 'Service' },
-    'Community':      { bg: brand.infoBg,        color: brand.info,     label: 'Community' },
+    'Service story':  { bg: 'rgba(245,158,11,0.1)',     color: brand.warning,  label: 'Service' },
+    'Community':      { bg: 'rgba(59,130,246,0.1)',        color: '#3B82F6',     label: 'Community' },
   }
 
   const card = {
@@ -146,7 +146,7 @@ export default function Memory() {
             <p style={{fontSize: '13px', color: t.text3, textAlign: 'center', marginBottom: '24px'}}>This cannot be undone.</p>
             <div style={{display: 'flex', gap: '10px'}}>
               <button onClick={() => setConfirmDelete(null)}
-                style={{flex: 1, padding: '14px', background: t.cardBg2, border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: t.text2}}>
+                style={{flex: 1, padding: '14px', background: t.inputBg, border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: t.text2}}>
                 Cancel
               </button>
               <button onClick={() => handleDelete(confirmDelete)} disabled={deletingIds.includes(confirmDelete)}
@@ -166,7 +166,7 @@ export default function Memory() {
             <p style={{fontSize: '12px', color: t.text3, marginTop: '3px'}}>Real moments · Real people</p>
           </div>
           <button onClick={() => setShowForm(!showForm)}
-            style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 18px', background: showForm ? t.cardBg2 : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: showForm ? `1px solid ${t.border}` : 'none', borderRadius: '9999px', color: showForm ? t.text2 : 'white', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: showForm ? 'none' : '0 4px 16px rgba(220,20,60,0.3)', transition: 'all 0.2s ease'}}>
+            style={{display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 18px', background: showForm ? t.inputBg : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: showForm ? `1px solid ${t.border}` : 'none', borderRadius: '9999px', color: showForm ? t.text2 : 'white', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: showForm ? 'none' : '0 4px 16px rgba(220,20,60,0.3)', transition: 'all 0.2s ease'}}>
             {showForm
               ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
               : <PlusIcon size={14} color="white" strokeWidth={2.5}/>}

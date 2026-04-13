@@ -58,9 +58,9 @@ export default function Notifications() {
   const getIcon = (type: string) => {
     switch (type) {
       case 'like': return { Icon: HeartIcon, color: brand.primary, bg: brand.primaryLight }
-      case 'comment': return { Icon: CommentIcon, color: brand.info, bg: brand.infoBg }
-      case 'family': return { Icon: FamilyIcon, color: brand.success, bg: brand.successBg }
-      case 'booking': return { Icon: CalendarIcon, color: brand.warning, bg: brand.warningBg }
+      case 'comment': return { Icon: CommentIcon, color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' }
+      case 'family': return { Icon: FamilyIcon, color: brand.success, bg: 'rgba(16,185,129,0.1)' }
+      case 'booking': return { Icon: CalendarIcon, color: brand.warning, bg: 'rgba(245,158,11,0.1)' }
       default: return { Icon: SparkleIcon, color: brand.primary, bg: brand.primaryLight }
     }
   }

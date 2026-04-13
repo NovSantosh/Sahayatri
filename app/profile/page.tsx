@@ -233,8 +233,8 @@ export default function Profile() {
             <p style={{fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px'}}>My Activity</p>
           </div>
           {[
-            { Icon: CalendarIcon, label: 'My Bookings', sub: 'View and manage bookings', path: '/bookings', color: brand.info, bg: brand.infoBg },
-            { Icon: WalletIcon, label: 'Payment History', sub: 'eSewa · Khalti · Bank', path: '/wallet', color: brand.success, bg: brand.successBg },
+            { Icon: CalendarIcon, label: 'My Bookings', sub: 'View and manage bookings', path: '/bookings', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
+            { Icon: WalletIcon, label: 'Payment History', sub: 'eSewa · Khalti · Bank', path: '/wallet', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
           ].map((item, i) => (
             <div key={i} onClick={() => router.push(item.path)}
               style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderTop: `1px solid ${t.border}`, cursor: 'pointer'}}>
@@ -258,8 +258,8 @@ export default function Profile() {
           {[
             { Icon: EditIcon, label: 'Edit Profile', sub: 'Name, photo, bio, location', path: '/edit-profile', color: brand.primary, bg: brand.primaryLight },
             { Icon: SparkleIcon, label: 'Switch to Companion Mode', sub: 'Earn by providing care services', path: '/companion/setup', color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-            { Icon: BellIcon, label: 'Notifications', sub: 'Likes, comments, updates', path: '/notifications', color: brand.warning, bg: brand.warningBg },
-            { Icon: SearchIcon, label: 'Search', sub: 'Find people and moments', path: '/search', color: brand.info, bg: brand.infoBg },
+            { Icon: BellIcon, label: 'Notifications', sub: 'Likes, comments, updates', path: '/notifications', color: brand.warning, bg: 'rgba(245,158,11,0.1)' },
+            { Icon: SearchIcon, label: 'Search', sub: 'Find people and moments', path: '/search', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
           ].map((item, i) => (
             <div key={i} onClick={() => router.push(item.path)}
               style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderTop: `1px solid ${t.border}`, cursor: 'pointer'}}>

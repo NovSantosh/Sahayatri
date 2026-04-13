@@ -33,7 +33,6 @@ export default function ResponsiveWrapper({ children }: { children: React.ReactN
       width: '100%',
       maxWidth: '480px',
       margin: '0 auto',
-      minHeight: '100vh',
       minHeight: '100dvh',
       position: 'relative',
       overflowX: 'hidden',

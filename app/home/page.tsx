@@ -239,7 +239,7 @@ export default function Dashboard() {
             </div>
             <div style={{background: t.border}}/>
             <div style={{display: 'flex', alignItems: 'center', gap: '10px', paddingLeft: '16px'}}>
-              <div style={{width: '34px', height: '34px', borderRadius: '10px', background: goodTimeToCall ? brand.successBg : brand.warningBg, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+              <div style={{width: '34px', height: '34px', borderRadius: '10px', background: goodTimeToCall ? 'rgba(16,185,129,0.1)' : 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                 {goodTimeToCall
                   ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={brand.success} strokeWidth="2" strokeLinecap="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.79 19.79 0 0 1 2.12 4.18 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                   : <MoonIcon size={16} color={brand.warning} strokeWidth={2}/>}
@@ -257,14 +257,14 @@ export default function Dashboard() {
         {/* ── FESTIVAL ── */}
         {nextFestival && nextFestival.days <= 45 && (
           <div style={{...card, padding: '16px 18px', display: 'flex', alignItems: 'center', gap: '14px'}}>
-            <div style={{width: '46px', height: '46px', borderRadius: '14px', background: brand.warningBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+            <div style={{width: '46px', height: '46px', borderRadius: '14px', background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
               <FestivalIcon size={24} color={brand.warning} strokeWidth={1.8}/>
             </div>
             <div style={{flex: 1}}>
               <p style={{fontSize: '10px', fontWeight: 700, color: brand.warning, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '3px'}}>Coming Up</p>
               <p style={{fontSize: '16px', fontWeight: 800, color: t.text1, letterSpacing: '-0.3px', transition: 'color 0.3s ease'}}>{nextFestival.name} · {nextFestival.nepali}</p>
             </div>
-            <div style={{textAlign: 'center', background: brand.warningBg, border: `1px solid rgba(217,119,6,0.15)`, borderRadius: '12px', padding: '8px 14px', flexShrink: 0}}>
+            <div style={{textAlign: 'center', background: 'rgba(245,158,11,0.1)', border: `1px solid rgba(217,119,6,0.15)`, borderRadius: '12px', padding: '8px 14px', flexShrink: 0}}>
               <p style={{fontSize: '22px', fontWeight: 900, color: brand.warning, lineHeight: 1, letterSpacing: '-1px'}}>{nextFestival.days}</p>
               <p style={{fontSize: '9px', fontWeight: 700, color: brand.warning, opacity: 0.7, textTransform: 'uppercase'}}>days</p>
             </div>
@@ -295,8 +295,8 @@ export default function Dashboard() {
         {/* ── LIVE STATS ── */}
         <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px'}}>
           {[
-            { id: 'stat1', Icon: FamilyIcon, label: familyOnline > 0 ? `${familyOnline} Online` : 'Family', sub: familyOnline > 0 ? 'in room' : 'Open room', path: '/family', color: brand.info, bg: brand.infoBg },
-            { id: 'stat2', Icon: CalendarIcon, label: pendingBookings > 0 ? `${pendingBookings} Pending` : 'Bookings', sub: pendingBookings > 0 ? 'payment due' : `${bookings.length} total`, path: '/bookings', color: brand.warning, bg: brand.warningBg },
+            { id: 'stat1', Icon: FamilyIcon, label: familyOnline > 0 ? `${familyOnline} Online` : 'Family', sub: familyOnline > 0 ? 'in room' : 'Open room', path: '/family', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
+            { id: 'stat2', Icon: CalendarIcon, label: pendingBookings > 0 ? `${pendingBookings} Pending` : 'Bookings', sub: pendingBookings > 0 ? 'payment due' : `${bookings.length} total`, path: '/bookings', color: brand.warning, bg: 'rgba(245,158,11,0.1)' },
             { id: 'stat3', Icon: FestivalIcon, label: nextFestival?.name || 'Festivals', sub: nextFestival ? `${nextFestival.days}d away` : 'Coming soon', path: '/family', color: brand.accent, bg: brand.accentBg },
           ].map((item) => (
             <div key={item.id}
@@ -361,8 +361,8 @@ export default function Dashboard() {
             {[
               { id: 'qa0', Icon: HeartIcon, label: 'Book Care', sub: 'For family in Nepal', path: '/care', color: brand.primary, bg: brand.primaryLight },
               { id: 'qa1', Icon: CameraIcon, label: 'Share a Moment', sub: 'Post to Memory', path: '/memory', color: brand.primary, bg: brand.primaryLight },
-              { id: 'qa2', Icon: FamilyIcon, label: 'Family Room', sub: 'Stay connected', path: '/family', color: brand.info, bg: brand.infoBg },
-              { id: 'qa3', Icon: WalletIcon, label: 'Payments', sub: 'eSewa · Khalti', path: '/wallet', color: brand.success, bg: brand.successBg },
+              { id: 'qa2', Icon: FamilyIcon, label: 'Family Room', sub: 'Stay connected', path: '/family', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
+              { id: 'qa3', Icon: WalletIcon, label: 'Payments', sub: 'eSewa · Khalti', path: '/wallet', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
               { id: 'qa4', Icon: CalendarIcon, label: 'My Bookings', sub: 'View all', path: '/bookings', color: brand.accent, bg: brand.accentBg },
             ].map((item) => (
               <div key={item.id}
@@ -415,10 +415,10 @@ export default function Dashboard() {
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.primary} strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="7" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/><path d="M12 14v3M10 17h4"/></svg> },
               { id: 'c2', label: 'Yoga & Wellness', sub: 'At-home sessions', color: brand.accent, bg: brand.accentBg,
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.accent} strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="4" r="2"/><path d="M15 20v-7l3-3-6-3-6 3 3 3v7"/><path d="M9 20h6"/></svg> },
-              { id: 'c3', label: 'Cooking', sub: 'Nepali home cooking', color: brand.warning, bg: brand.warningBg,
+              { id: 'c3', label: 'Cooking', sub: 'Nepali home cooking', color: brand.warning, bg: 'rgba(245,158,11,0.1)',
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.warning} strokeWidth="1.8" strokeLinecap="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg> },
-              { id: 'c4', label: 'Child Care', sub: 'Learning and care', color: brand.info, bg: brand.infoBg,
-                Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.info} strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="6" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
+              { id: 'c4', label: 'Child Care', sub: 'Learning and care', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)',
+                Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={'#3B82F6'} strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="6" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
             ].map((s) => (
               <div key={s.id}
                 onMouseDown={() => press(s.id)}
@@ -448,11 +448,11 @@ export default function Dashboard() {
           </div>
           <div style={{display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none'}}>
             {[
-              { id: 's1', name: 'Electrician', rate: 'NPR 800', color: brand.warning, bg: brand.warningBg,
+              { id: 's1', name: 'Electrician', rate: 'NPR 800', color: brand.warning, bg: 'rgba(245,158,11,0.1)',
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.warning} strokeWidth="1.8" strokeLinecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> },
-              { id: 's2', name: 'Plumber', rate: 'NPR 700', color: brand.info, bg: brand.infoBg,
-                Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.info} strokeWidth="1.8" strokeLinecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> },
-              { id: 's3', name: 'Cleaner', rate: 'NPR 600', color: brand.success, bg: brand.successBg,
+              { id: 's2', name: 'Plumber', rate: 'NPR 700', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)',
+                Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={'#3B82F6'} strokeWidth="1.8" strokeLinecap="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> },
+              { id: 's3', name: 'Cleaner', rate: 'NPR 600', color: brand.success, bg: 'rgba(16,185,129,0.1)',
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={brand.success} strokeWidth="1.8" strokeLinecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> },
               { id: 's4', name: 'Carpenter', rate: 'NPR 900', color: '#A0784A', bg: 'rgba(160,120,74,0.08)',
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A0784A" strokeWidth="1.8" strokeLinecap="round"><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/><line x1="18" y1="4" x2="6" y2="16"/><rect x="4" y="18" width="4" height="4" rx="1"/></svg> },

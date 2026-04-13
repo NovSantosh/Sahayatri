@@ -50,15 +50,15 @@ export default function Bookings() {
   }
 
   const statusConfig: any = {
-    pending:   { label: 'Pending',   color: brand.warning, bg: brand.warningBg },
-    confirmed: { label: 'Confirmed', color: brand.info,    bg: brand.infoBg },
-    completed: { label: 'Completed', color: brand.success, bg: brand.successBg },
+    pending:   { label: 'Pending',   color: brand.warning, bg: 'rgba(245,158,11,0.1)' },
+    confirmed: { label: 'Confirmed', color: '#3B82F6',    bg: 'rgba(59,130,246,0.1)' },
+    completed: { label: 'Completed', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
     cancelled: { label: 'Cancelled', color: t.text3,       bg: t.inputBg },
   }
 
   const paymentConfig: any = {
     unpaid: { label: 'Unpaid', color: brand.primary, bg: brand.primaryLight },
-    paid:   { label: 'Paid',   color: brand.success,  bg: brand.successBg },
+    paid:   { label: 'Paid',   color: brand.success,  bg: 'rgba(16,185,129,0.1)' },
   }
 
   const filtered = bookings.filter(b => {
@@ -188,15 +188,15 @@ export default function Bookings() {
                 <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px'}}>
                   {booking.date && (
                     <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: brand.infoBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                        <CalendarIcon size={15} color={brand.info} strokeWidth={2}/>
+                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                        <CalendarIcon size={15} color={'#3B82F6'} strokeWidth={2}/>
                       </div>
                       <p style={{fontSize: '13px', color: t.text2, transition: 'color 0.3s ease'}}>{booking.date}{booking.time ? ` · ${booking.time}` : ''}</p>
                     </div>
                   )}
                   {booking.address && (
                     <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: brand.successBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                         <LocationIcon size={15} color={brand.success} strokeWidth={2}/>
                       </div>
                       <p style={{fontSize: '13px', color: t.text2, transition: 'color 0.3s ease'}}>{booking.address}</p>
@@ -204,7 +204,7 @@ export default function Bookings() {
                   )}
                   {booking.amount > 0 && (
                     <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: brand.warningBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                         <WalletIcon size={15} color={brand.warning} strokeWidth={2}/>
                       </div>
                       <p style={{fontSize: '13px', fontWeight: 700, color: t.text1, transition: 'color 0.3s ease'}}>NPR {booking.amount.toLocaleString()}</p>
@@ -222,7 +222,7 @@ export default function Bookings() {
                     </button>
                   )}
                   {booking.status === 'completed' && (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '5px', background: brand.successBg, borderRadius: '9999px', padding: '5px 12px'}}>
+                    <div style={{display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16,185,129,0.1)', borderRadius: '9999px', padding: '5px 12px'}}>
                       <CheckIcon size={12} color={brand.success} strokeWidth={2.5}/>
                       <span style={{fontSize: '11px', fontWeight: 700, color: brand.success}}>Completed</span>
                     </div>

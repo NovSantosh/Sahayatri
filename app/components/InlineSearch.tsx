@@ -65,7 +65,7 @@ export default function InlineSearch() {
       </div>
 
       {showDropdown && (
-        <div style={{position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0, background: t.cardBg, borderRadius: '20px', border: `1px solid ${t.borderStrong}`, boxShadow: t.shadowElevated, overflow: 'hidden', animation: 'dropIn 0.2s ease'}}>
+        <div style={{position: 'absolute', top: 'calc(100% + 8px)', left: 0, right: 0, background: t.cardBg, borderRadius: '20px', border: `1px solid ${t.border}`, boxShadow: t.shadow, overflow: 'hidden', animation: 'dropIn 0.2s ease'}}>
 
           {!loading && results && !hasResults && (
             <div style={{padding: '28px 20px', textAlign: 'center'}}>
@@ -81,10 +81,10 @@ export default function InlineSearch() {
             <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '2px'}}>
               {[1,2].map(i => (
                 <div key={i} style={{display: 'flex', gap: '12px', alignItems: 'center', padding: '10px 0', borderBottom: i < 2 ? `1px solid ${t.border}` : 'none'}}>
-                  <div style={{width: '38px', height: '38px', borderRadius: '50%', background: t.cardBg2, animation: 'shimmer 1.5s ease infinite'}}/>
+                  <div style={{width: '38px', height: '38px', borderRadius: '50%', background: t.inputBg, animation: 'shimmer 1.5s ease infinite'}}/>
                   <div style={{flex: 1}}>
-                    <div style={{width: '55%', height: '11px', background: t.cardBg2, borderRadius: '6px', marginBottom: '6px', animation: 'shimmer 1.5s ease infinite'}}/>
-                    <div style={{width: '35%', height: '9px', background: t.cardBg2, borderRadius: '6px', animation: 'shimmer 1.5s ease infinite'}}/>
+                    <div style={{width: '55%', height: '11px', background: t.inputBg, borderRadius: '6px', marginBottom: '6px', animation: 'shimmer 1.5s ease infinite'}}/>
+                    <div style={{width: '35%', height: '9px', background: t.inputBg, borderRadius: '6px', animation: 'shimmer 1.5s ease infinite'}}/>
                   </div>
                 </div>
               ))}
@@ -100,7 +100,7 @@ export default function InlineSearch() {
               {results.users.map((user: any) => (
                 <div key={user._id} onClick={() => { setFocused(false); setQuery(''); setResults(null) }}
                   style={{display: 'flex', alignItems: 'center', gap: '12px', padding: '11px 16px', borderTop: `1px solid ${t.border}`, cursor: 'pointer'}}
-                  onMouseEnter={e => (e.currentTarget.style.background = t.cardBg2)}
+                  onMouseEnter={e => (e.currentTarget.style.background = t.inputBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                   {user.avatar
                     ? <img src={user.avatar} alt={user.name} style={{width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0}}/>
@@ -126,7 +126,7 @@ export default function InlineSearch() {
               {results.posts.slice(0, 3).map((post: any) => (
                 <div key={post._id} onClick={() => { router.push('/memory'); setFocused(false); setQuery(''); setResults(null) }}
                   style={{display: 'flex', gap: '12px', padding: '11px 16px', borderTop: `1px solid ${t.border}`, cursor: 'pointer', alignItems: 'flex-start'}}
-                  onMouseEnter={e => (e.currentTarget.style.background = t.cardBg2)}
+                  onMouseEnter={e => (e.currentTarget.style.background = t.inputBg)}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}>
                   <div style={{width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '10px', flexShrink: 0}}>
                     {initials(post.authorName)}
@@ -146,7 +146,7 @@ export default function InlineSearch() {
 
           {hasResults && (
             <div onClick={() => { router.push(`/search?q=${encodeURIComponent(query)}`); setFocused(false) }}
-              style={{padding: '11px 16px', borderTop: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer', background: t.cardBg2}}>
+              style={{padding: '11px 16px', borderTop: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', cursor: 'pointer', background: t.inputBg}}>
               <SearchIcon size={12} color={brand.primary} strokeWidth={2}/>
               <p style={{fontSize: '13px', fontWeight: 700, color: brand.primary}}>See all results for "{query}"</p>
             </div>

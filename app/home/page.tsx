@@ -163,7 +163,6 @@ export default function Dashboard() {
 
           {/* Right — just 3 items max */}
           <div style={{display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0}}>
-            <NotificationDrawer unreadCount={3}/>
             <ModeSwitch/>
             <ThemeToggle/>
             {/* Profile avatar — tapping opens notifications + profile menu */}

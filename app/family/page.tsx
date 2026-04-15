@@ -216,7 +216,7 @@ export default function Family() {
       <div style={{background: 'rgba(6,4,12,0.95)', backdropFilter: 'blur(20px)', padding: '52px 20px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', position: 'sticky', top: 0, zIndex: 50}}>
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: family ? '16px' : '0'}}>
           <div>
-            <h1 style={{fontSize: '22px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>Family Room</h1>
+            <h1 style={{fontSize: '22px', fontWeight: 800, color: t.text1, letterSpacing: '-0.5px'}}>Family Room</h1>
             <p style={{fontSize: '12px', color: t.text3, marginTop: '3px', fontWeight: 500}}>{family ? family.name : 'Your family · All in one place'}</p>
           </div>
           {family && (
@@ -238,7 +238,7 @@ export default function Family() {
                 <ClockIcon size={16} color="rgba(255,255,255,0.3)" strokeWidth={1.8}/>
                 <div>
                   <p style={{fontSize: '10px', color: t.text3, fontWeight: 600, marginBottom: '2px'}}>{city.label}</p>
-                  <p style={{fontSize: '16px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>
+                  <p style={{fontSize: '16px', fontWeight: 800, color: t.text1, letterSpacing: '-0.5px'}}>
                     {city.time.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
                   </p>
                 </div>
@@ -256,7 +256,7 @@ export default function Family() {
             <div style={{width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px'}}>
               <FamilyIcon size={40} color={brand.primary} strokeWidth={1.5}/>
             </div>
-            <h2 style={{fontSize: '24px', fontWeight: 800, color: 'white', marginBottom: '10px', letterSpacing: '-0.6px'}}>Create Your Family Room</h2>
+            <h2 style={{fontSize: '24px', fontWeight: 800, color: t.text1, marginBottom: '10px', letterSpacing: '-0.6px'}}>Create Your Family Room</h2>
             <p style={{fontSize: '15px', color: t.text3, lineHeight: 1.7, marginBottom: '32px', maxWidth: '280px', margin: '0 auto 32px'}}>One place for your whole family. Stay close no matter how far.</p>
             <div style={{display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '320px', margin: '0 auto'}}>
               <button onClick={() => { setShowCreate(true); setShowJoin(false) }}
@@ -264,17 +264,17 @@ export default function Family() {
                 Create Family Room
               </button>
               <button onClick={() => { setShowJoin(true); setShowCreate(false) }}
-                style={{width: '100%', padding: '16px', background: t.inputBg, color: t.text2, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
+                style={{width: '100%', padding: '16px', background: t.inputBg, color: t.text2, border: `1px solid ${t.border}`, borderRadius: '16px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
                 Join with a Code
               </button>
             </div>
           </div>
 
           {showCreate && (
-            <div style={{background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
-              <p style={{fontSize: '15px', fontWeight: 800, color: 'white', marginBottom: '12px'}}>Name your Family Room</p>
+            <div style={{background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
+              <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '12px'}}>Name your Family Room</p>
               <input value={familyName} onChange={(e) => setFamilyName(e.target.value)} placeholder={`${session?.user?.name?.split(' ')[0]}'s Family`}
-                style={{width: '100%', background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px 16px', fontSize: '15px', color: 'white', outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', marginBottom: '12px'}}/>
+                style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '14px 16px', fontSize: '15px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box', marginBottom: '12px'}}/>
               <button onClick={handleCreate} disabled={submitting}
                 style={{width: '100%', padding: '14px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.35)'}}>
                 {submitting ? 'Creating…' : 'Create Room'}
@@ -283,10 +283,10 @@ export default function Family() {
           )}
 
           {showJoin && (
-            <div style={{background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
-              <p style={{fontSize: '15px', fontWeight: 800, color: 'white', marginBottom: '12px'}}>Enter Family Code</p>
+            <div style={{background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px', maxWidth: '400px', margin: '0 auto', width: '100%'}}>
+              <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '12px'}}>Enter Family Code</p>
               <input value={joinCode} onChange={(e) => setJoinCode(e.target.value.toUpperCase())} placeholder="ABC123" maxLength={6}
-                style={{width: '100%', background: t.inputBg, border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '14px', fontSize: '28px', color: 'white', outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box', marginBottom: '12px', letterSpacing: '8px', textAlign: 'center', fontWeight: 800}}/>
+                style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '14px', fontSize: '28px', color: t.text1, outline: 'none', fontFamily: 'monospace', boxSizing: 'border-box', marginBottom: '12px', letterSpacing: '8px', textAlign: 'center', fontWeight: 800}}/>
               <button onClick={handleJoin} disabled={submitting || joinCode.length < 6}
                 style={{width: '100%', padding: '14px', background: joinCode.length >= 6 ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'rgba(220,20,60,0.3)', color: 'white', border: 'none', borderRadius: '12px', fontSize: '14px', fontWeight: 800, cursor: joinCode.length >= 6 ? 'pointer' : 'not-allowed', fontFamily: 'Inter, sans-serif'}}>
                 {submitting ? 'Joining…' : 'Join Family Room'}
@@ -390,7 +390,7 @@ export default function Family() {
                           <FestivalIcon size={28} color={brand.primary} strokeWidth={1.8}/>
                         </div>
                         <div>
-                          <p style={{fontSize: '20px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px'}}>{nextFestival.name}</p>
+                          <p style={{fontSize: '20px', fontWeight: 800, color: t.text1, letterSpacing: '-0.4px'}}>{nextFestival.name}</p>
                           <p style={{fontSize: '14px', color: t.text3, marginTop: '2px'}}>{nextFestival.nepali}</p>
                         </div>
                       </div>
@@ -413,7 +413,7 @@ export default function Family() {
                       <p style={{fontSize: '30px', fontWeight: 800, color: brand.primary}}>{todayWord.word[0]}</p>
                     </div>
                     <div>
-                      <p style={{fontSize: '28px', fontWeight: 800, color: 'white', letterSpacing: '-0.5px'}}>{todayWord.word}</p>
+                      <p style={{fontSize: '28px', fontWeight: 800, color: t.text1, letterSpacing: '-0.5px'}}>{todayWord.word}</p>
                       <p style={{fontSize: '13px', color: brand.primary, fontWeight: 600, marginBottom: '3px'}}>{todayWord.roman}</p>
                       <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.5}}>{todayWord.meaning}</p>
                     </div>
@@ -495,7 +495,7 @@ export default function Family() {
                       </div>
                       <div style={{flex: 1}}>
                         <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
-                          <p style={{fontSize: '14px', fontWeight: 700, color: 'white'}}>{msg.senderName}</p>
+                          <p style={{fontSize: '14px', fontWeight: 700, color: t.text1}}>{msg.senderName}</p>
                           <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.25)'}}>{timeAgo(msg.createdAt)}</p>
                         </div>
                         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
@@ -523,7 +523,7 @@ export default function Family() {
               <>
                 <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', overflow: 'hidden'}}>
                   <div style={{padding: '16px 16px 12px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                    <p style={{fontSize: '15px', fontWeight: 800, color: 'white'}}>Family ({family.members.length})</p>
+                    <p style={{fontSize: '15px', fontWeight: 800, color: t.text1}}>Family ({family.members.length})</p>
                     <div style={{display: 'flex', alignItems: 'center', gap: '6px'}}>
                       <div style={{width: '6px', height: '6px', borderRadius: '50%', background: '#22C55E', boxShadow: '0 0 6px rgba(34,197,94,0.6)'}}/>
                       <span style={{fontSize: '11px', fontWeight: 600, color: '#22C55E'}}>{family.members.filter((m: any) => isOnline(m.lastActive)).length} online</span>
@@ -539,7 +539,7 @@ export default function Family() {
                       </div>
                       <div style={{flex: 1}}>
                         <div style={{display: 'flex', alignItems: 'center', gap: '8px'}}>
-                          <p style={{fontSize: '15px', fontWeight: 700, color: 'white'}}>{member.name}</p>
+                          <p style={{fontSize: '15px', fontWeight: 700, color: t.text1}}>{member.name}</p>
                           {family.admin?.toString() === member.user?.toString() && <span style={{fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '20px', background: 'rgba(220,20,60,0.15)', color: brand.primary, border: `1px solid ${brand.primaryBorder}`}}>Admin</span>}
                         </div>
                         <p style={{fontSize: '12px', color: isOnline(member.lastActive) ? '#22C55E' : 'rgba(255,255,255,0.3)', marginTop: '2px', fontWeight: 500}}>
@@ -553,7 +553,7 @@ export default function Family() {
 
                 {/* Invite */}
                 <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
-                  <p style={{fontSize: '15px', fontWeight: 800, color: 'white', marginBottom: '6px'}}>Invite Family Members</p>
+                  <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '6px'}}>Invite Family Members</p>
                   <p style={{fontSize: '13px', color: t.text3, marginBottom: '16px', lineHeight: 1.5}}>Share this code with your family to join your room.</p>
                   <div style={{display: 'flex', alignItems: 'center', gap: '12px', background: t.inputBg, borderRadius: '16px', padding: '16px 18px'}}>
                     <div style={{flex: 1}}>

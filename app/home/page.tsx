@@ -139,32 +139,51 @@ export default function Dashboard() {
       )}
 
       {/* ── HEADER ── */}
-      <div style={{background: t.headerBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '52px 20px 14px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50, boxShadow: isDark ? 'none' : '0 1px 12px rgba(0,0,0,0.04)', transition: 'background 0.3s ease'}}>
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px'}}>
-          <div>
-            <p style={{fontSize: '11px', fontWeight: 600, color: t.text3, letterSpacing: '0.5px', marginBottom: '4px'}}>
-              {hour < 12 ? 'शुभ प्रभात' : hour < 17 ? 'नमस्ते' : 'शुभ सन्ध्या'}
-            </p>
-            <h1 style={{fontSize: '24px', fontWeight: 900, color: t.text1, letterSpacing: '-0.8px', lineHeight: 1.1, transition: 'color 0.3s ease'}}>
-              {hour < 5 ? `Still up, ${firstName}?`
-                : hour < 12 ? `Good morning, ${firstName}`
-                : hour < 17 ? `Good afternoon, ${firstName}`
-                : hour < 21 ? `Good evening, ${firstName}`
-                : `Good night, ${firstName}`}
+      <div style={{background: t.headerBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '52px 20px 14px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50, transition: 'background 0.3s ease'}}>
+        
+        {/* Top row — greeting + avatar */}
+        <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px'}}>
+          <div style={{flex: 1, minWidth: 0}}>
+            {/* Dynamic contextual greeting */}
+            <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px'}}>
+              <div style={{width: '6px', height: '6px', borderRadius: '50%', background: hour < 20 ? '#10B981' : '#F59E0B', boxShadow: hour < 20 ? '0 0 6px #10B981' : '0 0 6px #F59E0B'}}/>
+              <p style={{fontSize: '11px', fontWeight: 600, color: t.text3, letterSpacing: '0.3px'}}>
+                {hour < 5 ? 'Late night · Nepal is sleeping' 
+                  : hour < 12 ? 'शुभ प्रभात · Good morning'
+                  : hour < 17 ? 'नमस्ते · Good afternoon'  
+                  : hour < 21 ? 'शुभ सन्ध्या · Good evening'
+                  : 'Good night · Rest well'}
+              </p>
+            </div>
+            <h1 style={{fontSize: '22px', fontWeight: 900, color: t.text1, letterSpacing: '-0.6px', lineHeight: 1.1}}>
+              {firstName}
             </h1>
           </div>
-          <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-            <ModeSwitch /><SOSButton /><ThemeToggle />
-            <Link href="/notifications" style={{width: '40px', height: '40px', borderRadius: '12px', border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', textDecoration: 'none', background: t.cardBg}}>
-              <BellIcon size={18} color={t.text2} strokeWidth={1.8}/>
-              <div style={{position: 'absolute', top: '-2px', right: '-2px', width: '8px', height: '8px', borderRadius: '50%', background: brand.primary, border: `2px solid ${t.pageBg}`}}/>
-            </Link>
-            <Link href="/profile" style={{width: '40px', height: '40px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '14px', textDecoration: 'none', boxShadow: '0 4px 16px rgba(220,20,60,0.3)'}}>
-              {initials}
-            </Link>
+
+          {/* Right — just 3 items max */}
+          <div style={{display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0}}>
+            <ModeSwitch/>
+            <ThemeToggle/>
+            {/* Profile avatar — tapping opens notifications + profile menu */}
+            <div style={{position: 'relative'}}>
+              <Link href="/profile" style={{width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '13px', textDecoration: 'none', boxShadow: '0 4px 12px rgba(220,20,60,0.3)'}}>
+                {initials}
+              </Link>
+              {/* Notification badge on avatar */}
+              <div style={{position: 'absolute', top: '-2px', right: '-2px', width: '14px', height: '14px', borderRadius: '50%', background: brand.primary, border: `2px solid ${t.pageBg}`, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <span style={{fontSize: '8px', fontWeight: 800, color: 'white'}}>3</span>
+              </div>
+            </div>
           </div>
         </div>
-        <InlineSearch />
+
+        {/* Second row — SOS + Search side by side */}
+        <div style={{display: 'flex', gap: '10px', alignItems: 'center'}}>
+          <div style={{flex: 1}}>
+            <InlineSearch/>
+          </div>
+          <SOSButton/>
+        </div>
       </div>
 
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative', zIndex: 1}}>

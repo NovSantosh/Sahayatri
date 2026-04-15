@@ -51,15 +51,19 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
     }
 
     const handleTouchEnd = (e: TouchEvent) => {
-      const dx = touchStartX.current - e.changedTouches[0].clientX
-      const dy = Math.abs(touchStartY.current - e.changedTouches[0].clientY)
-      // Swipe left from right edge (last 30px of screen)
-      if (touchStartX.current > window.innerWidth - 30 && dx > 40 && dy < 60) {
+      const endX = e.changedTouches[0].clientX
+      const endY = e.changedTouches[0].clientY
+      const dx = endX - touchStartX.current  // positive = swipe right, negative = swipe left
+      const dy = Math.abs(endY - touchStartY.current)
+
+      // Swipe LEFT from right edge to OPEN (finger moves left from right side)
+      if (touchStartX.current > window.innerWidth - 32 && dx < -40 && dy < 80) {
         setOpen(true)
         fetchNotifications()
       }
-      // Swipe right to close
-      if (open && dx < -60 && dy < 60) {
+
+      // Swipe RIGHT to CLOSE (finger moves right while drawer is open)
+      if (open && dx > 60 && dy < 80) {
         setOpen(false)
       }
     }

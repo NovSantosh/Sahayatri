@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import SOSButton from '../components/SOSButton'
+import NotificationDrawer from '../components/NotificationDrawer'
 import ModeSwitch from '../components/ModeSwitch'
 import BottomNav from '../components/BottomNav'
 import InlineSearch from '../components/InlineSearch'
@@ -162,6 +163,7 @@ export default function Dashboard() {
 
           {/* Right — just 3 items max */}
           <div style={{display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0}}>
+            <NotificationDrawer unreadCount={3}/>
             <ModeSwitch/>
             <ThemeToggle/>
             {/* Profile avatar — tapping opens notifications + profile menu */}

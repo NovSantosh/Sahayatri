@@ -75,6 +75,7 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
       }
       if (open && dx > 60 && dy < 80) {
         setOpen(false)
+        document.body.style.overflow = ''
       }
     }
     document.addEventListener('touchstart', handleTouchStart, { passive: true })
@@ -82,6 +83,7 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
     return () => {
       document.removeEventListener('touchstart', handleTouchStart)
       document.removeEventListener('touchend', handleTouchEnd)
+      document.body.style.overflow = ''
     }
   }, [open])
 
@@ -116,6 +118,7 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
   }
 
   const handleOpen = () => {
+    document.body.style.overflow = 'hidden';
     setOpen(true)
     setPeeking(false)
     fetchNotifications()
@@ -213,13 +216,13 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
               {/* Drag indicator — 3 dots */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', opacity: 0.3 }}>
                 {[0,1,2].map(i => (
-                  <div key={i} style={{ width: '3px', height: '3px', borderRadius: '50%', background: t.text1 }}/>
+                  <div key={i} style={{ width: '2px', height: '2px', borderRadius: '50%', background: t.text1 }}/>
                 ))}
               </div>
 
               {/* Bell icon */}
               <div style={{ position: 'relative' }}>
-                <BellIcon size={16} color={count > 0 ? brand.primary : t.text3} strokeWidth={2}/>
+                <BellIcon size={14} color={count > 0 ? brand.primary : t.text3} strokeWidth={2}/>
                 {count > 0 && (
                   <div style={{
                     position: 'absolute',
@@ -238,7 +241,7 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
               </div>
 
               {/* Arrow pointing left — open cue */}
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={t.text3} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: 0.4 }}>
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke={t.text3} strokeWidth="2.5" strokeLinecap="round" style={{ opacity: 0.4 }}>
                 <path d="M19 12H5M12 5l-7 7 7 7"/>
               </svg>
 
@@ -256,7 +259,7 @@ export default function NotificationDrawer({ unreadCount = 0 }: Props) {
       {/* ── OVERLAY ── */}
       {open && (
         <div
-          onClick={() => setOpen(false)}
+          onClick={() => { setOpen(false); document.body.style.overflow = '' }}
           style={{
             position: 'fixed', inset: 0,
             background: 'rgba(0,0,0,0.5)',

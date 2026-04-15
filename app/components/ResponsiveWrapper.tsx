@@ -35,7 +35,7 @@ export default function ResponsiveWrapper({ children }: { children: React.ReactN
       margin: '0 auto',
       minHeight: '100dvh',
       position: 'relative',
-      overflowX: 'hidden',
+      overflowX: 'clip',
     }}>
       {children}
     </div>

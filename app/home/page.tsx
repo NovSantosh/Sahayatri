@@ -517,6 +517,7 @@ export default function Dashboard() {
         ::-webkit-scrollbar { display: none; }
       `}</style>
 
+      <NotificationDrawer unreadCount={3}/>
       <BottomNav />
     </div>
   )

@@ -90,14 +90,17 @@ export default function Search() {
                 <p style={{ fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '10px' }}>People</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {results.people.map((p: any) => (
-                    <div key={p._id} style={{ ...card, padding: '14px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}>
+                    <div key={p._id} onClick={() => router.push(`/professional?name=${encodeURIComponent(p.name)}&role=${encodeURIComponent(p.role || 'Sahayatri Member')}&rating=${p.rating || '5.0'}&jobs=${p.jobsCompleted || '0'}`)} style={{ ...card, padding: '14px', display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }} className="pressable">
                       <div style={{ width: '44px', height: '44px', borderRadius: '50%', background: brand.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontSize: '16px', flexShrink: 0 }}>
                         {p.name?.[0]?.toUpperCase() || '?'}
                       </div>
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <p style={{ fontSize: '15px', fontWeight: 700, color: t.text1, marginBottom: '2px' }}>{p.name}</p>
-                        <p style={{ fontSize: '12px', color: t.text3 }}>{p.email}</p>
+                        <p style={{ fontSize: '12px', color: t.text3 }}>{p.role || 'Sahayatri Member'}</p>
                       </div>
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.text3} strokeWidth="2" strokeLinecap="round">
+                        <path d="M9 18l6-6-6-6"/>
+                      </svg>
                     </div>
                   ))}
                 </div>

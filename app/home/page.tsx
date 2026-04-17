@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import SOSButton from '../components/SOSButton'
-import NotificationHandle from '../components/NotificationHandle'
 import ModeSwitch from '../components/ModeSwitch'
 import BottomNav from '../components/BottomNav'
 import InlineSearch from '../components/InlineSearch'
@@ -517,7 +516,6 @@ export default function Dashboard() {
         ::-webkit-scrollbar { display: none; }
       `}</style>
 
-      <NotificationHandle unreadCount={3}/>
 <BottomNav />
     </div>
   )

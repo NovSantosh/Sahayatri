@@ -97,10 +97,40 @@ export default function GestureNav({ side = 'right' }: { side?: 'left' | 'right'
   useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
+    if (navState === 'full') {
+      document.body.style.overflow = 'hidden'
+      // Auto close after 1.5 seconds
+      autoCollapseRef.current = setTimeout(() => {
+        setNavState('mini')
+        document.body.style.overflow = ''
+      }, 1500)
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { if (autoCollapseRef.current) clearTimeout(autoCollapseRef.current) }
+  }, [navState])
+
+  // Close on scroll instantly
+  useEffect(() => {
+    const onScroll = () => {
+      if (navState === 'full') {
+        if (autoCollapseRef.current) clearTimeout(autoCollapseRef.current)
+        setNavState('mini')
+        document.body.style.overflow = ''
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    document.addEventListener('touchmove', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      document.removeEventListener('touchmove', onScroll)
+    }
+  }, [navState])
+
+  useEffect(() => {
     if (navState === 'mini') {
       autoCollapseRef.current = setTimeout(() => setNavState('hidden'), 2500)
     }
-    return () => { if (autoCollapseRef.current) clearTimeout(autoCollapseRef.current) }
   }, [navState])
 
   useEffect(() => {

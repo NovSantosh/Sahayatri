@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { useSession } from 'next-auth/react'
 import { useTheme } from '../context/ThemeContext'
@@ -27,6 +27,8 @@ export default function NotificationHandle({ unreadCount = 0 }: { unreadCount?: 
   const [loading, setLoading] = useState(false)
   const [count, setCount] = useState(unreadCount)
   const [handleY, setHandleY] = useState(55)
+  const swipeStartX = useRef(0)
+  const swipeStartY = useRef(0)
 
   useEffect(() => { setMounted(true) }, [])
 
@@ -173,6 +175,18 @@ export default function NotificationHandle({ unreadCount = 0 }: { unreadCount?: 
         flexDirection: 'column',
         boxShadow: '-8px 0 40px rgba(0,0,0,0.3)',
         borderRadius: '20px 0 0 20px',
+      }}
+      onTouchStart={(e) => {
+        swipeStartX.current = e.touches[0].clientX
+        swipeStartY.current = e.touches[0].clientY
+      }}
+      onTouchEnd={(e) => {
+        const dx = e.changedTouches[0].clientX - swipeStartX.current
+        const dy = Math.abs(e.changedTouches[0].clientY - swipeStartY.current)
+        if (dx > 60 && dy < 100) {
+          setOpen(false)
+          document.body.style.overflow = ''
+        }
       }}>
 
         {/* Header */}

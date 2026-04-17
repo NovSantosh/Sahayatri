@@ -250,7 +250,7 @@ export default function JoinProfessional() {
 
   // DOCUMENTS STEP
   if (step === 'documents') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '120px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Documents" sub="Step 4 of 4" back={() => setStep('experience')} step={4}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
@@ -338,7 +338,7 @@ export default function JoinProfessional() {
 
   // EXPERIENCE STEP
   if (step === 'experience') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '120px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Your Experience" sub="Step 3 of 4" back={() => setStep('info')} step={3}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
@@ -398,7 +398,7 @@ export default function JoinProfessional() {
 
   // PERSONAL INFO STEP
   if (step === 'info') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '120px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Personal Information" sub="Step 2 of 4" back={() => setStep('role')} step={2}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
@@ -455,7 +455,7 @@ export default function JoinProfessional() {
 
   // ROLE SELECTION
   if (step === 'role') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '120px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Choose Your Role" sub="Step 1 of 4 · What will you do?" back={() => setStep('landing')} step={1}/>
       <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
 

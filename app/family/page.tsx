@@ -197,7 +197,7 @@ export default function Family() {
   )
 
   return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px'}}>
       <div style={{position: 'fixed', inset: 0, background: 'radial-gradient(ellipse 80% 50% at 50% 0%, rgba(139,0,30,0.25) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0}}/>
 
       {/* Maya animation */}

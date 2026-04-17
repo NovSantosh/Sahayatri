@@ -25,7 +25,7 @@ function ProfessionalContent() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px', transition: 'background 0.3s ease' }}>
+    <div style={{ minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease' }}>
 
       {/* Header */}
       <div style={{ background: 'linear-gradient(135deg, #0E0B18, #1A0A16)', padding: '52px 20px 28px', position: 'relative', overflow: 'hidden' }}>

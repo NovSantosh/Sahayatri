@@ -202,7 +202,7 @@ export default function Care() {
 
   // BOOKED
   if (step === 'booked') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <div style={{padding: '60px 24px 32px', textAlign: 'center'}}>
         <div style={{width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', boxShadow: '0 8px 32px rgba(220,20,60,0.35)', animation: 'breathe 2s ease infinite'}}>
           <CheckIcon size={36} color="white" strokeWidth={2.5}/>
@@ -239,7 +239,7 @@ export default function Care() {
 
   // PAYMENT STEP
   if (step === 'payment') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Pay to Confirm" sub="Payment required to confirm booking" back={() => setStep('confirm')}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
@@ -336,7 +336,7 @@ export default function Care() {
 
   // CONFIRM
   if (step === 'confirm') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Review Booking" sub="Check details before paying" back={() => setStep('details')}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
@@ -415,7 +415,7 @@ export default function Care() {
 
   // DETAILS
   if (step === 'details') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Care Details" sub="Tell us about your loved one" back={() => setStep('companion')}/>
       <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '14px'}}>
 
@@ -476,7 +476,7 @@ export default function Care() {
 
   // COMPANION
   if (step === 'companion') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Choose Companion" sub="All verified · Background checked" back={() => setStep('care-type')}/>
       <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
 
@@ -537,7 +537,7 @@ export default function Care() {
 
   // CARE TYPE
   if (step === 'care-type') return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '100px'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px'}}>
       <Header title="Choose Care Type" sub="What does your loved one need?" back={() => setStep('home')}/>
       <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '10px'}}>
         {CARE_TYPES.map((care) => (
@@ -600,7 +600,7 @@ export default function Care() {
 
   // HOME LANDING
   return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px', transition: 'background 0.3s ease'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease'}}>
       <div style={{background: t.headerBg, backdropFilter: 'blur(20px)', padding: '52px 20px 16px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50}}>
         <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
           <button onClick={() => router.back()} style={{width: '38px', height: '38px', borderRadius: '12px', background: t.inputBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer'}}>

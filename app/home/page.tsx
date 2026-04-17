@@ -121,7 +121,7 @@ export default function Dashboard() {
   const isDark = theme === 'dark'
 
   return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '100px', transition: 'background 0.3s ease'}}>
+    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease'}}>
 
       {/* Global glow in dark mode */}
       {isDark && <div style={{position: 'fixed', top: 0, left: 0, right: 0, height: '40vh', background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(139,0,30,0.18) 0%, transparent 70%)', pointerEvents: 'none', zIndex: 0}}/>}

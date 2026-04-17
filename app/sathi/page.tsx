@@ -102,7 +102,7 @@ export default function Sathi() {
       </div>
 
       {/* ── MESSAGES ── */}
-      <div style={{flex: 1, overflowY: 'auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '100px', position: 'relative', zIndex: 1}}>
+      <div style={{flex: 1, overflowY: 'auto', padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px', paddingBottom: '40px', position: 'relative', zIndex: 1}}>
 
         {/* Welcome state */}
         {showWelcome && (

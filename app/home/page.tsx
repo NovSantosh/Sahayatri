@@ -119,6 +119,13 @@ export default function Dashboard() {
   })
 
   const isDark = theme === 'dark'
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
     <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease'}}>
@@ -138,12 +145,16 @@ export default function Dashboard() {
       )}
 
       {/* ── HEADER ── */}
-      <div style={{background: t.headerBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '52px 20px 14px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50, transition: 'background 0.3s ease'}}>
+      <div style={{background: t.headerBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: scrolled ? '12px 20px 12px' : '52px 20px 14px',
+        borderBottom: `1px solid ${t.border}`,
+        position: 'sticky', top: 0, zIndex: 50,
+        transition: 'all 0.3s cubic-bezier(0.4,0,0.2,1)',
+        boxShadow: scrolled ? '0 4px 24px rgba(0,0,0,0.12)' : 'none'}}>
         
         {/* Top row — greeting + avatar */}
         <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px'}}>
           <div style={{flex: 1, minWidth: 0}}>
-            {/* Dynamic contextual greeting */}
+            {/* Dynamic contextual greeting - hides on scroll */}
             <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px'}}>
               <div style={{width: '6px', height: '6px', borderRadius: '50%', background: hour < 20 ? '#10B981' : '#F59E0B', boxShadow: hour < 20 ? '0 0 6px #10B981' : '0 0 6px #F59E0B'}}/>
               <p style={{fontSize: '11px', fontWeight: 600, color: t.text3, letterSpacing: '0.3px'}}>

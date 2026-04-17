@@ -308,8 +308,8 @@ export default function Family() {
               ].map((tab) => (
                 <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
                   style={{flex: 1, padding: '10px 4px', borderRadius: '12px', border: 'none', background: activeTab === tab.id ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'transparent', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: activeTab === tab.id ? '0 4px 16px rgba(220,20,60,0.35)' : 'none', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'}}>
-                  <tab.Icon size={14} color={activeTab === tab.id ? 'white' : 'rgba(255,255,255,0.4)'} strokeWidth={2}/>
-                  <span style={{fontSize: '12px', fontWeight: 700, color: activeTab === tab.id ? 'white' : 'rgba(255,255,255,0.4)'}}>
+                  <tab.Icon size={14} color={activeTab === tab.id ? 'white' : t.text3} strokeWidth={2}/>
+                  <span style={{fontSize: '12px', fontWeight: 700, color: activeTab === tab.id ? 'white' : t.text3}}>
                     {tab.label}
                   </span>
                 </button>
@@ -323,14 +323,14 @@ export default function Family() {
             {activeTab === 'home' && (
               <>
                 {/* Morning Lamp */}
-                <div style={{background: lampLit ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))' : 'rgba(255,255,255,0.04)', border: `1px solid ${lampLit ? 'rgba(251,191,36,0.25)' : 'rgba(255,255,255,0.08)'}`, borderRadius: '20px', padding: '22px', textAlign: 'center', transition: 'all 0.4s ease'}}>
+                <div style={{background: lampLit ? 'linear-gradient(135deg, rgba(251,191,36,0.12), rgba(245,158,11,0.06))' : t.cardBg, border: `1px solid ${lampLit ? 'rgba(251,191,36,0.25)' : t.border}`, borderRadius: '20px', padding: '22px', textAlign: 'center', transition: 'all 0.4s ease'}}>
                   <p style={{fontSize: '10px', fontWeight: 700, color: lampLit ? 'rgba(251,191,36,0.7)' : 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px'}}>Morning Lamp · बिहानको दियो</p>
                   <button onClick={() => setLampLit(!lampLit)}
                     style={{width: '72px', height: '72px', borderRadius: '50%', background: lampLit ? 'rgba(251,191,36,0.2)' : 'rgba(255,255,255,0.06)', border: `2px solid ${lampLit ? 'rgba(251,191,36,0.4)' : 'rgba(255,255,255,0.1)'}`, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', animation: lampLit ? 'lampGlow 2s ease infinite' : 'none', transition: 'all 0.3s ease'}}>
                     <LampIcon size={36} color={lampLit ? '#F59E0B' : 'rgba(255,255,255,0.3)'} strokeWidth={lampLit ? 2 : 1.5}/>
                   </button>
-                  <p style={{fontSize: '15px', fontWeight: 700, color: lampLit ? 'rgba(251,191,36,0.9)' : 'rgba(255,255,255,0.5)', marginBottom: '4px'}}>{lampLit ? 'Your lamp is lit · सब ठीक छ' : 'Tap to light your lamp'}</p>
-                  <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.25)'}}>{lampLit ? 'Your family knows you are okay today' : 'Let your family know you are okay'}</p>
+                  <p style={{fontSize: '15px', fontWeight: 700, color: lampLit ? 'rgba(251,191,36,0.9)' : t.text2, marginBottom: '4px'}}>{lampLit ? 'Your lamp is lit · सब ठीक छ' : 'Tap to light your lamp'}</p>
+                  <p style={{fontSize: '12px', color: t.text3}}>{lampLit ? 'Your family knows you are okay today' : 'Let your family know you are okay'}</p>
                   {family.members.length > 1 && (
                     <div style={{display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '18px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.06)'}}>
                       {family.members.slice(0, 5).map((m: any, i: number) => (
@@ -346,8 +346,8 @@ export default function Family() {
                 </div>
 
                 {/* Feeling */}
-                <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
-                  <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '14px'}}>Today I am Feeling · आज म...</p>
+                <div style={{background: t.cardBg, border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
+                  <p style={{fontSize: '10px', fontWeight: 700, color: t.text3, textTransform: 'uppercase' as const, letterSpacing: '1px', marginBottom: '14px'}}>Today I am Feeling · आज म...</p>
                   <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px'}}>
                     {[
                       { Icon: FeelingHappyIcon, label: 'Happy', nepali: 'खुशी', color: '#22C55E', border: 'rgba(34,197,94,0.4)', bg: 'rgba(34,197,94,0.1)' },
@@ -355,16 +355,16 @@ export default function Family() {
                       { Icon: FeelingSadIcon, label: 'Need support', nepali: 'साथ चाहियो', color: '#60A5FA', border: 'rgba(96,165,250,0.4)', bg: 'rgba(96,165,250,0.1)' },
                     ].map((f) => (
                       <button key={f.label} onClick={() => setFeeling(f.label)}
-                        style={{padding: '14px 6px', borderRadius: '16px', border: `1.5px solid ${feeling === f.label ? f.border : 'rgba(255,255,255,0.08)'}`, background: feeling === f.label ? f.bg : 'rgba(255,255,255,0.03)', cursor: 'pointer', textAlign: 'center', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
+                        style={{padding: '14px 6px', borderRadius: '16px', border: `1.5px solid ${feeling === f.label ? f.border : t.border}`, background: feeling === f.label ? f.bg : t.inputBg, cursor: 'pointer', textAlign: 'center', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
                         <div style={{display: 'flex', justifyContent: 'center', marginBottom: '8px'}}>
                           <f.Icon size={28} color={feeling === f.label ? f.color : 'rgba(255,255,255,0.3)'} strokeWidth={1.8}/>
                         </div>
                         <p style={{fontSize: '11px', fontWeight: 700, color: feeling === f.label ? f.color : 'rgba(255,255,255,0.4)'}}>{f.label}</p>
-                        <p style={{fontSize: '10px', color: 'rgba(255,255,255,0.2)', marginTop: '2px'}}>{f.nepali}</p>
+                        <p style={{fontSize: '10px', color: t.text3, marginTop: '2px'}}>{f.nepali}</p>
                       </button>
                     ))}
                   </div>
-                  {feeling && <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.35)', textAlign: 'center', marginTop: '14px', fontStyle: 'italic'}}>{feeling === 'Need support' ? 'Your family has been notified.' : `Your family knows you are feeling ${feeling.toLowerCase()} today.`}</p>}
+                  {feeling && <p style={{fontSize: '12px', color: t.text2, textAlign: 'center' as const, marginTop: '14px', fontStyle: 'italic'}}>{feeling === 'Need support' ? 'Your family has been notified.' : `Your family knows you are feeling ${feeling.toLowerCase()} today.`}</p>}
                 </div>
 
                 {/* Send Maya */}
@@ -404,8 +404,8 @@ export default function Family() {
                 {/* Daily Word */}
                 <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '20px', padding: '20px'}}>
                   <div style={{display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px'}}>
-                    <WordIcon size={14} color="rgba(255,255,255,0.25)" strokeWidth={2}/>
-                    <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px'}}>Word of the Day · आजको शब्द</p>
+                    <WordIcon size={14} color={t.text3} strokeWidth={2}/>
+                    <p style={{fontSize: '10px', fontWeight: 700, color: t.text3, textTransform: 'uppercase' as const, letterSpacing: '1px'}}>Word of the Day · आजको शब्द</p>
                   </div>
                   <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
                     <div style={{width: '64px', height: '64px', borderRadius: '18px', background: brand.primaryLight, border: `1px solid ${brand.primaryBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
@@ -414,7 +414,7 @@ export default function Family() {
                     <div>
                       <p style={{fontSize: '28px', fontWeight: 800, color: t.text1, letterSpacing: '-0.5px'}}>{todayWord.word}</p>
                       <p style={{fontSize: '13px', color: brand.primary, fontWeight: 600, marginBottom: '3px'}}>{todayWord.roman}</p>
-                      <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.35)', lineHeight: 1.5}}>{todayWord.meaning}</p>
+                      <p style={{fontSize: '12px', color: t.text3, lineHeight: 1.5}}>{todayWord.meaning}</p>
                     </div>
                   </div>
                 </div>
@@ -448,7 +448,7 @@ export default function Family() {
                 {error && <div style={{background: 'rgba(220,20,60,0.1)', border: '1px solid rgba(220,20,60,0.25)', borderRadius: '14px', padding: '12px 16px', fontSize: '13px', color: '#DC143C', fontWeight: 600}}>{error}</div>}
 
                 <div style={{background: 'rgba(255,255,255,0.04)', border: `1px solid ${t.border}`, borderRadius: '24px', padding: '28px 20px', textAlign: 'center'}}>
-                  <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '20px'}}>
+                  <p style={{fontSize: '10px', fontWeight: 700, color: t.text3, textTransform: 'uppercase' as const, letterSpacing: '1px', marginBottom: '20px'}}>
                     {recording ? `Recording ${formatTime(recordingTime)}` : uploading ? 'Sending to family…' : 'Leave a voice for your family'}
                   </p>
                   <div style={{display: 'flex', justifyContent: 'center', marginBottom: '14px'}}>
@@ -482,7 +482,7 @@ export default function Family() {
                       <MicIcon size={28} color="rgba(255,255,255,0.2)" strokeWidth={1.5}/>
                     </div>
                     <p style={{fontSize: '15px', fontWeight: 700, color: t.text3, marginBottom: '6px'}}>No voices yet</p>
-                    <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.25)'}}>Be the first to leave a voice for your family.</p>
+                    <p style={{fontSize: '13px', color: t.text3}}>Be the first to leave a voice for your family.</p>
                   </div>
                 )}
 
@@ -495,7 +495,7 @@ export default function Family() {
                       <div style={{flex: 1}}>
                         <div style={{display: 'flex', justifyContent: 'space-between', marginBottom: '10px'}}>
                           <p style={{fontSize: '14px', fontWeight: 700, color: t.text1}}>{msg.senderName}</p>
-                          <p style={{fontSize: '11px', color: 'rgba(255,255,255,0.25)'}}>{timeAgo(msg.createdAt)}</p>
+                          <p style={{fontSize: '11px', color: t.text3}}>{timeAgo(msg.createdAt)}</p>
                         </div>
                         <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                           <button onClick={() => playVoice(msg)}
@@ -557,7 +557,7 @@ export default function Family() {
                   <div style={{display: 'flex', alignItems: 'center', gap: '12px', background: t.inputBg, borderRadius: '16px', padding: '16px 18px'}}>
                     <div style={{flex: 1}}>
                       <p style={{fontSize: '10px', fontWeight: 700, color: 'rgba(255,255,255,0.25)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '6px'}}>Family Code</p>
-                      <p style={{fontSize: '30px', fontWeight: 800, color: 'white', letterSpacing: '8px', fontFamily: 'monospace'}}>{family.code}</p>
+                      <p style={{fontSize: '30px', fontWeight: 800, color: t.text1, letterSpacing: '8px', fontFamily: 'monospace', background: t.inputBg, padding: '14px 20px', borderRadius: '14px', border: `1px solid ${t.border}`}}>{family.code}</p>
                     </div>
                     <button onClick={copyCode}
                       style={{padding: '11px 18px', background: copied ? 'rgba(34,197,94,0.15)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', color: copied ? '#22C55E' : 'white', border: copied ? '1px solid rgba(34,197,94,0.3)' : 'none', borderRadius: '12px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0, boxShadow: copied ? 'none' : '0 4px 16px rgba(220,20,60,0.35)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', gap: '6px'}}>

@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import SessionProvider from './components/SessionProvider'
 import { ThemeProvider } from './context/ThemeContext'
 import ResponsiveWrapper from './components/ResponsiveWrapper'
+import GestureNav from './components/GestureNav'
 import PWARegister from './components/PWARegister'
 import ViewportMeta from './components/ViewportMeta'
 import './globals.css'
@@ -52,6 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <ResponsiveWrapper>
               {children}
             </ResponsiveWrapper>
+            <GestureNav/>
           </ThemeProvider>
         </SessionProvider>
       </body>

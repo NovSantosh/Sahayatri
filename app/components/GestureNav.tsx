@@ -244,7 +244,7 @@ export default function GestureNav({ side = 'right' }: { side?: 'left' | 'right'
       {/* ── FULL NAV DOCK ── */}
       {navState === 'full' && (
         <div style={{
-          position: 'fixed', top: '50%', transform: 'translateY(-50%)',
+          position: 'fixed', top: '62%', transform: 'translateY(-50%)',
           ...edgeSide, zIndex: 99991,
           display: 'flex', flexDirection: 'column', gap: '4px',
           padding: '12px 0',
@@ -324,7 +324,7 @@ export default function GestureNav({ side = 'right' }: { side?: 'left' | 'right'
       {/* ── MINI DOCK ── */}
       {navState === 'mini' && (
         <div style={{
-          position: 'fixed', top: '50%', transform: 'translateY(-50%)',
+          position: 'fixed', top: '62%', transform: 'translateY(-50%)',
           ...edgeSide, zIndex: 99991,
           display: 'flex', flexDirection: 'column', gap: '3px',
           padding: '8px 0',
@@ -362,7 +362,7 @@ export default function GestureNav({ side = 'right' }: { side?: 'left' | 'right'
       {navState === 'hidden' && !notifOpen && (
         <div onClick={() => setNavState('full')}
           style={{
-            position: 'fixed', top: '50%', transform: 'translateY(-50%)',
+            position: 'fixed', top: '62%', transform: 'translateY(-50%)',
             ...edgeSide, zIndex: 99991, cursor: 'pointer',
             width: '16px', paddingTop: '24px', paddingBottom: '24px',
             background: bg, borderRadius,

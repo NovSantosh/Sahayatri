@@ -86,6 +86,7 @@ export default function NotificationHandle({ unreadCount = 0 }: { unreadCount?: 
       {!open && (
         <div
           onClick={() => setOpen(true)}
+          onTouchEnd={(e) => { e.preventDefault(); setOpen(true); }}
           style={{
             position: 'fixed',
             right: 0,

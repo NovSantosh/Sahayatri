@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { SearchIcon, ArrowLeftIcon, HeartIcon, StarIcon } from '../components/Icons'
@@ -128,7 +127,6 @@ export default function Search() {
           </>
         )}
       </div>
-      <BottomNav/>
       <style>{`input::placeholder{color:${t.text3}}`}</style>
     </div>
   )

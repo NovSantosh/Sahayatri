@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { MicIcon, SendIcon, ArrowLeftIcon, SparkleIcon } from '../components/Icons'
@@ -212,8 +211,6 @@ export default function Sathi() {
         input::placeholder { color: rgba(255,255,255,0.25); }
         ::-webkit-scrollbar { display: none; }
       `}</style>
-
-      <BottomNav/>
     </div>
   )
 }

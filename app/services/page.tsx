@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { SearchIcon, LocationIcon, StarIcon, ClockIcon, CheckIcon, ArrowLeftIcon } from '../components/Icons'
@@ -403,7 +402,6 @@ export default function Services() {
           </p>
 
         </div>
-        <BottomNav/>
       </div>
     )
   }
@@ -577,8 +575,6 @@ export default function Services() {
         input::placeholder { color: ${t.text3}; }
         ::-webkit-scrollbar { display: none; }
       `}</style>
-
-      <BottomNav/>
     </div>
   )
 }

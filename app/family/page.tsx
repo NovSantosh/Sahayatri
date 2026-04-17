@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import BottomNav from '../components/BottomNav'
 import { brand } from '../design-system'
 import { useTheme } from '../context/ThemeContext'
 import {
@@ -583,8 +582,6 @@ export default function Family() {
         input::placeholder { color: rgba(255,255,255,0.2); }
         ::-webkit-scrollbar { display: none; }
       `}</style>
-
-      <BottomNav />
     </div>
   )
 }

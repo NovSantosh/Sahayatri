@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { ArrowLeftIcon, CheckIcon } from '../components/Icons'
@@ -142,7 +141,6 @@ export default function Wallet() {
           </p>
         </div>
       </div>
-      <BottomNav/>
     </div>
   )
 }

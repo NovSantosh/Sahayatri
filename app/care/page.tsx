@@ -2,7 +2,6 @@
 import { useState } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import PaymentSheet from '../components/PaymentSheet'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
@@ -234,7 +233,6 @@ export default function Care() {
           Back to Home
         </button>
       </div>
-      <BottomNav/>
       <style>{`@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}`}</style>
     </div>
   )
@@ -333,7 +331,6 @@ export default function Care() {
           </p>
         </div>
       </div>
-      <BottomNav/>
     </div>
   )
 
@@ -413,7 +410,6 @@ export default function Care() {
         </button>
         <p style={{fontSize: '12px', color: t.text3, textAlign: 'center'}}>Booking only confirmed after payment · Cancel anytime before first visit</p>
       </div>
-      <BottomNav/>
     </div>
   )
 
@@ -474,7 +470,6 @@ export default function Care() {
           Review Booking
         </button>
       </div>
-      <BottomNav/>
       <style>{`input::placeholder,textarea::placeholder{color:${t.text3}}`}</style>
     </div>
   )
@@ -537,7 +532,6 @@ export default function Care() {
           {selectedCompanion ? `Continue with ${selectedCompanion.name}` : 'Select a companion'}
         </button>
       </div>
-      <BottomNav/>
     </div>
   )
 
@@ -601,7 +595,6 @@ export default function Care() {
           {selectedCare ? `Continue with ${selectedCare.title}` : 'Select a care type'}
         </button>
       </div>
-      <BottomNav/>
     </div>
   )
 
@@ -707,8 +700,6 @@ export default function Care() {
           Pay securely via eSewa or Khalti · Cancel anytime · 100% refund before first visit
         </p>
       </div>
-
-      <BottomNav/>
       <style>{`
         @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
         ::-webkit-scrollbar{display:none}

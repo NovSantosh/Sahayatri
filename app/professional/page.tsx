@@ -3,7 +3,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
-import BottomNav from '../components/BottomNav'
 import { ArrowLeftIcon, StarIcon, CheckIcon, LocationIcon, CalendarIcon } from '../components/Icons'
 
 function ProfessionalContent() {
@@ -130,8 +129,6 @@ function ProfessionalContent() {
           Book {name.split(' ')[0]}
         </button>
       </div>
-
-      <BottomNav/>
     </div>
   )
 }

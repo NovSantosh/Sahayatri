@@ -4,7 +4,6 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
-import BottomNav from '../components/BottomNav'
 import { ArrowLeftIcon, HeartIcon, CheckIcon, StarIcon } from '../components/Icons'
 
 const MOOD_CONFIG: any = {
@@ -167,7 +166,6 @@ export default function CareReports() {
           </div>
         )}
       </div>
-      <BottomNav/>
       <style>{`textarea::placeholder{color:${t.text3}}`}</style>
     </div>
   )
@@ -265,7 +263,6 @@ export default function CareReports() {
           )
         })}
       </div>
-      <BottomNav/>
     </div>
   )
 }

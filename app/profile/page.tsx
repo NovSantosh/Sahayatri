@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import {
@@ -65,7 +64,6 @@ export default function Profile() {
     return (
       <div style={{minHeight: '100vh', background: t.pageBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif'}}>
         <a href="/login" style={{padding: '14px 32px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', borderRadius: '14px', fontWeight: 700, textDecoration: 'none', fontSize: '15px', boxShadow: '0 4px 16px rgba(220,20,60,0.3)'}}>Sign In</a>
-        <BottomNav/>
       </div>
     )
   }
@@ -313,8 +311,6 @@ export default function Profile() {
         @keyframes wave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1.2); } }
         ::-webkit-scrollbar { display: none; }
       `}</style>
-
-      <BottomNav/>
     </div>
   )
 }

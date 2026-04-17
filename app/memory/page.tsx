@@ -1,7 +1,6 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import { useSession } from 'next-auth/react'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { HeartIcon, CommentIcon, ShareIcon, TrashIcon, CameraIcon, SendIcon, PlusIcon } from '../components/Icons'
@@ -386,8 +385,6 @@ export default function Memory() {
         textarea::placeholder { color: ${t.text3}; }
         input::placeholder { color: ${t.text3}; }
       `}</style>
-
-      <BottomNav />
     </div>
   )
 }

@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import SOSButton from '../components/SOSButton'
 import ModeSwitch from '../components/ModeSwitch'
-import BottomNav from '../components/BottomNav'
 import InlineSearch from '../components/InlineSearch'
 import ThemeToggle from '../components/ThemeToggle'
 import { useTheme } from '../context/ThemeContext'
@@ -515,8 +514,6 @@ export default function Dashboard() {
         @keyframes heartPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
         ::-webkit-scrollbar { display: none; }
       `}</style>
-
-<BottomNav />
     </div>
   )
 }

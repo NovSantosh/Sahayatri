@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { BellIcon, HeartIcon, CommentIcon, FamilyIcon, CalendarIcon, SparkleIcon, CheckIcon } from '../components/Icons'
@@ -309,8 +308,6 @@ export default function Notifications() {
           </div>
         )}
       </div>
-
-      <BottomNav/>
     </div>
   )
 }

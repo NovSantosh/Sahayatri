@@ -2,7 +2,6 @@
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import BottomNav from '../components/BottomNav'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
 import { CalendarIcon, ClockIcon, LocationIcon, CheckIcon, ArrowLeftIcon, WalletIcon } from '../components/Icons'
@@ -246,8 +245,6 @@ export default function Bookings() {
         @keyframes spin { to { transform: rotate(360deg); } }
         ::-webkit-scrollbar { display: none; }
       `}</style>
-
-      <BottomNav/>
     </div>
   )
 }

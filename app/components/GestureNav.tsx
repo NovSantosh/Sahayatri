@@ -220,6 +220,10 @@ export default function GestureNav({ side = 'right' }: { side?: 'left' | 'right'
 
   if (!mounted) return null
 
+  // Hide on public pages
+  const publicPages = ['/', '/login', '/signup', '/about']
+  if (publicPages.some(p => pathname === p)) return null
+
   const edgeSide = side === 'right' ? { right: 0 } : { left: 0 }
   const borderRadius = side === 'right' ? '12px 0 0 12px' : '0 12px 12px 0'
   const borderStyle = side === 'right' ? { borderRight: 'none' } : { borderLeft: 'none' }

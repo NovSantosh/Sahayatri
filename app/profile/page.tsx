@@ -4,24 +4,80 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '../context/ThemeContext'
 import { brand } from '../design-system'
-import {
-  EditIcon, CalendarIcon, BellIcon, SearchIcon,
-  WalletIcon, GlobeIcon, SparkleIcon, HeartIcon,
-  MicIcon, CameraIcon, PlusIcon, SahayatriLogo
-} from '../components/Icons'
+import ModeSwitch from '../components/ModeSwitch'
+import ThemeToggle from '../components/ThemeToggle'
+import { SahayatriLogo, EditIcon, BellIcon, CalendarIcon, WalletIcon, HeartIcon, SparkleIcon, CheckIcon, ArrowLeftIcon, CameraIcon, GlobeIcon } from '../components/Icons'
+
+const SECTIONS = [
+  {
+    title: 'My Account',
+    items: [
+      { icon: '👤', label: 'Edit Profile', sub: 'Name, photo, bio, location', path: '/edit-profile' },
+      { icon: '🔒', label: 'Password & Security', sub: 'Change password, 2FA', path: '/edit-profile' },
+      { icon: '📱', label: 'Phone Number', sub: 'Update your contact number', path: '/edit-profile' },
+      { icon: '📧', label: 'Email Address', sub: 'Change your email', path: '/edit-profile' },
+    ]
+  },
+  {
+    title: 'Family',
+    items: [
+      { icon: '🏠', label: 'Family Room', sub: 'Manage your family group', path: '/family' },
+      { icon: '👵', label: 'Elder Care', sub: 'View and manage care bookings', path: '/care' },
+      { icon: '📋', label: 'Care Reports', sub: 'Daily visit reports from companions', path: '/care-reports' },
+      { icon: '📅', label: 'My Bookings', sub: 'View and manage bookings', path: '/bookings' },
+    ]
+  },
+  {
+    title: 'Preferences',
+    items: [
+      { icon: '🌙', label: 'Appearance', sub: 'Dark mode, light mode', action: 'theme' },
+      { icon: '🔔', label: 'Notifications', sub: 'Push, email, SMS alerts', path: '/notifications' },
+      { icon: '🌐', label: 'Language', sub: 'English · नेपाली', action: 'language' },
+      { icon: '📍', label: 'Navigation Side', sub: 'Right hand or left hand', action: 'navside' },
+    ]
+  },
+  {
+    title: 'Payments',
+    items: [
+      { icon: '💳', label: 'Payment History', sub: 'eSewa · Khalti · Bank', path: '/wallet' },
+      { icon: '🧾', label: 'Invoices', sub: 'Download payment receipts', path: '/wallet' },
+    ]
+  },
+  {
+    title: 'Companion',
+    items: [
+      { icon: '⚡', label: 'Switch to Companion Mode', sub: 'Start earning as a companion', action: 'companion' },
+      { icon: '📄', label: 'Legal Agreement', sub: 'View your signed agreement', path: '/companion/agreement' },
+    ]
+  },
+  {
+    title: 'About',
+    items: [
+      { icon: '📖', label: 'About Sahayatri', sub: 'Our story and mission', path: '/about' },
+      { icon: '⭐', label: 'Rate the App', sub: 'Help us improve', action: 'rate' },
+      { icon: '🔗', label: 'Share App', sub: 'Invite your family and friends', action: 'share' },
+      { icon: '📜', label: 'Privacy Policy', sub: 'How we protect your data', path: '/about' },
+      { icon: '⚖️', label: 'Terms of Service', sub: 'Legal terms and conditions', path: '/about' },
+    ]
+  },
+]
 
 export default function Profile() {
   const { data: session } = useSession()
-  const { t, theme } = useTheme()
+  const { t, theme, toggleTheme } = useTheme()
   const router = useRouter()
   const [profile, setProfile] = useState<any>(null)
   const [posts, setPosts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [showMayaAnimation, setShowMayaAnimation] = useState(false)
-  const [langNepali, setLangNepali] = useState(false)
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false)
+  const [language, setLanguage] = useState<'en' | 'np'>('en')
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false)
+  const [showNavSide, setShowNavSide] = useState(false)
+  const isDark = theme === 'dark'
 
   useEffect(() => {
     if (session?.user?.email) fetchProfile()
+    else setLoading(false)
   }, [session])
 
   const fetchProfile = async () => {
@@ -36,19 +92,19 @@ export default function Profile() {
 
   const initials = (name: string) => name?.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
 
-  const timeAgo = (date: string) => {
-    const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
-    if (s < 60) return 'just now'
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-    return `${Math.floor(s / 86400)}d ago`
-  }
-
-  const getBSDate = () => {
-    const now = new Date()
-    const bsYear = now.getFullYear() + 56
-    const months = ['बैशाख','जेठ','असार','साउन','भदौ','असोज','कार्तिक','मंसिर','पुष','माघ','फागुन','चैत']
-    return `${months[now.getMonth()]} ${bsYear} BS`
+  const handleAction = (action: string) => {
+    switch (action) {
+      case 'theme': toggleTheme(); break
+      case 'language': setShowLanguagePicker(true); break
+      case 'navside': setShowNavSide(true); break
+      case 'companion': router.push('/companion/setup'); break
+      case 'rate': window.open('https://sahayatri-eight.vercel.app', '_blank'); break
+      case 'share':
+        if (navigator.share) {
+          navigator.share({ title: 'Sahayatri', text: 'Care for your family from anywhere', url: 'https://sahayatri-eight.vercel.app' })
+        }
+        break
+    }
   }
 
   const card = {
@@ -57,260 +113,227 @@ export default function Profile() {
     border: `1px solid ${t.border}`,
     boxShadow: t.shadow,
     overflow: 'hidden' as const,
-    transition: 'background 0.3s ease, border-color 0.3s ease',
   }
 
-  if (!session?.user) {
-    return (
-      <div style={{minHeight: '100vh', background: t.pageBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif'}}>
-        <a href="/login" style={{padding: '14px 32px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', color: 'white', borderRadius: '14px', fontWeight: 700, textDecoration: 'none', fontSize: '15px', boxShadow: '0 4px 16px rgba(220,20,60,0.3)'}}>Sign In</a>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div style={{ minHeight: '100vh', background: t.pageBg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: '40px', height: '40px', border: `3px solid ${t.border}`, borderTop: `3px solid ${brand.primary}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
+    </div>
+  )
+
+  const name = profile?.name || session?.user?.name || 'User'
+  const email = profile?.email || session?.user?.email || ''
+  const bio = profile?.bio || 'Sahayatri member'
+  const location = profile?.location || ''
+  const joinDate = profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : 'Recently'
 
   return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease'}}>
+    <div style={{ minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease' }}>
 
-      {/* Maya animation */}
-      {showMayaAnimation && (
-        <div style={{position: 'fixed', inset: 0, background: 'linear-gradient(135deg, #3D0010, #DC143C, #C4507A)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-          <div style={{animation: 'heartPulse 0.6s ease infinite'}}>
-            <HeartIcon size={80} color="white" filled strokeWidth={0}/>
-          </div>
-          <h2 style={{fontSize: '32px', fontWeight: 800, color: 'white', marginTop: '24px', marginBottom: '8px', letterSpacing: '-1px'}}>माया पठाइयो!</h2>
-          <p style={{fontSize: '16px', color: 'rgba(255,255,255,0.6)'}}>Love sent to your family</p>
-        </div>
-      )}
-
-      {/* ── HEADER — always dark ── */}
-      <div style={{background: 'linear-gradient(135deg, #0E0B18 0%, #1A0A16 50%, #0A0E1A 100%)', padding: '52px 20px 24px', position: 'relative', overflow: 'hidden'}}>
-        <div style={{position: 'absolute', top: '-50px', right: '-30px', width: '200px', height: '200px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,20,60,0.18), transparent 70%)', pointerEvents: 'none'}}/>
-        <div style={{position: 'absolute', top: '16px', right: '16px', opacity: 0.06, pointerEvents: 'none'}}>
-          <SahayatriLogo size={80} color="white"/>
-        </div>
-
-        {/* BS Date pill */}
-        <div style={{position: 'absolute', top: '56px', right: '20px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '9999px', padding: '4px 12px'}}>
-          <p style={{fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.4)'}}>{getBSDate()}</p>
-        </div>
-
-        {/* Avatar row */}
-        <div style={{display: 'flex', alignItems: 'flex-start', gap: '16px', position: 'relative', zIndex: 1}}>
-          <div style={{position: 'relative', flexShrink: 0}}>
-            {profile?.avatar
-              ? <img src={profile.avatar} alt="avatar" style={{width: '80px', height: '80px', borderRadius: '50%', objectFit: 'cover', border: '3px solid rgba(255,255,255,0.15)', boxShadow: '0 4px 20px rgba(0,0,0,0.3)'}}/>
-              : <div style={{width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '28px', fontWeight: 800, border: '3px solid rgba(255,255,255,0.15)', boxShadow: '0 4px 20px rgba(220,20,60,0.3)'}}>
-                  {initials(session.user.name || '')}
-                </div>}
-            {/* Online dot */}
-            <div style={{position: 'absolute', bottom: '2px', right: '2px', width: '14px', height: '14px', borderRadius: '50%', background: '#22C55E', border: '2.5px solid #0E0B18', boxShadow: '0 0 6px rgba(34,197,94,0.6)'}}/>
-            {/* Camera button */}
-            <button onClick={() => router.push('/edit-profile')}
-              style={{position: 'absolute', top: '-4px', right: '-4px', width: '24px', height: '24px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: '2px solid #0E0B18', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(220,20,60,0.4)'}}>
-              <PlusIcon size={10} color="white" strokeWidth={3}/>
-            </button>
-          </div>
-
-          <div style={{flex: 1, paddingTop: '4px'}}>
-            <h1 style={{fontSize: '22px', fontWeight: 800, color: 'white', marginBottom: '4px', letterSpacing: '-0.5px'}}>{profile?.name || session.user.name}</h1>
-            {profile?.location && <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.4)', marginBottom: '6px'}}>{profile.location}</p>}
-            {profile?.bio && <p style={{fontSize: '12px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.5, marginBottom: '8px'}}>{profile.bio}</p>}
-            <div style={{display: 'inline-flex', alignItems: 'center', gap: '5px', background: brand.primaryLight, border: `1px solid ${brand.primaryBorder}`, borderRadius: '9999px', padding: '3px 10px'}}>
-              <div style={{width: '5px', height: '5px', borderRadius: '50%', background: brand.primary}}/>
-              <span style={{fontSize: '10px', fontWeight: 700, color: brand.primary}}>{profile?.role || 'FAMILY'} · Active</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Send Maya button */}
-        <button onClick={() => { setShowMayaAnimation(true); setTimeout(() => setShowMayaAnimation(false), 2500) }}
-          style={{marginTop: '18px', width: '100%', padding: '14px 20px', background: 'rgba(220,20,60,0.15)', border: '1px solid rgba(220,20,60,0.25)', borderRadius: '16px', color: 'white', fontSize: '14px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', position: 'relative', zIndex: 1}}>
-          <HeartIcon size={18} color="white" filled strokeWidth={0}/>
-          <span>Send Maya to Family</span>
-          <span style={{fontSize: '11px', color: 'rgba(255,255,255,0.35)', fontWeight: 400}}>· माया पठाउनुस्</span>
-        </button>
-      </div>
-
-      <div style={{padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px'}}>
-
-        {/* Stats */}
-        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px'}}>
-          {[
-            { val: posts.length.toString(), label: 'Moments', color: t.text1 },
-            { val: posts.reduce((s, p) => s + (p.likes || 0), 0).toString(), label: 'Likes', color: brand.primary },
-            { val: new Date(profile?.createdAt || Date.now()).toLocaleDateString('en', { month: 'short', year: '2-digit' }), label: 'Joined', color: t.text1 },
-          ].map((s, i) => (
-            <div key={i} style={{...card, padding: '16px 8px', textAlign: 'center'}}>
-              <p style={{fontSize: '22px', fontWeight: 800, color: s.color, letterSpacing: '-0.5px', transition: 'color 0.3s ease'}}>{s.val}</p>
-              <p style={{fontSize: '10px', fontWeight: 700, color: t.text3, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.5px'}}>{s.label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Moments Bento */}
-        <div>
-          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
-            <h3 style={{fontSize: '17px', fontWeight: 700, color: t.text1, letterSpacing: '-0.3px', transition: 'color 0.3s ease'}}>Moments</h3>
-            <button onClick={() => router.push('/memory')}
-              style={{fontSize: '13px', fontWeight: 700, color: brand.primary, background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Inter, sans-serif'}}>
-              + Share
-            </button>
-          </div>
-          <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px'}}>
-
-            {/* Featured post */}
-            <div onClick={() => router.push('/memory')}
-              style={{...card, cursor: 'pointer', minHeight: '180px'}}>
-              {posts[0]?.images?.[0]
-                ? <div style={{position: 'relative', height: '130px'}}>
-                    <img src={posts[0].images[0]} alt="moment" style={{width: '100%', height: '100%', objectFit: 'cover'}}/>
-                    <div style={{position: 'absolute', bottom: '8px', left: '8px', background: 'rgba(220,20,60,0.9)', borderRadius: '8px', padding: '3px 8px'}}>
-                      <span style={{fontSize: '9px', fontWeight: 700, color: 'white', textTransform: 'uppercase'}}>Care</span>
-                    </div>
-                  </div>
-                : <div style={{height: '130px', background: brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '8px'}}>
-                    <CameraIcon size={28} color={brand.primary} strokeWidth={1.8}/>
-                    <p style={{fontSize: '11px', color: brand.primary, fontWeight: 600}}>Share a photo</p>
-                  </div>}
-              <div style={{padding: '10px 12px'}}>
-                <p style={{fontSize: '12px', fontWeight: 700, color: t.text1, lineHeight: 1.4, transition: 'color 0.3s ease'}}>{posts[0]?.content?.slice(0, 36) || 'Your first moment'}{posts[0]?.content?.length > 36 ? '…' : ''}</p>
-                <p style={{fontSize: '10px', color: t.text3, marginTop: '3px'}}>{posts[0] ? timeAgo(posts[0].createdAt) : 'No moments yet'}</p>
-              </div>
-            </div>
-
-            {/* Right column */}
-            <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
-              {/* Sathi tile — always dark */}
-              <div onClick={() => router.push('/sathi')}
-                style={{background: 'linear-gradient(135deg, #0E0B18, #1A0A16)', borderRadius: '20px', padding: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.2)', cursor: 'pointer', flex: 1, border: '1px solid rgba(255,255,255,0.06)'}}>
-                <div style={{display: 'flex', gap: '3px', alignItems: 'flex-end', marginBottom: '10px', height: '28px'}}>
-                  {[4,7,5,9,6,8,4,7,5,8,6].map((h, i) => (
-                    <div key={i} style={{width: '3px', background: brand.primary, borderRadius: '2px', height: `${h * 3}px`, animation: `wave 1.2s ease-in-out ${i * 0.1}s infinite`}}/>
-                  ))}
-                </div>
-                <p style={{fontSize: '12px', fontWeight: 800, color: 'white', marginBottom: '2px'}}>Sathi AI</p>
-                <p style={{fontSize: '10px', color: 'rgba(255,255,255,0.35)'}}>Tap to talk</p>
-              </div>
-
-              {/* Mini stats */}
-              <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px'}}>
-                {[
-                  { val: posts.length, label: 'Posts', color: t.text1 },
-                  { val: posts.reduce((s, p) => s + (p.likes || 0), 0), label: 'Likes', color: brand.primary },
-                ].map((s, i) => (
-                  <div key={i} style={{...card, padding: '12px 8px', textAlign: 'center'}}>
-                    <p style={{fontSize: '20px', fontWeight: 800, color: s.color, letterSpacing: '-0.5px'}}>{s.val}</p>
-                    <p style={{fontSize: '9px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.5px', marginTop: '2px'}}>{s.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Daily Dial */}
-            <div style={{gridColumn: '1 / -1', ...card, padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
-              <div style={{width: '36px', height: '36px', borderRadius: '12px', background: brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                <SparkleIcon size={18} color={brand.primary} strokeWidth={1.8}/>
-              </div>
-              <div style={{flex: 1}}>
-                <p style={{fontSize: '10px', fontWeight: 700, color: brand.primary, textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '3px'}}>Daily Dial</p>
-                <p style={{fontSize: '13px', color: t.text2, fontStyle: 'italic', lineHeight: 1.4, transition: 'color 0.3s ease'}}>
-                  {profile?.bio ? `"${profile.bio.slice(0, 55)}${profile.bio.length > 55 ? '…' : ''}"` : '"Feeling connected to family today."'}
-                </p>
-              </div>
-              <button onClick={() => router.push('/edit-profile')}
-                style={{background: brand.primaryLight, border: 'none', borderRadius: '9999px', cursor: 'pointer', padding: '5px 12px', flexShrink: 0}}>
-                <span style={{fontSize: '11px', fontWeight: 700, color: brand.primary, fontFamily: 'Inter, sans-serif'}}>Edit</span>
+      {/* Sign out confirm */}
+      {showSignOutConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ background: t.cardBg, borderRadius: '24px', padding: '28px 24px', width: '100%', maxWidth: '380px', border: `1px solid ${t.border}` }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: t.text1, textAlign: 'center', marginBottom: '8px' }}>Sign out?</h3>
+            <p style={{ fontSize: '14px', color: t.text3, textAlign: 'center', marginBottom: '24px' }}>You will need to sign in again to access your account.</p>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setShowSignOutConfirm(false)}
+                style={{ flex: 1, padding: '14px', background: t.inputBg, border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: t.text2 }}>
+                Cancel
+              </button>
+              <button onClick={() => signOut({ callbackUrl: '/' })}
+                style={{ flex: 1, padding: '14px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: 'white', boxShadow: '0 4px 16px rgba(220,20,60,0.3)' }}>
+                Sign Out
               </button>
             </div>
           </div>
         </div>
+      )}
 
-        {/* My Activity */}
-        <div style={{...card}}>
-          <div style={{padding: '16px 16px 8px'}}>
-            <p style={{fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px'}}>My Activity</p>
+      {/* Language picker */}
+      {showLanguagePicker && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ background: t.cardBg, borderRadius: '24px', padding: '28px 24px', width: '100%', maxWidth: '380px', border: `1px solid ${t.border}` }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: t.text1, marginBottom: '20px' }}>Choose Language</h3>
+            {[
+              { id: 'en', label: 'English', sub: 'App in English' },
+              { id: 'np', label: 'नेपाली', sub: 'App in Nepali' },
+            ].map(lang => (
+              <div key={lang.id} onClick={() => { setLanguage(lang.id as any); setShowLanguagePicker(false) }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '14px', background: language === lang.id ? brand.primaryLight : t.inputBg, border: `1px solid ${language === lang.id ? brand.primaryBorder : t.border}`, marginBottom: '8px', cursor: 'pointer' }}>
+                <div>
+                  <p style={{ fontSize: '15px', fontWeight: 700, color: language === lang.id ? brand.primary : t.text1 }}>{lang.label}</p>
+                  <p style={{ fontSize: '12px', color: t.text3 }}>{lang.sub}</p>
+                </div>
+                {language === lang.id && <CheckIcon size={18} color={brand.primary} strokeWidth={2.5}/>}
+              </div>
+            ))}
+            <button onClick={() => setShowLanguagePicker(false)}
+              style={{ width: '100%', padding: '14px', background: t.inputBg, border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: t.text2, marginTop: '8px' }}>
+              Cancel
+            </button>
           </div>
-          {[
-            { Icon: CalendarIcon, label: 'My Bookings', sub: 'View and manage bookings', path: '/bookings', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
-            { Icon: WalletIcon, label: 'Payment History', sub: 'eSewa · Khalti · Bank', path: '/wallet', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
-          ].map((item, i) => (
-            <div key={i} onClick={() => router.push(item.path)}
-              style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderTop: `1px solid ${t.border}`, cursor: 'pointer'}}>
-              <div style={{width: '42px', height: '42px', borderRadius: '12px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                <item.Icon size={20} color={item.color} strokeWidth={1.8}/>
+        </div>
+      )}
+
+      {/* Nav side picker */}
+      {showNavSide && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', zIndex: 200, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: '24px', backdropFilter: 'blur(8px)' }}>
+          <div style={{ background: t.cardBg, borderRadius: '24px', padding: '28px 24px', width: '100%', maxWidth: '380px', border: `1px solid ${t.border}` }}>
+            <h3 style={{ fontSize: '18px', fontWeight: 800, color: t.text1, marginBottom: '8px' }}>Navigation Side</h3>
+            <p style={{ fontSize: '14px', color: t.text3, marginBottom: '20px' }}>Choose which side the gesture navigation appears on</p>
+            {[
+              { id: 'right', label: '👉 Right side', sub: 'Default — for right-handed users' },
+              { id: 'left', label: '👈 Left side', sub: 'For left-handed users' },
+            ].map(opt => (
+              <div key={opt.id} onClick={() => { localStorage.setItem('navSide', opt.id); setShowNavSide(false); window.location.reload() }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 16px', borderRadius: '14px', background: t.inputBg, border: `1px solid ${t.border}`, marginBottom: '8px', cursor: 'pointer' }}>
+                <div>
+                  <p style={{ fontSize: '15px', fontWeight: 700, color: t.text1 }}>{opt.label}</p>
+                  <p style={{ fontSize: '12px', color: t.text3 }}>{opt.sub}</p>
+                </div>
               </div>
-              <div style={{flex: 1}}>
-                <p style={{fontSize: '15px', fontWeight: 700, color: t.text1, transition: 'color 0.3s ease'}}>{item.label}</p>
-                <p style={{fontSize: '12px', color: t.text3, marginTop: '2px'}}>{item.sub}</p>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.text4} strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
+            ))}
+            <button onClick={() => setShowNavSide(false)}
+              style={{ width: '100%', padding: '14px', background: t.inputBg, border: 'none', borderRadius: '14px', fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', color: t.text2, marginTop: '8px' }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div style={{ background: t.headerBg, backdropFilter: 'blur(20px)', padding: '52px 20px 20px', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h1 style={{ fontSize: '22px', fontWeight: 900, color: t.text1, letterSpacing: '-0.6px' }}>Profile</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ThemeToggle/>
+            <button onClick={() => router.push('/edit-profile')}
+              style={{ width: '38px', height: '38px', borderRadius: '12px', background: t.inputBg, border: `1px solid ${t.border}`, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+              <EditIcon size={16} color={t.text2} strokeWidth={2}/>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: '20px 16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+
+        {/* Profile hero */}
+        <div style={{ ...card, padding: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+            {/* Avatar */}
+            <div style={{ position: 'relative', flexShrink: 0 }}>
+              {profile?.avatar
+                ? <img src={profile.avatar} style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover' }} alt={name}/>
+                : <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '24px', boxShadow: '0 4px 16px rgba(220,20,60,0.3)' }}>
+                    {initials(name)}
+                  </div>}
+              <button onClick={() => router.push('/edit-profile')}
+                style={{ position: 'absolute', bottom: 0, right: 0, width: '24px', height: '24px', borderRadius: '50%', background: brand.primary, border: '2px solid white', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
+                <CameraIcon size={10} color="white" strokeWidth={2}/>
+              </button>
             </div>
-          ))}
+
+            {/* Info */}
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 800, color: t.text1, letterSpacing: '-0.4px', marginBottom: '3px' }}>{name}</h2>
+              <p style={{ fontSize: '13px', color: t.text3, marginBottom: '4px' }}>{email}</p>
+              {location && <p style={{ fontSize: '12px', color: t.text3 }}>📍 {location}</p>}
+            </div>
+          </div>
+
+          {bio && (
+            <p style={{ fontSize: '14px', color: t.text2, lineHeight: 1.6, marginBottom: '16px', paddingBottom: '16px', borderBottom: `1px solid ${t.border}` }}>
+              {bio}
+            </p>
+          )}
+
+          {/* Stats row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+            {[
+              { val: posts.length.toString(), label: 'Moments' },
+              { val: joinDate, label: 'Member since' },
+              { val: '4.9★', label: 'Rating' },
+            ].map((s, i) => (
+              <div key={i} style={{ textAlign: 'center', padding: '10px 6px', background: t.inputBg, borderRadius: '12px' }}>
+                <p style={{ fontSize: i === 1 ? '10px' : '16px', fontWeight: 800, color: t.text1, marginBottom: '3px', letterSpacing: i === 1 ? '0' : '-0.5px' }}>{s.val}</p>
+                <p style={{ fontSize: '10px', color: t.text3, fontWeight: 500 }}>{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
-        {/* Personalize */}
-        <div style={{...card}}>
-          <div style={{padding: '16px 16px 8px'}}>
-            <p style={{fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px'}}>Personalize</p>
-          </div>
-          {[
-            { Icon: EditIcon, label: 'Edit Profile', sub: 'Name, photo, bio, location', path: '/edit-profile', color: brand.primary, bg: brand.primaryLight },
-            { Icon: SparkleIcon, label: 'Switch to Companion Mode', sub: 'Earn by providing care services', path: '/companion/setup', color: '#7C3AED', bg: 'rgba(124,58,237,0.08)' },
-            { Icon: BellIcon, label: 'Notifications', sub: 'Likes, comments, updates', path: '/notifications', color: brand.warning, bg: 'rgba(245,158,11,0.1)' },
-            { Icon: SearchIcon, label: 'Search', sub: 'Find people and moments', path: '/search', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
-          ].map((item, i) => (
-            <div key={i} onClick={() => router.push(item.path)}
-              style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderTop: `1px solid ${t.border}`, cursor: 'pointer'}}>
-              <div style={{width: '42px', height: '42px', borderRadius: '12px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                <item.Icon size={20} color={item.color} strokeWidth={1.8}/>
+        {/* Mode switch */}
+        <div style={{ ...card, padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <SparkleIcon size={20} color="white" strokeWidth={1.8}/>
               </div>
-              <div style={{flex: 1}}>
-                <p style={{fontSize: '15px', fontWeight: 700, color: t.text1, transition: 'color 0.3s ease'}}>{item.label}</p>
-                <p style={{fontSize: '12px', color: t.text3, marginTop: '2px'}}>{item.sub}</p>
+              <div>
+                <p style={{ fontSize: '14px', fontWeight: 700, color: t.text1 }}>Companion Mode</p>
+                <p style={{ fontSize: '12px', color: t.text3 }}>Switch between family and companion</p>
               </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={t.text4} strokeWidth="2.5" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>
             </div>
-          ))}
+            <ModeSwitch/>
+          </div>
+        </div>
 
-          {/* Language toggle */}
-          <div style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderTop: `1px solid ${t.border}`}}>
-            <div style={{width: '42px', height: '42px', borderRadius: '12px', background: 'rgba(124,58,237,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-              <GlobeIcon size={20} color="#7C3AED" strokeWidth={1.8}/>
-            </div>
-            <div style={{flex: 1}}>
-              <p style={{fontSize: '15px', fontWeight: 700, color: t.text1, transition: 'color 0.3s ease'}}>Language</p>
-              <p style={{fontSize: '12px', color: t.text3, marginTop: '2px'}}>English / नेपाली</p>
-            </div>
-            <div onClick={() => setLangNepali(!langNepali)}
-              style={{width: '52px', height: '28px', borderRadius: '9999px', background: langNepali ? brand.primary : t.border, position: 'relative', cursor: 'pointer', transition: 'background 0.3s ease', flexShrink: 0}}>
-              <div style={{position: 'absolute', top: '3px', left: langNepali ? '27px' : '3px', width: '22px', height: '22px', borderRadius: '50%', background: 'white', boxShadow: '0 2px 6px rgba(0,0,0,0.15)', transition: 'left 0.3s ease', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <span style={{fontSize: '9px', fontWeight: 800, color: langNepali ? brand.primary : t.text3}}>{langNepali ? 'ने' : 'EN'}</span>
-              </div>
+        {/* Settings sections */}
+        {SECTIONS.map((section, si) => (
+          <div key={si}>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px', paddingLeft: '4px' }}>
+              {section.title}
+            </p>
+            <div style={{ ...card }}>
+              {section.items.map((item, ii) => (
+                <div key={ii}
+                  onClick={() => item.path ? router.push(item.path) : item.action ? handleAction(item.action) : null}
+                  style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '14px 16px', borderBottom: ii < section.items.length - 1 ? `1px solid ${t.border}` : 'none', cursor: 'pointer', transition: 'background 0.15s ease' }}
+                  className="pressable">
+                  <div style={{ width: '38px', height: '38px', borderRadius: '11px', background: t.inputBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: '18px' }}>
+                    {item.icon}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: '14px', fontWeight: 600, color: t.text1, marginBottom: '2px' }}>{item.label}</p>
+                    <p style={{ fontSize: '12px', color: t.text3 }}>{item.sub}</p>
+                  </div>
+                  {item.action === 'theme' ? (
+                    <div style={{ width: '44px', height: '24px', borderRadius: '12px', background: isDark ? brand.primary : t.inputBg, border: `1px solid ${isDark ? brand.primary : t.border}`, position: 'relative', transition: 'all 0.3s ease' }}>
+                      <div style={{ position: 'absolute', top: '2px', left: isDark ? '22px' : '2px', width: '20px', height: '20px', borderRadius: '50%', background: 'white', transition: 'left 0.3s ease', boxShadow: '0 1px 4px rgba(0,0,0,0.2)' }}/>
+                    </div>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={t.text3} strokeWidth="2" strokeLinecap="round">
+                      <path d="M9 18l6-6-6-6"/>
+                    </svg>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
+        ))}
+
+        {/* App version */}
+        <div style={{ textAlign: 'center', padding: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '6px' }}>
+            <div style={{ width: '24px', height: '24px', borderRadius: '7px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <SahayatriLogo size={14} color="white"/>
+            </div>
+            <p style={{ fontSize: '13px', fontWeight: 700, color: t.text2 }}>Sahayatri</p>
+          </div>
+          <p style={{ fontSize: '11px', color: t.text3 }}>Version 1.0.0 · Built with ❤️ for Nepal</p>
         </div>
 
         {/* Sign out */}
-        <div style={{textAlign: 'center'}}>
-          <button onClick={() => signOut({ callbackUrl: '/' })}
-            style={{background: 'none', border: 'none', color: t.text3, fontSize: '13px', fontWeight: 500, cursor: 'pointer', fontFamily: 'Inter, sans-serif', padding: '8px 20px'}}>
-            Sign out
-          </button>
-        </div>
-
-        {/* Footer watermark */}
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', paddingBottom: '8px'}}>
-          <SahayatriLogo size={14} color={t.text3}/>
-          <p style={{fontSize: '11px', color: t.text4}}>Sahayatri · Made with love for Nepal</p>
-        </div>
-
+        <button onClick={() => setShowSignOutConfirm(true)}
+          style={{ width: '100%', padding: '16px', background: 'rgba(220,20,60,0.06)', border: '1px solid rgba(220,20,60,0.15)', borderRadius: '16px', color: brand.primary, fontSize: '15px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={brand.primary} strokeWidth="2" strokeLinecap="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+          </svg>
+          Sign Out
+        </button>
       </div>
-
-      <style>{`
-        @keyframes heartPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
-        @keyframes wave { 0%, 100% { transform: scaleY(0.4); } 50% { transform: scaleY(1.2); } }
-        ::-webkit-scrollbar { display: none; }
-      `}</style>
     </div>
   )
 }

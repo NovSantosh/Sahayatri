@@ -75,7 +75,13 @@ const NOTIF_TYPE_CONFIG: any = {
 type NavState = 'hidden' | 'mini' | 'full'
 type Panel = 'nav' | 'notifications'
 
-export default function GestureNav({ side = 'right' }: { side?: 'left' | 'right' }) {
+export default function GestureNav({ side: defaultSide = 'right' }: { side?: 'left' | 'right' }) {
+  const [side, setSide] = useState<'left' | 'right'>(defaultSide)
+
+  useEffect(() => {
+    const saved = localStorage.getItem('navSide') as 'left' | 'right' | null
+    if (saved) setSide(saved)
+  }, [])
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()

@@ -155,7 +155,7 @@ export default function Dashboard() {
         <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px'}}>
           <div style={{flex: 1, minWidth: 0}}>
             {/* Dynamic contextual greeting - hides on scroll */}
-            <div style={{display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px'}}>
+            <div style={{display: scrolled ? 'none' : 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px'}}>
               <div style={{width: '6px', height: '6px', borderRadius: '50%', background: hour < 20 ? '#10B981' : '#F59E0B', boxShadow: hour < 20 ? '0 0 6px #10B981' : '0 0 6px #F59E0B'}}/>
               <p style={{fontSize: '11px', fontWeight: 600, color: t.text3, letterSpacing: '0.3px'}}>
                 {hour < 5 ? 'Late night · Nepal is sleeping' 

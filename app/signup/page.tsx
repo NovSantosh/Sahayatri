@@ -80,12 +80,26 @@ export default function Signup() {
     setLoading(true)
     setError('')
     try {
-      // TODO: wire to real OTP service (Sparrow SMS for Nepal, SendGrid for email)
-      await new Promise(r => setTimeout(r, 800))
-      setStep('otp')
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: otpChannel === 'email' ? email : undefined,
+          phone: otpChannel === 'phone' ? phone : undefined,
+          channel: otpChannel,
+        })
+      })
+      const data = await res.json()
+      if (data.success) {
+        setStep('otp')
+      } else {
+        setError(data.error || 'Failed to send OTP')
+      }
     } catch (e) {
       setError('Failed to send OTP. Try again.')
     }
+    setLoading(false)
+  }
     setLoading(false)
   }
 

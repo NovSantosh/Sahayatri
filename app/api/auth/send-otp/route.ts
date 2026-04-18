@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
       const { Resend } = await import('resend')
       const resend = new Resend(process.env.RESEND_API_KEY)
 
-      await resend.emails.send({
+      console.log("Sending email to:", email, "with key:", process.env.RESEND_API_KEY ? "SET" : "NOT SET")
+      const result = await resend.emails.send({
         from: 'Sahayatri <onboarding@resend.dev>',
         to: email,
         subject: `Your Sahayatri verification code: ${otp}`,
@@ -67,7 +68,7 @@ export async function POST(req: NextRequest) {
         `
       })
 
-      return NextResponse.json({ success: true })
+      return NextResponse.json({ success: true, hint: process.env.NODE_ENV === 'development' ? otp : undefined })
 
     } else if (channel === 'phone' && phone) {
       // Sparrow SMS for Nepal

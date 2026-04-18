@@ -33,6 +33,12 @@ export default function Dashboard() {
     if (status === 'authenticated') fetchAll()
   }, [status])
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const fetchAll = async () => {
     try {
       const [bRes, pRes, fRes] = await Promise.all([

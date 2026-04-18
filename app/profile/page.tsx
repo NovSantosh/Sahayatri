@@ -31,7 +31,7 @@ const SECTIONS = [
     title: 'Preferences',
     items: [
       { icon: '🌙', label: 'Appearance', sub: 'Dark mode, light mode', action: 'theme' },
-      { icon: '🔔', label: 'Notifications', sub: 'Push, email, SMS alerts', path: '/notifications' },
+
       { icon: '🌐', label: 'Language', sub: 'English · नेपाली', action: 'language' },
       { icon: '📍', label: 'Navigation Side', sub: 'Right hand or left hand', action: 'navside' },
     ]
@@ -40,7 +40,7 @@ const SECTIONS = [
     title: 'Payments',
     items: [
       { icon: '💳', label: 'Payment History', sub: 'eSewa · Khalti · Bank', path: '/wallet' },
-      { icon: '🧾', label: 'Invoices', sub: 'Download payment receipts', path: '/wallet' },
+
     ]
   },
   {

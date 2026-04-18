@@ -325,9 +325,7 @@ export default function Signup() {
                   {otpChannel === 'email' ? email : phone}
                 </span>
               </p>
-              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', marginTop: '6px' }}>
-                (Demo: use any 6 digits to continue)
-              </p>
+
             </div>
 
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '24px' }}>

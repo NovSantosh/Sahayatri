@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server'
+import nodemailer from 'nodemailer'
 
 const OTP_STORE = new Map<string, { otp: string, expires: number }>()
 
 function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+function getTransporter() {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -12,69 +23,53 @@ export async function POST(req: NextRequest) {
 
     const otp = generateOTP()
     const key = channel === 'email' ? email : phone
-    const expires = Date.now() + 10 * 60 * 1000 // 10 minutes
+    const expires = Date.now() + 10 * 60 * 1000
 
-    // Store OTP
     OTP_STORE.set(key, { otp, expires })
+    console.log(`OTP for ${key}: ${otp}`)
 
     if (channel === 'email' && email) {
-      // Send via Resend
-      if (!process.env.RESEND_API_KEY) {
-        // Demo mode — log OTP
-        console.log(`OTP for ${email}: ${otp}`)
-        return NextResponse.json({ success: true, demo: true })
+      if (!process.env.GMAIL_USER || !process.env.GMAIL_APP_PASSWORD) {
+        console.log('Gmail not configured - demo mode OTP:', otp)
+        return NextResponse.json({ success: true, demo: true, otp })
       }
 
-      const { Resend } = await import('resend')
-      const resend = new Resend(process.env.RESEND_API_KEY)
+      const transporter = getTransporter()
 
-      console.log("Sending email to:", email, "with key:", process.env.RESEND_API_KEY ? "SET" : "NOT SET")
-      const result = await resend.emails.send({
-        from: 'Sahayatri <onboarding@resend.dev>',
+      await transporter.sendMail({
+        from: `"Sahayatri" <${process.env.GMAIL_USER}>`,
         to: email,
         subject: `Your Sahayatri verification code: ${otp}`,
         html: `
-          <div style="font-family:Inter,sans-serif;max-width:480px;margin:0 auto;padding:40px 24px;background:#06040C;border-radius:16px;">
+          <div style="font-family:Inter,Arial,sans-serif;max-width:480px;margin:0 auto;padding:40px 24px;background:#06040C;border-radius:16px;">
             <div style="text-align:center;margin-bottom:32px;">
-              <div style="width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#DC143C,#A50E2D);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                <span style="font-size:32px;">❤️</span>
-              </div>
-              <h1 style="color:white;font-size:24px;font-weight:800;letter-spacing:-0.5px;margin:0;">Sahayatri</h1>
-              <p style="color:rgba(255,255,255,0.5);font-size:14px;margin-top:8px;">साथयात्री · Fellow Traveler</p>
+              <h1 style="color:white;font-size:28px;font-weight:800;letter-spacing:-1px;margin:0;">Sahayatri</h1>
+              <p style="color:rgba(255,255,255,0.4);font-size:14px;margin-top:6px;">साथयात्री · Fellow Traveler</p>
             </div>
-            
             <p style="color:rgba(255,255,255,0.7);font-size:16px;line-height:1.6;margin-bottom:24px;">
               Your verification code is:
             </p>
-            
-            <div style="background:rgba(220,20,60,0.1);border:1px solid rgba(220,20,60,0.3);border-radius:16px;padding:24px;text-align:center;margin-bottom:24px;">
-              <p style="font-size:48px;font-weight:900;color:#DC143C;letter-spacing:12px;margin:0;">${otp}</p>
+            <div style="background:rgba(220,20,60,0.12);border:2px solid rgba(220,20,60,0.3);border-radius:16px;padding:28px;text-align:center;margin-bottom:24px;">
+              <p style="font-size:52px;font-weight:900;color:#DC143C;letter-spacing:14px;margin:0;font-family:monospace;">${otp}</p>
             </div>
-            
-            <p style="color:rgba(255,255,255,0.4);font-size:13px;line-height:1.6;margin-bottom:8px;">
+            <p style="color:rgba(255,255,255,0.35);font-size:13px;line-height:1.6;">
               This code expires in 10 minutes. Do not share it with anyone.
             </p>
-            
-            <p style="color:rgba(255,255,255,0.25);font-size:12px;line-height:1.6;">
-              If you did not request this code, please ignore this email.
-            </p>
-
-            <div style="margin-top:32px;padding-top:24px;border-top:1px solid rgba(255,255,255,0.08);text-align:center;">
+            <div style="margin-top:32px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);text-align:center;">
               <p style="color:rgba(255,255,255,0.2);font-size:11px;">
-                Built for the Nepali community · sahayatri.app
+                Sahayatri · Built for the Nepali community
               </p>
             </div>
           </div>
-        `
+        `,
       })
 
-      return NextResponse.json({ success: true, hint: process.env.NODE_ENV === 'development' ? otp : undefined })
+      return NextResponse.json({ success: true })
 
     } else if (channel === 'phone' && phone) {
-      // Sparrow SMS for Nepal
       if (!process.env.SPARROW_TOKEN) {
-        console.log(`OTP for ${phone}: ${otp}`)
-        return NextResponse.json({ success: true, demo: true })
+        console.log('Sparrow SMS not configured - demo OTP:', otp)
+        return NextResponse.json({ success: true, demo: true, otp })
       }
 
       const res = await fetch('http://api.sparrowsms.com/v2/sms/', {
@@ -84,22 +79,18 @@ export async function POST(req: NextRequest) {
           token: process.env.SPARROW_TOKEN,
           from: 'Sahayatri',
           to: phone,
-          text: `Your Sahayatri verification code is: ${otp}. Valid for 10 minutes. Do not share.`,
+          text: `Your Sahayatri verification code: ${otp}. Valid 10 minutes. Do not share.`,
         })
       })
-
-      if (!res.ok) {
-        console.log(`SMS OTP for ${phone}: ${otp}`)
-      }
-
+      console.log('SMS result:', await res.text())
       return NextResponse.json({ success: true })
     }
 
     return NextResponse.json({ error: 'Invalid channel' }, { status: 400 })
 
-  } catch (error) {
-    console.error('OTP error:', error)
-    return NextResponse.json({ error: 'Failed to send OTP' }, { status: 500 })
+  } catch (error: any) {
+    console.error('OTP error:', error?.message || error)
+    return NextResponse.json({ error: 'Failed to send OTP', details: error?.message }, { status: 500 })
   }
 }
 
@@ -108,13 +99,13 @@ export async function GET(req: NextRequest) {
   const otp = req.nextUrl.searchParams.get('otp')
 
   if (!key || !otp) {
-    return NextResponse.json({ error: 'Missing key or otp' }, { status: 400 })
+    return NextResponse.json({ error: 'Missing params' }, { status: 400 })
   }
 
   const stored = OTP_STORE.get(key)
 
   if (!stored) {
-    return NextResponse.json({ valid: false, error: 'OTP not found or expired' })
+    return NextResponse.json({ valid: false, error: 'OTP expired or not found' })
   }
 
   if (Date.now() > stored.expires) {
@@ -123,7 +114,7 @@ export async function GET(req: NextRequest) {
   }
 
   if (stored.otp !== otp) {
-    return NextResponse.json({ valid: false, error: 'Invalid OTP' })
+    return NextResponse.json({ valid: false, error: 'Invalid code' })
   }
 
   OTP_STORE.delete(key)

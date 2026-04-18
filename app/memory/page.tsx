@@ -27,6 +27,9 @@ export default function Memory() {
   const [submittingComment, setSubmittingComment] = useState<string[]>([])
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null)
   const [deletingIds, setDeletingIds] = useState<string[]>([])
+  const [location, setLocation] = useState('')
+  const [showLocationInput, setShowLocationInput] = useState(false)
+  const [selectedMood, setSelectedMood] = useState('')
 
   useEffect(() => { fetchPosts() }, [])
 
@@ -216,8 +219,15 @@ export default function Memory() {
                 { emoji: '😢', label: 'Missing', color: '#6B7280' },
               ].map((mood) => (
                 <button key={mood.label}
-                  onClick={() => setContent(prev => prev.includes(mood.emoji) ? prev : mood.emoji + ' ' + prev)}
-                  style={{flexShrink: 0, padding: '6px 12px', borderRadius: '9999px', border: `1px solid ${t.border}`, background: t.inputBg, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s ease'}}>
+                  onClick={() => {
+                  setSelectedMood(mood.label === selectedMood ? '' : mood.label)
+                  setContent(prev => {
+                    // Remove any previous mood emoji
+                    const cleaned = prev.replace(/^[🌀-🿿☀-⛿s]+/gu, '').trim()
+                    return mood.label === selectedMood ? cleaned : mood.emoji + ' ' + cleaned
+                  })
+                }}
+                  style={{flexShrink: 0, padding: '6px 12px', borderRadius: '9999px', border: `1.5px solid ${selectedMood === mood.label ? mood.color : t.border}`, background: selectedMood === mood.label ? `${mood.color}15` : t.inputBg, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s ease'}}>
                   <span style={{fontSize: '14px'}}>{mood.emoji}</span>
                   <span style={{fontSize: '11px', fontWeight: 600, color: t.text2}}>{mood.label}</span>
                 </button>

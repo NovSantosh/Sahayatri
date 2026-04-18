@@ -203,9 +203,35 @@ export default function Memory() {
               </div>
             </div>
           )}
+          {/* Mood selector */}
+          <div style={{marginBottom: '14px'}}>
+            <p style={{fontSize: '11px', fontWeight: 700, color: t.text3, textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: '8px'}}>How is everyone feeling?</p>
+            <div style={{display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px', scrollbarWidth: 'none'}}>
+              {[
+                { emoji: '😊', label: 'Happy', color: '#10B981' },
+                { emoji: '🙏', label: 'Grateful', color: '#7C3AED' },
+                { emoji: '❤️', label: 'Loved', color: '#DC143C' },
+                { emoji: '😌', label: 'Peaceful', color: '#3B82F6' },
+                { emoji: '🎉', label: 'Celebrating', color: '#F59E0B' },
+                { emoji: '😢', label: 'Missing', color: '#6B7280' },
+              ].map((mood) => (
+                <button key={mood.label}
+                  onClick={() => setContent(prev => prev.includes(mood.emoji) ? prev : mood.emoji + ' ' + prev)}
+                  style={{flexShrink: 0, padding: '6px 12px', borderRadius: '9999px', border: `1px solid ${t.border}`, background: t.inputBg, cursor: 'pointer', fontFamily: 'Inter, sans-serif', display: 'flex', alignItems: 'center', gap: '5px', transition: 'all 0.2s ease'}}>
+                  <span style={{fontSize: '14px'}}>{mood.emoji}</span>
+                  <span style={{fontSize: '11px', fontWeight: 600, color: t.text2}}>{mood.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
           <textarea value={content} onChange={(e) => setContent(e.target.value)}
-            placeholder="What happened today? Share a real moment…" rows={4}
+            placeholder="What happened today? Share a real moment… A photo update, a milestone, something that made you smile."
+            rows={4}
             style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '14px', padding: '14px', fontSize: '15px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', resize: 'none', boxSizing: 'border-box', lineHeight: 1.6, transition: 'background 0.3s ease'}}/>
+          
+          {/* Character count */}
+          <p style={{fontSize: '11px', color: content.length > 280 ? brand.primary : t.text3, textAlign: 'right', marginTop: '4px'}}>{content.length}/500</p>
 
           {imagePreview.length > 0 && (
             <div style={{display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap'}}>
@@ -271,6 +297,12 @@ export default function Memory() {
 
         {filteredPosts.map((post) => {
           const catStyle = categoryStyle[post.category] || categoryStyle['Community']
+          const catColors: any = {
+            'Care moment': { grad: 'linear-gradient(135deg, #DC143C, #A50E2D)', light: 'rgba(220,20,60,0.08)' },
+            'Service story': { grad: 'linear-gradient(135deg, #F59E0B, #D97706)', light: 'rgba(245,158,11,0.08)' },
+            'Community': { grad: 'linear-gradient(135deg, #7C3AED, #5B21B6)', light: 'rgba(124,58,237,0.08)' },
+          }
+          const cc = catColors[post.category] || catColors['Community']
           const isOwn = session?.user?.email === post.authorEmail || session?.user?.name === post.authorName
           const isCommenting = openComments.includes(post._id)
 

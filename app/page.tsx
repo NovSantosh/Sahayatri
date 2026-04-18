@@ -1,13 +1,13 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { brand } from './design-system'
 import { SahayatriLogo } from './components/Icons'
 
 const FEATURES = [
   {
-    title: 'Elder Care',
+    title: 'Elder Care at Home',
     desc: 'Verified companions visit your parents daily in Nepal',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
@@ -16,6 +16,7 @@ const FEATURES = [
     ),
     color: '#DC143C',
     bg: 'rgba(220,20,60,0.12)',
+    route: '/care',
   },
   {
     title: 'Daily Photo Updates',
@@ -29,6 +30,7 @@ const FEATURES = [
     ),
     color: '#7C3AED',
     bg: 'rgba(124,58,237,0.12)',
+    route: '/signup',
   },
   {
     title: 'Home Services',
@@ -41,31 +43,36 @@ const FEATURES = [
     ),
     color: '#F59E0B',
     bg: 'rgba(245,158,11,0.12)',
+    route: '/services',
   },
   {
-    title: 'Earn as Companion',
-    desc: 'Switch to companion mode and start earning today',
+    title: 'Earn as a Companion',
+    desc: 'Help Nepali families and earn from your skills',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
-        <line x1="12" y1="1" x2="12" y2="23"/>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
       </svg>
     ),
     color: '#10B981',
     bg: 'rgba(16,185,129,0.12)',
+    route: '/join-professional',
   },
 ]
 
 export default function Landing() {
   const { data: session, status } = useSession()
   const router = useRouter()
+  const [activeFeature, setActiveFeature] = useState<number | null>(null)
 
   useEffect(() => {
     if (status === 'authenticated') router.push('/home')
   }, [status])
 
   if (status === 'loading' || status === 'authenticated') return (
-    <div style={{ minHeight: '100vh', background: '#06040C', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', background: '#F7F7F8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'breathe 2s ease infinite', boxShadow: '0 8px 32px rgba(220,20,60,0.4)' }}>
         <SahayatriLogo size={32} color="white"/>
       </div>
@@ -74,70 +81,82 @@ export default function Landing() {
   )
 
   return (
-    <div style={{ minHeight: '100vh', background: '#06040C', fontFamily: 'Inter, -apple-system, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ minHeight: '100vh', background: '#F7F7F8', fontFamily: 'Inter, -apple-system, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
 
-      {/* Background glow */}
-      <div style={{ position: 'absolute', top: '-120px', left: '50%', transform: 'translateX(-50%)', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,0,30,0.2) 0%, transparent 70%)', pointerEvents: 'none' }}/>
-      <div style={{ position: 'absolute', bottom: '-80px', right: '-80px', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.08) 0%, transparent 70%)', pointerEvents: 'none' }}/>
+      {/* Background decoration */}
+      <div style={{ position: 'absolute', top: '-100px', right: '-80px', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(220,20,60,0.06) 0%, transparent 70%)', pointerEvents: 'none' }}/>
+      <div style={{ position: 'absolute', bottom: '-60px', left: '-60px', width: '250px', height: '250px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(124,58,237,0.05) 0%, transparent 70%)', pointerEvents: 'none' }}/>
 
       {/* Logo section */}
       <div style={{ padding: '72px 28px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
 
         {/* App icon */}
-        <div style={{ width: '88px', height: '88px', borderRadius: '28px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 48px rgba(220,20,60,0.45)', marginBottom: '20px', position: 'relative' }}>
+        <div style={{ width: '88px', height: '88px', borderRadius: '28px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 12px 48px rgba(220,20,60,0.3)', marginBottom: '20px', position: 'relative' }}>
           <SahayatriLogo size={52} color="white"/>
-          {/* Shine */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', borderRadius: '28px 28px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 100%)', pointerEvents: 'none' }}/>
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', borderRadius: '28px 28px 0 0', background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%)', pointerEvents: 'none' }}/>
         </div>
 
-        <h1 style={{ fontSize: '40px', fontWeight: 900, color: 'white', letterSpacing: '-1.8px', marginBottom: '10px', textAlign: 'center', lineHeight: 1 }}>
+        <h1 style={{ fontSize: '40px', fontWeight: 900, color: '#0F0F10', letterSpacing: '-2px', marginBottom: '8px', textAlign: 'center', lineHeight: 1 }}>
           Sahayatri
         </h1>
-        <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', textAlign: 'center', lineHeight: 1.65, maxWidth: '240px' }}>
+        <p style={{ fontSize: '15px', color: 'rgba(0,0,0,0.4)', textAlign: 'center', lineHeight: 1.65, maxWidth: '240px' }}>
           साथयात्री — Companion in life's journey
         </p>
 
         {/* Trust badges */}
-        <div style={{ display: 'flex', gap: '8px', marginTop: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', gap: '8px', marginTop: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
           {['🇳🇵 Made for Nepalis', '100% Ad-free', 'Legally verified'].map((badge, i) => (
-            <div key={i} style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '9999px' }}>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.5)', margin: 0, fontWeight: 500 }}>{badge}</p>
+            <div key={i} style={{ padding: '4px 10px', background: 'white', border: '1px solid rgba(0,0,0,0.07)', borderRadius: '9999px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.45)', margin: 0, fontWeight: 500 }}>{badge}</p>
             </div>
           ))}
         </div>
       </div>
 
       {/* Features */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '32px 24px 24px', position: 'relative', zIndex: 1 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '32px' }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '28px 20px 20px', position: 'relative', zIndex: 1 }}>
+        <p style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(0,0,0,0.35)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', paddingLeft: '4px' }}>What we offer</p>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '24px' }}>
           {FEATURES.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '14px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '16px', padding: '14px 16px', transition: 'all 0.2s ease' }}>
+            <div key={i}
+              onClick={() => router.push('/signup')}
+              className="pressable"
+              style={{ display: 'flex', alignItems: 'center', gap: '14px', background: activeFeature === i ? item.bg : 'white', border: `1px solid ${activeFeature === i ? item.color + '30' : 'rgba(0,0,0,0.06)'}`, borderRadius: '16px', padding: '14px 16px', cursor: 'pointer', boxShadow: '0 1px 4px rgba(0,0,0,0.04)', transition: 'all 0.2s ease' }}
+              onMouseEnter={() => setActiveFeature(i)}
+              onMouseLeave={() => setActiveFeature(null)}>
+
               {/* Icon */}
-              <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: item.bg, border: `1px solid ${item.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {item.icon}
+              <div style={{ width: '44px', height: '44px', borderRadius: '14px', background: item.bg, border: `1px solid ${item.color}25`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, position: 'relative', overflow: 'hidden' }}>
+                <div style={{ position: 'absolute', inset: 0, background: `linear-gradient(135deg, ${item.color}, ${item.color}AA)` }}/>
+                <div style={{ position: 'relative', zIndex: 1 }}>{item.icon}</div>
               </div>
+
               <div style={{ flex: 1 }}>
-                <p style={{ fontSize: '14px', fontWeight: 700, color: 'white', marginBottom: '3px', letterSpacing: '-0.2px' }}>{item.title}</p>
-                <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.4 }}>{item.desc}</p>
+                <p style={{ fontSize: '14px', fontWeight: 700, color: '#0F0F10', marginBottom: '3px', letterSpacing: '-0.2px' }}>{item.title}</p>
+                <p style={{ fontSize: '12px', color: 'rgba(0,0,0,0.4)', lineHeight: 1.4 }}>{item.desc}</p>
               </div>
+
               {/* Arrow */}
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2" strokeLinecap="round">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
+              <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: item.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M9 18l6-6-6-6"/>
+                </svg>
+              </div>
             </div>
           ))}
         </div>
 
         {/* Stats row */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
           {[
             { val: '500+', label: 'Families' },
             { val: '4.9★', label: 'Rating' },
             { val: '98%', label: 'Satisfaction' },
           ].map((s, i) => (
-            <div key={i} style={{ flex: 1, padding: '12px 8px', textAlign: 'center', background: 'rgba(220,20,60,0.06)', border: '1px solid rgba(220,20,60,0.12)', borderRadius: '14px' }}>
-              <p style={{ fontSize: '17px', fontWeight: 900, color: '#DC143C', letterSpacing: '-0.5px', marginBottom: '3px' }}>{s.val}</p>
-              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{s.label}</p>
+            <div key={i} style={{ flex: 1, padding: '12px 8px', textAlign: 'center', background: 'white', border: '1px solid rgba(0,0,0,0.06)', borderRadius: '14px', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: '17px', fontWeight: 900, color: brand.primary, letterSpacing: '-0.5px', marginBottom: '3px' }}>{s.val}</p>
+              <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.35)', fontWeight: 600 }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -146,7 +165,7 @@ export default function Landing() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           <button onClick={() => router.push('/signup')}
             className="pressable"
-            style={{ width: '100%', padding: '18px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '18px', color: 'white', fontSize: '17px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 8px 32px rgba(220,20,60,0.4)', letterSpacing: '-0.3px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            style={{ width: '100%', padding: '18px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '18px', color: 'white', fontSize: '17px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 8px 32px rgba(220,20,60,0.3)', letterSpacing: '-0.3px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             Get Started Free
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
               <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -154,15 +173,17 @@ export default function Landing() {
           </button>
           <button onClick={() => router.push('/login')}
             className="pressable"
-            style={{ width: '100%', padding: '16px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '18px', color: 'rgba(255,255,255,0.8)', fontSize: '16px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+            style={{ width: '100%', padding: '16px', background: 'white', border: '1px solid rgba(0,0,0,0.1)', borderRadius: '18px', color: '#0F0F10', fontSize: '16px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
             Sign In to your account
           </button>
         </div>
 
-        <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.18)', textAlign: 'center', marginTop: '16px', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '11px', color: 'rgba(0,0,0,0.25)', textAlign: 'center', marginTop: '14px', lineHeight: 1.6 }}>
           Your data stays private · Never shared · Nepal law compliant
         </p>
       </div>
+
+      <style>{`@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}`}</style>
     </div>
   )
 }

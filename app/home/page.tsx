@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [family, setFamily] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [pressedCard, setPressedCard] = useState<string | null>(null)
+  const [scrolled, setScrolled] = useState(false)
   const [showMayaAnim, setShowMayaAnim] = useState(false)
   const [mayaSent, setMayaSent] = useState(false)
 
@@ -119,7 +120,6 @@ export default function Dashboard() {
   })
 
   const isDark = theme === 'dark'
-  const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)

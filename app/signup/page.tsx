@@ -143,10 +143,10 @@ export default function Signup() {
     setLoading(false)
   }
 
-  const primaryBtn = (disabled: boolean, onClick: () => void, label: string, loading?: boolean) => (
-    <button onClick={onClick} disabled={disabled || loading}
+  const primaryBtn = (disabled: boolean, onClick: () => void, label: string, isLoading?: boolean) => (
+    <button onClick={onClick} disabled={disabled || isLoading}
       style={{ width: '100%', padding: '17px', background: disabled ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: disabled ? 'rgba(255,255,255,0.3)' : 'white', fontSize: '16px', fontWeight: 800, cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', marginTop: '24px', boxShadow: disabled ? 'none' : '0 6px 24px rgba(220,20,60,0.35)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-      {loading
+      {isLoading
         ? <><div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Please wait…</>
         : label}
     </button>

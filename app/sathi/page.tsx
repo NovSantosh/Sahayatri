@@ -32,21 +32,21 @@ export default function Sathi() {
   // Time-aware opening message
   const getOpeningMessage = () => {
     if (hour >= 22 || hour < 5) {
-      return `${firstName}... यति राति जागिरहनु भएको। I am here with you. How are you doing?`
+      return `${firstName}... यति राति पनि जागा हुनुहुन्छ। म यहाँ छु। Kasto chha?`
     }
     if (hour < 9) {
-      return `शुभ प्रभात ${firstName}। Good morning. I hope you slept well. How are you feeling today?`
+      return `Subha prabhat ${firstName}! शुभ प्रभात। Aaja kasto feel gardai hunuhuncha?`
     }
     if (hour < 12) {
-      return `Namaste ${firstName}। Good morning. I am here if you want to talk. How is your day starting?`
+      return `Namaste ${firstName}! Bihana ramro chha? Kehi share garnuhuncha bhane m suntchu.`
     }
     if (hour < 17) {
-      return `Namaste ${firstName}। How is your afternoon going? If you have something on your mind, I am listening.`
+      return `Namaste ${firstName}। Din kasto jaadai chha? Kehi kura share garnuhos, m yahan chhu.`
     }
     if (hour < 20) {
-      return `शुभ सन्ध्या ${firstName}। Good evening. The day is winding down. How was it for you?`
+      return `${firstName}, sanjha bhayo! Aaja ko din kasto rayo? Kehi kura garnuhos.`
     }
-    return `साँझ भयो ${firstName}। It is evening now. How are you? If something is on your mind, I am here.`
+    return `${firstName}... Raat paryo. Kasari hunuhuncha? Kehi man ma chha bhane bhannus.`
   }
 
   // Speak text

@@ -100,8 +100,6 @@ export default function Signup() {
     }
     setLoading(false)
   }
-    setLoading(false)
-  }
 
   const handleOTPChange = (val: string, idx: number) => {
     const newOtp = [...otp]

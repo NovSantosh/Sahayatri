@@ -23,6 +23,7 @@ export default function Sathi() {
   const [hasGreeted, setHasGreeted] = useState(false)
   const [showInput, setShowInput] = useState(false)
   const [voiceSupported, setVoiceSupported] = useState(false)
+  const [started, setStarted] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -88,6 +89,20 @@ export default function Sathi() {
     window.speechSynthesis.speak(utterance)
   }, [])
 
+  const handleStart = () => {
+    setStarted(true)
+    // User gesture required for speech synthesis on mobile
+    const u = new SpeechSynthesisUtterance('')
+    window.speechSynthesis?.speak(u)
+    setTimeout(() => {
+      const opening = getOpeningMessage()
+      const greetMsg: Message = { role: 'assistant', content: opening, timestamp: new Date() }
+      setMessages([greetMsg])
+      setHasGreeted(true)
+      setTimeout(() => speak(opening, () => setShowInput(true)), 300)
+    }, 100)
+  }
+
   // Check voice support
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -103,30 +118,7 @@ export default function Sathi() {
     }
   }, [])
 
-  // Auto greet on mount
-  useEffect(() => {
-    if (hasGreeted) return
-    const timer = setTimeout(() => {
-      const opening = getOpeningMessage()
-      const greetMsg: Message = {
-        role: 'assistant',
-        content: opening,
-        timestamp: new Date(),
-      }
-      setMessages([greetMsg])
-      setHasGreeted(true)
 
-      // Speak the greeting after a small delay
-      setTimeout(() => {
-        speak(opening, () => {
-          // After speaking, show the input options
-          setShowInput(true)
-        })
-      }, 500)
-    }, 800)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })

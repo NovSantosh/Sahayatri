@@ -101,6 +101,11 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, userEmail, userName, userLocation, familyData, hour } = await req.json()
 
+    // Detect language of last user message
+    const lastUserMsg = messages[messages.length - 1]?.content || ''
+    const hasNepali = /[ऀ-ॿ]/.test(lastUserMsg)
+    const langInstruction = hasNepali ? 'The user is speaking Nepali. REPLY IN NEPALI SCRIPT (देवनागरी). Use simple conversational Nepali.' : 'Reply in English.'
+
     // Build context about the user
     let userContext = `The person talking to you is ${userName || 'a Sahayatri user'}.`
     if (userLocation) userContext += ` They live in ${userLocation}.`
@@ -114,7 +119,7 @@ export async function POST(req: NextRequest) {
     const completion = await groq.chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: SATHI_SOUL + '\n\nCONTEXT: ' + userContext },
+        { role: 'system', content: SATHI_SOUL + '\n\nCONTEXT: ' + userContext + ' ' + langInstruction },
         ...messages,
       ],
       max_tokens: 600,

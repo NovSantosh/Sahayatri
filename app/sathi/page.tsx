@@ -253,6 +253,29 @@ export default function Sathi() {
         </div>
       </div>
 
+      {/* ── START SCREEN ── */}
+      {!started && (
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 24px', textAlign: 'center', position: 'relative', zIndex: 1 }}>
+          <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 0 60px rgba(220,20,60,0.3)', animation: 'breathe 3s ease infinite', marginBottom: '28px' }}>
+            <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+          </div>
+          <h2 style={{ fontSize: '24px', fontWeight: 900, color: 'white', letterSpacing: '-0.6px', marginBottom: '10px' }}>
+            Namaste, {firstName}
+          </h2>
+          <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.7, maxWidth: '260px', marginBottom: '36px' }}>
+            Sathi is here with you. Tap to start — I will speak first.
+          </p>
+          <button onClick={handleStart}
+            style={{ padding: '18px 48px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '9999px', color: 'white', fontSize: '16px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 8px 32px rgba(220,20,60,0.4)' }}>
+            Tap to Begin
+          </button>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.2)', marginTop: '16px' }}>
+            🎙 Allow microphone for voice · or type to chat
+          </p>
+        </div>
+      )}
       {/* ── MESSAGES ── */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 16px', display: 'flex', flexDirection: 'column', gap: '20px', paddingBottom: '180px', position: 'relative', zIndex: 1 }}>
 

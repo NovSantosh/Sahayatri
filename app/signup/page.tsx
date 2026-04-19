@@ -143,14 +143,7 @@ export default function Signup() {
     setLoading(false)
   }
 
-  const primaryBtn = (disabled: boolean, onClick: () => void, label: string, isLoading?: boolean) => (
-    <button onClick={onClick} disabled={disabled || isLoading}
-      style={{ width: '100%', padding: '17px', background: disabled ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: disabled ? 'rgba(255,255,255,0.3)' : 'white', fontSize: '16px', fontWeight: 800, cursor: disabled ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', marginTop: '24px', boxShadow: disabled ? 'none' : '0 6px 24px rgba(220,20,60,0.35)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-      {isLoading
-        ? <><div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Please wait…</>
-        : label}
-    </button>
-  )
+
 
   return (
     <div style={{ minHeight: '100vh', background: '#06040C', fontFamily: 'Inter, sans-serif', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
@@ -245,7 +238,10 @@ export default function Signup() {
             </div>
 
             {error && <p style={{ fontSize: '13px', color: brand.primary, marginTop: '8px' }}>{error}</p>}
-            {primaryBtn(!name || !myLocation, () => { if (name && myLocation) { setError(''); setStep('contact') } else setError('Please fill your name and location') }, 'Continue →')}
+            <button onClick={() => { if (name && myLocation) { setError(''); setStep('contact') } else setError('Please fill your name and location') }} disabled={!name || !myLocation}
+              style={{ width: '100%', padding: '17px', background: (!name || !myLocation) ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: (!name || !myLocation) ? 'rgba(255,255,255,0.3)' : 'white', fontSize: '16px', fontWeight: 800, cursor: (!name || !myLocation) ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', marginTop: '24px', boxShadow: (!name || !myLocation) ? 'none' : '0 6px 24px rgba(220,20,60,0.35)', transition: 'all 0.2s ease' }}>
+              Continue →
+            </button>
           </>
         )}
 
@@ -312,7 +308,10 @@ export default function Signup() {
             </div>
 
             {error && <p style={{ fontSize: '13px', color: brand.primary, marginTop: '8px' }}>{error}</p>}
-            {primaryBtn(!email || !password, sendOTP, `Send code via ${otpChannel === 'email' ? 'email' : 'SMS'}`, loading)}
+            <button onClick={sendOTP} disabled={!email || !password || loading}
+              style={{ width: '100%', padding: '17px', background: (!email || !password || loading) ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: (!email || !password || loading) ? 'rgba(255,255,255,0.3)' : 'white', fontSize: '16px', fontWeight: 800, cursor: (!email || !password || loading) ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', marginTop: '24px', boxShadow: (!email || !password) ? 'none' : '0 6px 24px rgba(220,20,60,0.35)', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {loading ? <><div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Sending…</> : `Send code via ${otpChannel === 'email' ? 'email' : 'SMS'}`}
+            </button>
 
             <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.25)', textAlign: 'center', marginTop: '14px' }}>
               Already have an account?{' '}
@@ -352,7 +351,10 @@ export default function Signup() {
               ))}
             </div>
 
-            {primaryBtn(otp.join('').length < 6, handleSignup, 'Verify & Create Account', loading)}
+            <button onClick={handleSignup} disabled={otp.join('').length < 6 || loading}
+              style={{ width: '100%', padding: '17px', background: (otp.join('').length < 6 || loading) ? 'rgba(255,255,255,0.06)' : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: (otp.join('').length < 6 || loading) ? 'rgba(255,255,255,0.3)' : 'white', fontSize: '16px', fontWeight: 800, cursor: (otp.join('').length < 6 || loading) ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: otp.join('').length === 6 ? '0 6px 24px rgba(220,20,60,0.35)' : 'none', transition: 'all 0.2s ease', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              {loading ? <><div style={{ width: '18px', height: '18px', border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }}/> Creating account…</> : 'Verify & Create Account'}
+            </button>
 
             <div style={{ textAlign: 'center', marginTop: '20px' }}>
               <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>Didn't receive the code?</p>

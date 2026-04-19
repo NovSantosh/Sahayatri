@@ -136,13 +136,16 @@ export default function Sathi() {
       (window as any).SpeechRecognition
     recognitionRef.current = new SpeechRecognition()
     recognitionRef.current.continuous = false
-    recognitionRef.current.interimResults = false
+    recognitionRef.current.interimResults = true
     recognitionRef.current.lang = 'en-US'
 
     recognitionRef.current.onresult = (event: any) => {
-      const transcript = event.results[0][0].transcript
-      setIsListening(false)
-      if (transcript.trim()) sendMessage(transcript)
+      const results = Array.from(event.results)
+      const transcript = results.map((r: any) => r[0].transcript).join('')
+      if (event.results[event.results.length - 1].isFinal) {
+        setIsListening(false)
+        if (transcript.trim()) sendMessage(transcript)
+      }
     }
 
     recognitionRef.current.onerror = () => setIsListening(false)
@@ -365,10 +368,7 @@ export default function Sathi() {
 
               {/* Main mic */}
               <button
-                onTouchStart={startListening}
-                onTouchEnd={stopListening}
-                onMouseDown={startListening}
-                onMouseUp={stopListening}
+                onClick={() => isListening ? stopListening() : startListening()}
                 style={{
                   width: '76px', height: '76px', borderRadius: '50%',
                   background: isListening

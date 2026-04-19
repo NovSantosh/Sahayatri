@@ -137,7 +137,7 @@ export default function Sathi() {
     recognitionRef.current = new SpeechRecognition()
     recognitionRef.current.continuous = false
     recognitionRef.current.interimResults = true
-    recognitionRef.current.lang = 'en-US'
+    recognitionRef.current.lang = 'ne-NP'
 
     recognitionRef.current.onresult = (event: any) => {
       const results = Array.from(event.results)

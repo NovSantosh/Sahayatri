@@ -455,3 +455,18 @@ export const PauseIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }
 )
 
 export const HomeIcon = HomeIconInactive
+
+export const LocationIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 3C9.6 3 6 6.6 6 11C6 17 14 25 14 25C14 25 22 17 22 11C22 6.6 18.4 3 14 3Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <circle cx="14" cy="11" r="3" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+  </svg>
+)
+
+export const StarIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 3L17 10L24 11L19 16L20.5 23L14 20L7.5 23L9 16L4 11L11 10Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </svg>
+)
+
+export const ProfileIcon = ProfileIconInactive

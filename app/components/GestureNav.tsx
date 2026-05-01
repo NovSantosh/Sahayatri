@@ -3,61 +3,45 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { createPortal } from 'react-dom'
-import { useTheme } from '../context/ThemeContext'
+
 import { brand } from '../design-system'
-import { BellIcon, HeartIcon, CommentIcon, FamilyIcon, CalendarIcon, SparkleIcon, CheckIcon } from './Icons'
+import { BellIcon, HeartIcon, CommentIcon, FamilyIcon, CalendarIcon, SparkleIcon, CheckIcon, HomeIconActive, HomeIconInactive, FamilyIconActive, FamilyIconInactive, MomentsIconActive, MomentsIconInactive, SathiIconActive, SathiIconInactive, ProfileIconActive, ProfileIconInactive } from './Icons'
 
 const TABS = [
   {
     path: '/home',
     label: 'Home',
-    icon: (color: string, size: number) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill={color} stroke="none">
-        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
-        <path d="M9 21V12h6v9" fill="rgba(0,0,0,0.2)"/>
-      </svg>
-    ),
+    icon: (color: string, size: number, active: boolean) => active
+      ? <HomeIconActive size={size}/>
+      : <HomeIconInactive size={size} color={color}/>,
   },
   {
     path: '/family',
     label: 'Family',
-    icon: (color: string, size: number) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
-        <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-      </svg>
-    ),
+    icon: (color: string, size: number, active: boolean) => active
+      ? <FamilyIconActive size={size}/>
+      : <FamilyIconInactive size={size} color={color}/>,
   },
   {
     path: '/memory',
     label: 'Moments',
-    icon: (color: string, size: number) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
-        <rect x="3" y="3" width="18" height="18" rx="3"/>
-        <circle cx="8.5" cy="8.5" r="1.5" fill={color} stroke="none"/>
-        <polyline points="21 15 16 10 5 21"/>
-      </svg>
-    ),
+    icon: (color: string, size: number, active: boolean) => active
+      ? <MomentsIconActive size={size}/>
+      : <MomentsIconInactive size={size} color={color}/>,
   },
   {
     path: '/sathi',
-    label: 'Sathi AI',
-    icon: (color: string, size: number) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
-        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
-      </svg>
-    ),
+    label: 'Sathi',
+    icon: (color: string, size: number, active: boolean) => active
+      ? <SathiIconActive size={size}/>
+      : <SathiIconInactive size={size} color={color}/>,
   },
   {
     path: '/profile',
     label: 'Profile',
-    icon: (color: string, size: number) => (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round">
-        <circle cx="12" cy="8" r="4"/>
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-      </svg>
-    ),
+    icon: (color: string, size: number, active: boolean) => active
+      ? <ProfileIconActive size={size}/>
+      : <ProfileIconInactive size={size} color={color}/>,
   },
 ]
 
@@ -283,7 +267,7 @@ export default function GestureNav({ side: defaultSide = 'right' }: { side?: 'le
                   border: active ? `1.5px solid ${brand.primaryBorder}` : `1px solid ${borderColor}`,
                   boxShadow: active ? '0 4px 12px rgba(220,20,60,0.2)' : 'none',
                 }}>
-                  {tab.icon(active ? brand.primary : (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'), 18)}
+                  {tab.icon(active ? brand.primary : (isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.4)'), 22, active)}
                 </div>
                 <p style={{ fontSize: '10px', fontWeight: active ? 700 : 500, color: active ? brand.primary : (isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'), margin: 0 }}>
                   {tab.label}
@@ -353,7 +337,7 @@ export default function GestureNav({ side: defaultSide = 'right' }: { side?: 'le
                   border: 'none', cursor: 'pointer',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                {tab.icon(active ? brand.primary : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)'), 13)}
+                {tab.icon(active ? brand.primary : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.25)'), 16, active)}
               </button>
             )
           })}

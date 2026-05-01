@@ -386,3 +386,72 @@ export const CommentIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2
 export const WalletIcon2 = WalletIcon
 
 export const CheckIcon2 = CheckIcon
+
+// ── ADDITIONAL ICONS ──
+export const LampIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="14" cy="23" rx="8" ry="2.5" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M8 23L10 17C10 15.5 11.5 14.5 14 14.5C16.5 14.5 18 15.5 18 17L20 23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+    <ellipse cx="14" cy="15" rx="4" ry="1.5" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M14 14.5C14 14.5 9 10 10.5 5C11.5 2 14 0.5 14 0.5C14 0.5 16.5 2 17.5 5C19 10 14 14.5 14 14.5Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </svg>
+)
+
+export const QuoteIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 18C5 18 5 12 10 10L11 12C8 13 8 15 8 15H11V20H5V18Z" fill={color} opacity="0.7"/>
+    <path d="M15 18C15 18 15 12 20 10L21 12C18 13 18 15 18 15H21V20H15V18Z" fill={color} opacity="0.7"/>
+  </svg>
+)
+
+export const WordIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 6H24" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"/>
+    <path d="M4 11H24" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"/>
+    <path d="M4 16H16" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"/>
+    <circle cx="22" cy="21" r="4" fill={color} opacity="0.5"/>
+    <text x="22" y="23" textAnchor="middle" fontSize="5" fontWeight="700" fill="white" fontFamily="-apple-system,sans-serif">A</text>
+  </svg>
+)
+
+export const FeelingHappyIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="14" cy="14" r="11" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M9 16C9 16 11 19 14 19C17 19 19 16 19 16" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+    <circle cx="10" cy="11" r="1.5" fill={color}/>
+    <circle cx="18" cy="11" r="1.5" fill={color}/>
+  </svg>
+)
+
+export const FeelingOkayIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="14" cy="14" r="11" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <line x1="9" y1="17" x2="19" y2="17" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"/>
+    <circle cx="10" cy="11" r="1.5" fill={color}/>
+    <circle cx="18" cy="11" r="1.5" fill={color}/>
+  </svg>
+)
+
+export const FeelingSadIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="14" cy="14" r="11" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M9 19C9 19 11 16 14 16C17 16 19 19 19 19" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+    <circle cx="10" cy="11" r="1.5" fill={color}/>
+    <circle cx="18" cy="11" r="1.5" fill={color}/>
+  </svg>
+)
+
+export const PlayIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 5L22 14L6 23V5Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+  </svg>
+)
+
+export const PauseIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="9" y1="5" x2="9" y2="23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"/>
+    <line x1="19" y1="5" x2="19" y2="23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round"/>
+  </svg>
+)
+
+export const HomeIcon = HomeIconInactive

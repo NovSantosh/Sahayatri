@@ -383,9 +383,9 @@ export const CommentIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2
   </svg>
 )
 
-export const WalletIcon2 = WalletIcon
 
-export const CheckIcon2 = CheckIcon
+
+
 
 // ── ADDITIONAL ICONS ──
 export const LampIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
@@ -454,7 +454,12 @@ export const PauseIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }
   </svg>
 )
 
-export const HomeIcon = HomeIconInactive
+export const HomeIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 4L3 13.5L5 13.5L5 24C5 24.6 5.4 25 6 25L11 25L11 18L17 18L17 25L22 25C22.6 25 23 24.6 23 24L23 13.5L25 13.5Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <circle cx="14" cy="4" r="1" fill={color}/>
+  </svg>
+)
 
 export const LocationIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -469,4 +474,9 @@ export const StarIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }:
   </svg>
 )
 
-export const ProfileIcon = ProfileIconInactive
+export const ProfileIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="14" cy="9" r="5" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M4 24C4 19 8.5 16 14 16C19.5 16 24 19 24 24" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+  </svg>
+)

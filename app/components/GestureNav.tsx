@@ -69,6 +69,7 @@ export default function GestureNav({ side: defaultSide = 'right' }: { side?: 'le
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
+  import { useTheme } from 'next-themes'
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const [mounted, setMounted] = useState(false)

@@ -468,9 +468,9 @@ export const LocationIcon = ({ size = 24, color = 'currentColor', strokeWidth = 
   </svg>
 )
 
-export const StarIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+export const StarIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2, filled = false }: IconProps & { filled?: boolean }) => (
   <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M14 3L17 10L24 11L19 16L20.5 23L14 20L7.5 23L9 16L4 11L11 10Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+    <path d="M14 3L17 10L24 11L19 16L20.5 23L14 20L7.5 23L9 16L4 11L11 10Z" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" fill={filled ? color : 'none'}/>
   </svg>
 )
 

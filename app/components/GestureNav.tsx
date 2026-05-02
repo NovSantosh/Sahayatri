@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { createPortal } from 'react-dom'
+import { useTheme } from 'next-themes'
 
 import { brand } from '../design-system'
 import { BellIcon, HeartIcon, CommentIcon, FamilyIcon, CalendarIcon, SparkleIcon, CheckIcon, HomeIconActive, HomeIconInactive, FamilyIconActive, FamilyIconInactive, MomentsIconActive, MomentsIconInactive, SathiIconActive, SathiIconInactive, ProfileIconActive, ProfileIconInactive } from './Icons'
@@ -69,7 +70,6 @@ export default function GestureNav({ side: defaultSide = 'right' }: { side?: 'le
   const router = useRouter()
   const pathname = usePathname()
   const { data: session } = useSession()
-  import { useTheme } from 'next-themes'
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const [mounted, setMounted] = useState(false)

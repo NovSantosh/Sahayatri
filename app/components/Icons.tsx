@@ -196,7 +196,7 @@ export const SearchIcon = ({ size = 24, color = 'rgba(255,255,255,0.5)' }: { siz
   </svg>
 )
 
-export const WalletIcon = ({ size = 24, color = '#F59E0B' }: { size?: number, color?: string }) => (
+export const WalletIcon = ({ size = 24, color = '#F59E0B', strokeWidth = 2 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="2" y="7" width="24" height="17" rx="3" stroke={color} strokeWidth="2" fill={`${color}08`}/>
     <path d="M2 11L26 11" stroke={color} strokeWidth="1.5" opacity="0.5"/>

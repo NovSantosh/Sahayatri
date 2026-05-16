@@ -69,6 +69,11 @@ export default function Landing() {
 
   useEffect(() => {
     if (status === 'authenticated') router.push('/home')
+    // First time visitor — show onboarding
+    if (status === 'unauthenticated' && typeof window !== 'undefined') {
+      const seen = localStorage.getItem('onboardingSeen')
+      if (!seen) router.push('/onboarding')
+    }
   }, [status])
 
   if (status === 'loading' || status === 'authenticated') return (

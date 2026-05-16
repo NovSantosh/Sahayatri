@@ -370,26 +370,7 @@ export default function Onboarding() {
           )}
 
           {/* END */}
-          {s.visual === 'end' && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px', width: '100%' }}>
-              <div style={{ display: 'flex', gap: '10px', width: '100%' }}>
-                {[{ val: '500+', label: 'Families' }, { val: '4.9★', label: 'Rating' }, { val: '98%', label: 'Happy' }].map((s2, i) => (
-                  <div key={i} style={{ flex: 1, textAlign: 'center', padding: '18px 8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '18px' }}>
-                    <p style={{ fontSize: '22px', fontWeight: 900, color: '#DC143C', letterSpacing: '-1px', marginBottom: '4px' }}>{s2.val}</p>
-                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.28)', fontWeight: 500 }}>{s2.label}</p>
-                  </div>
-                ))}
-              </div>
-              <div style={{ display: 'flex', gap: '10px' }}>
-                {['🇳🇵', '🇨🇦', '��🇧', '🇦🇺', '🇺🇸'].map((f, i) => (
-                  <span key={i} style={{ fontSize: '28px', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))' }}>{f}</span>
-                ))}
-              </div>
-              <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.2)', textAlign: 'center', lineHeight: 1.7 }}>
-                Nepali families in 5 countries<br/>connected through Sahayatri
-              </p>
-            </div>
-          )}
+          {s.visual === 'end' && <EndSlide/>}
         </div>
 
         {/* Text */}

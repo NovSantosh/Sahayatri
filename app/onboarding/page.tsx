@@ -90,6 +90,81 @@ const SLIDES = [
   },
 ]
 
+
+const COUNTRIES = [
+  { flag: '🇳🇵', name: 'Nepal', city: 'Kathmandu', color: '#DC143C', families: '200+' },
+  { flag: '🇨🇦', name: 'Canada', city: 'Vancouver · Toronto', color: '#FF0000', families: '120+' },
+  { flag: '🇬🇧', name: 'United Kingdom', city: 'London · Manchester', color: '#012169', families: '80+' },
+  { flag: '🇦🇺', name: 'Australia', city: 'Sydney · Melbourne', color: '#00008B', families: '60+' },
+  { flag: '🇺🇸', name: 'United States', city: 'New York · Texas', color: '#3C3B6E', families: '40+' },
+  { flag: '🇯🇵', name: 'Japan', city: 'Tokyo · Osaka', color: '#BC002D', families: '20+' },
+]
+
+function EndSlide() {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const [prevIdx, setPrevIdx] = useState(-1)
+  const [anim, setAnim] = useState(false)
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setAnim(true)
+      setTimeout(() => {
+        setPrevIdx(activeIdx)
+        setActiveIdx(i => (i + 1) % COUNTRIES.length)
+        setAnim(false)
+      }, 300)
+    }, 2000)
+    return () => clearInterval(t)
+  }, [activeIdx])
+
+  const c = COUNTRIES[activeIdx]
+
+  return (
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+      {/* Stats row */}
+      <div style={{ display: 'flex', gap: '8px' }}>
+        {[{ val: '500+', label: 'Families' }, { val: '4.9★', label: 'Rating' }, { val: '98%', label: 'Happy' }].map((s, i) => (
+          <div key={i} style={{ flex: 1, textAlign: 'center', padding: '16px 8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px' }}>
+            <p style={{ fontSize: '20px', fontWeight: 900, color: '#DC143C', letterSpacing: '-0.8px', marginBottom: '3px' }}>{s.val}</p>
+            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Animated country card */}
+      <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${c.color}25`, borderRadius: '20px', padding: '20px', position: 'relative', overflow: 'hidden', transition: 'border-color 0.5s ease' }}>
+        {/* Color accent bar */}
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, ${c.color}, ${c.color}44)`, transition: 'background 0.5s ease' }}/>
+
+        {/* Country info */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', opacity: anim ? 0 : 1, transform: anim ? 'translateY(8px)' : 'translateY(0)', transition: 'all 0.3s ease' }}>
+          <div style={{ fontSize: '52px', lineHeight: 1, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))', flexShrink: 0 }}>{c.flag}</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: '18px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: '3px' }}>{c.name}</p>
+            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>📍 {c.city}</p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: `${c.color}15`, border: `1px solid ${c.color}30`, borderRadius: '9999px', padding: '3px 10px' }}>
+              <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: c.color, animation: 'blink 1.5s ease infinite' }}/>
+              <p style={{ fontSize: '11px', fontWeight: 700, color: c.color }}>{c.families} families connected</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Dot indicators */}
+        <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginTop: '16px' }}>
+          {COUNTRIES.map((_, i) => (
+            <div key={i} onClick={() => setActiveIdx(i)}
+              style={{ width: i === activeIdx ? '20px' : '5px', height: '5px', borderRadius: '2.5px', background: i === activeIdx ? c.color : 'rgba(255,255,255,0.12)', transition: 'all 0.4s ease', cursor: 'pointer' }}/>
+          ))}
+        </div>
+      </div>
+
+      <p style={{ textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.18)', lineHeight: 1.7 }}>
+        Sahayatri connects Nepali families worldwide
+      </p>
+    </div>
+  )
+}
+
 export default function Onboarding() {
   const router = useRouter()
   const [current, setCurrent] = useState(0)

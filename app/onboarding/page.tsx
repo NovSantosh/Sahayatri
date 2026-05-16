@@ -264,7 +264,7 @@ export default function Onboarding() {
           {/* LOGO */}
           {s.visual === 'logo' && (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '130px', height: '130px', borderRadius: '40px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 24px 80px rgba(220,20,60,0.5), inset 0 1px 0 rgba(255,255,255,0.12)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ width: '130px', height: '130px', borderRadius: '40px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', outline: `3px solid ${s.accent}30`, outlineOffset: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 24px 80px rgba(220,20,60,0.5), inset 0 1px 0 rgba(255,255,255,0.12)', position: 'relative', overflow: 'hidden' }}>
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)' }}/>
                 <SahayatriLogo size={75} color="white"/>
               </div>
@@ -313,8 +313,8 @@ export default function Onboarding() {
                 { emoji: '🍛', time: '12:45 PM', title: 'Lunch completed', sub: 'Dal bhat, saag, achar — full meal', color: '#F59E0B' },
               ].map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${item.color}20`, borderRadius: '16px', padding: '13px 14px', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: item.color, borderRadius: '16px 0 0 16px' }}/>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '11px', background: `${item.color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>{item.emoji}</div>
+                  <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: s.accent, borderRadius: '16px 0 0 16px' }}/>
+                  <div style={{ width: '38px', height: '38px', borderRadius: '11px', background: `${s.accent}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>{item.emoji}</div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', marginBottom: '2px' }}>{item.title}</p>
                     <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{item.sub}</p>
@@ -322,10 +322,10 @@ export default function Onboarding() {
                   <div style={{ flexShrink: 0, textAlign: 'right' }}>
                     <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', marginBottom: '4px' }}>{item.time}</p>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
-                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: s.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5L4 7.5L8 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
                       </div>
-                      <p style={{ fontSize: '9px', color: item.color, fontWeight: 700 }}>Live</p>
+                      <p style={{ fontSize: '9px', color: s.accent, fontWeight: 700 }}>Live</p>
                     </div>
                   </div>
                 </div>
@@ -335,7 +335,8 @@ export default function Onboarding() {
 
           {/* SATHI — Soundwave chat */}
           {s.visual === 'sathi' && (
-            <div style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '24px', padding: '18px', backdropFilter: 'blur(20px)' }}>
+            <div style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: `1px solid ${s.accent}25`, borderRadius: '24px', padding: '18px', backdropFilter: 'blur(20px)', position: 'relative', overflow: 'hidden' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, ${s.accent}, ${s.accent}44)` }}/>
               {/* Header with soundwave */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #F59E0B, #D97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', boxShadow: '0 4px 12px rgba(245,158,11,0.3)', flexShrink: 0 }}>🪔</div>

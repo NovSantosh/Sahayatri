@@ -54,6 +54,7 @@ const SECTIONS = [
     title: 'About',
     items: [
       { icon: '📖', label: 'About Sahayatri', sub: 'Our story and mission', path: '/about' },
+      { icon: '✨', label: 'View Introduction', sub: 'Replay the onboarding tour', action: 'onboarding' },
       { icon: '⭐', label: 'Rate the App', sub: 'Help us improve', action: 'rate' },
       { icon: '🔗', label: 'Share App', sub: 'Invite your family and friends', action: 'share' },
       { icon: '📜', label: 'Privacy Policy', sub: 'How we protect your data', path: '/about' },
@@ -99,6 +100,10 @@ export default function Profile() {
       case 'navside': setShowNavSide(true); break
       case 'companion': router.push('/companion/setup'); break
       case 'rate': window.open('https://sahayatri-eight.vercel.app', '_blank'); break
+      case 'onboarding':
+        if (typeof window !== 'undefined') localStorage.removeItem('onboardingSeen')
+        router.push('/onboarding')
+        break
       case 'share':
         if (navigator.share) {
           navigator.share({ title: 'Sahayatri', text: 'Care for your family from anywhere', url: 'https://sahayatri-eight.vercel.app' })

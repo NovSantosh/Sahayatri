@@ -188,7 +188,7 @@ export const PaymentsIcon = ({ size = 24, color = '#10B981' }: { size?: number, 
   </svg>
 )
 
-export const SearchIcon = ({ size = 24, color = 'rgba(255,255,255,0.5)' }: { size?: number, color?: string }) => (
+export const SearchIcon = ({ size = 24, color = 'rgba(255,255,255,0.5)', strokeWidth = 2 }: IconProps) => (
   <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="12" cy="12" r="7.5" stroke={color} strokeWidth="2.2" fill="none"/>
     <line x1="17.5" y1="17.5" x2="24" y2="24" stroke={color} strokeWidth="2.5" strokeLinecap="round"/>
@@ -318,7 +318,16 @@ export const FestivalIcon = ({ size = 24, color = 'currentColor', strokeWidth = 
   </svg>
 )
 
-export const FamilyIcon = FamilyIconInactive
+export const FamilyIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2 }: IconProps) => (
+  <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="7" cy="8" r="3.5" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M2 23C2 18.5 4.2 16 7 16C9.8 16 12 18.5 12 23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+    <circle cx="21" cy="8" r="3.5" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M16 23C16 18.5 18.2 16 21 16C23.8 16 26 18.5 26 23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+    <circle cx="14" cy="10" r="2.8" stroke={color} strokeWidth={strokeWidth} fill="none"/>
+    <path d="M9.5 23C9.5 19.5 11.5 17.5 14 17.5C16.5 17.5 18.5 19.5 18.5 23" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" fill="none"/>
+  </svg>
+)
 export const EyeIcon = ({ size = 24, color = 'currentColor', strokeWidth = 2, closed = false }: IconProps & { closed?: boolean }) => (
   <svg width={size} height={size} viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
     {closed ? (

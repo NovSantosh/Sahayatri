@@ -3,21 +3,72 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { SahayatriLogo } from '../components/Icons'
 
+const UI_DECK = [
+  {
+    id: 0,
+    kicker: 'FOR NEPALI FAMILIES',
+    title: 'Your parents\nback home.\nLooked after.',
+    subline: 'Real care. Real people. Every day.',
+    body: 'For every Nepali who left home to build a better life — this is for you. And for the family you left behind.',
+    variant: 'identity',
+    accent: '#DC143C',
+  },
+  {
+    id: 1,
+    kicker: 'THE DISTANCE IS REAL',
+    title: 'You are in Canada.\nThey are in Nepal.',
+    subline: 'Bridging the 11-hour gap.',
+    body: 'When it is midnight for you, it is morning for them. Stop staying up wondering if Aama took her medicine. We handle it.',
+    variant: 'chrono',
+    accent: '#7C3AED',
+  },
+  {
+    id: 2,
+    kicker: 'PROOF EVERY DAY',
+    title: 'Complete proof.\nZero guesswork.',
+    subline: 'You see it happen. Live.',
+    body: 'Every single day a verified companion visits your parents. Photo updates, medication checks, meal confirmation. All sent to you instantly.',
+    variant: 'feed',
+    accent: '#10B981',
+  },
+  {
+    id: 3,
+    kicker: 'YOUR 2AM FRIEND',
+    title: 'A friend who\nnever sleeps.',
+    subline: 'Nepali at heart.',
+    body: 'Talk to Sathi when you cannot sleep. In Nepali. In English. In whatever comes naturally at 2am. Sathi always listens.',
+    variant: 'wave',
+    accent: '#F59E0B',
+  },
+  {
+    id: 4,
+    kicker: 'START TODAY',
+    title: 'Peace of mind\nis not a luxury.',
+    subline: 'Your family deserves this.',
+    body: 'Serving Kathmandu, Pokhara, Lalitpur, Bhaktapur, Chitwan and Butwal. Join 500+ families who sleep better because of Sahayatri.',
+    variant: 'funnel',
+    accent: '#DC143C',
+  },
+]
+
 function useRealTime() {
-  const [time, setTime] = useState({ local: '', ktm: '', city: '' })
+  const [time, setTime] = useState({ local: '00:00', ktm: '00:00', city: 'Your city' })
   useEffect(() => {
     const update = () => {
       const now = new Date()
-      const ktm = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kathmandu' }))
       const fmt = (d: Date) => {
-        const h = d.getHours()
+        const h = d.getHours().toString().padStart(2, '0')
         const m = d.getMinutes().toString().padStart(2, '0')
-        const p = h >= 12 ? 'PM' : 'AM'
-        return `${h % 12 || 12}:${m} ${p}`
+        return `${h}:${m}`
       }
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
-      const city = tz.split('/').pop()?.replace(/_/g, ' ') || 'Your city'
-      setTime({ local: fmt(now), ktm: fmt(ktm), city })
+      try {
+        const ktmStr = new Intl.DateTimeFormat([], { timeZone: 'Asia/Kathmandu', hour: '2-digit', minute: '2-digit', hour12: false }).format(now)
+        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+        const city = tz.split('/').pop()?.replace(/_/g, ' ') || 'Your city'
+        setTime({ local: fmt(now), ktm: ktmStr, city })
+      } catch {
+        setTime({ local: fmt(now), ktm: '—:—', city: 'Your city' })
+      }
     }
     update()
     const t = setInterval(update, 1000)
@@ -26,402 +77,370 @@ function useRealTime() {
   return time
 }
 
-function useReducedMotion() {
-  const [reduced, setReduced] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReduced(mq.matches)
-    const h = (e: MediaQueryListEvent) => setReduced(e.matches)
-    mq.addEventListener('change', h)
-    return () => mq.removeEventListener('change', h)
-  }, [])
-  return reduced
-}
-
-function haptic(p: number[] = [10]) {
+function haptic(p: number[] = [6]) {
   if (typeof navigator !== 'undefined' && navigator.vibrate) navigator.vibrate(p)
-}
-
-const SLIDES = [
-  {
-    id: 0, visual: 'logo',
-    tag: 'SAHAYATRI',
-    headline: 'Home is not\na place.',
-    subline: 'It is the people in it.',
-    body: 'For every Nepali who left home to build a better life — this is for you. And for the family you left behind.',
-    bg: ['#0D0208', '#1A0510'],
-    accent: '#DC143C',
-  },
-  {
-    id: 1, visual: 'worry',
-    tag: 'THE REALITY',
-    headline: 'You wake up\nworrying.',
-    subline: 'Every. Single. Night.',
-    body: '"Is Aama okay? Did someone check on her today? What if something happened and nobody told me?"',
-    bg: ['#080412', '#0E0820'],
-    accent: '#7C3AED',
-  },
-  {
-    id: 2, visual: 'care',
-    tag: 'OUR PROMISE',
-    headline: 'Someone is\nalways there.',
-    subline: 'So you can sleep.',
-    body: 'Verified companions visit your parents every day in Nepal. You see it happen. Live updates. Real care.',
-    bg: ['#030D08', '#081A10'],
-    accent: '#10B981',
-  },
-  {
-    id: 3, visual: 'sathi',
-    tag: 'SATHI AI',
-    headline: 'A friend who\nnever sleeps.',
-    subline: 'Nepali at heart.',
-    body: 'Talk to Sathi at 2am when you are worried. In Nepali or English. Sathi always listens.',
-    bg: ['#0D0800', '#1A1000'],
-    accent: '#F59E0B',
-  },
-  {
-    id: 4, visual: 'end',
-    tag: 'JOIN US',
-    headline: 'Your parents\ndeserve this.',
-    subline: 'So do you.',
-    body: 'Peace of mind is not a luxury. It is what every family separated by distance deserves.',
-    bg: ['#0D0208', '#1A0510'],
-    accent: '#DC143C',
-  },
-]
-
-
-const COUNTRIES = [
-  { flag: '🇳🇵', name: 'Nepal', city: 'Kathmandu', color: '#DC143C', families: '200+' },
-  { flag: '🇨🇦', name: 'Canada', city: 'Vancouver · Toronto', color: '#FF0000', families: '120+' },
-  { flag: '🇬🇧', name: 'United Kingdom', city: 'London · Manchester', color: '#012169', families: '80+' },
-  { flag: '🇦🇺', name: 'Australia', city: 'Sydney · Melbourne', color: '#00008B', families: '60+' },
-  { flag: '🇺🇸', name: 'United States', city: 'New York · Texas', color: '#3C3B6E', families: '40+' },
-  { flag: '🇯🇵', name: 'Japan', city: 'Tokyo · Osaka', color: '#BC002D', families: '20+' },
-]
-
-function EndSlide() {
-  const [activeIdx, setActiveIdx] = useState(0)
-  const [prevIdx, setPrevIdx] = useState(-1)
-  const [anim, setAnim] = useState(false)
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      setAnim(true)
-      setTimeout(() => {
-        setPrevIdx(activeIdx)
-        setActiveIdx(i => (i + 1) % COUNTRIES.length)
-        setAnim(false)
-      }, 300)
-    }, 2000)
-    return () => clearInterval(t)
-  }, [activeIdx])
-
-  const c = COUNTRIES[activeIdx]
-
-  return (
-    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-      {/* Stats row */}
-      <div style={{ display: 'flex', gap: '8px' }}>
-        {[{ val: '500+', label: 'Families' }, { val: '4.9★', label: 'Rating' }, { val: '98%', label: 'Happy' }].map((s, i) => (
-          <div key={i} style={{ flex: 1, textAlign: 'center', padding: '16px 8px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '16px' }}>
-            <p style={{ fontSize: '20px', fontWeight: 900, color: '#DC143C', letterSpacing: '-0.8px', marginBottom: '3px' }}>{s.val}</p>
-            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontWeight: 500 }}>{s.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Animated country card */}
-      <div style={{ background: 'rgba(255,255,255,0.03)', border: `1px solid ${c.color}25`, borderRadius: '20px', padding: '20px', position: 'relative', overflow: 'hidden', transition: 'border-color 0.5s ease' }}>
-        {/* Color accent bar */}
-        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, ${c.color}, ${c.color}44)`, transition: 'background 0.5s ease' }}/>
-
-        {/* Country info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', opacity: anim ? 0 : 1, transform: anim ? 'translateY(8px)' : 'translateY(0)', transition: 'all 0.3s ease' }}>
-          <div style={{ fontSize: '52px', lineHeight: 1, filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.4))', flexShrink: 0 }}>{c.flag}</div>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: '18px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: '3px' }}>{c.name}</p>
-            <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>📍 {c.city}</p>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: `${c.color}15`, border: `1px solid ${c.color}30`, borderRadius: '9999px', padding: '3px 10px' }}>
-              <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: c.color, animation: 'blink 1.5s ease infinite' }}/>
-              <p style={{ fontSize: '11px', fontWeight: 700, color: c.color }}>{c.families} families connected</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Dot indicators */}
-        <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginTop: '16px' }}>
-          {COUNTRIES.map((_, i) => (
-            <div key={i} onClick={() => setActiveIdx(i)}
-              style={{ width: i === activeIdx ? '20px' : '5px', height: '5px', borderRadius: '2.5px', background: i === activeIdx ? c.color : 'rgba(255,255,255,0.12)', transition: 'all 0.4s ease', cursor: 'pointer' }}/>
-          ))}
-        </div>
-      </div>
-
-      <p style={{ textAlign: 'center', fontSize: '12px', color: 'rgba(255,255,255,0.18)', lineHeight: 1.7 }}>
-        Sahayatri connects Nepali families worldwide
-      </p>
-    </div>
-  )
 }
 
 export default function Onboarding() {
   const router = useRouter()
-  const [current, setCurrent] = useState(0)
-  const [animating, setAnimating] = useState(false)
-  const [lang, setLang] = useState<'en' | 'np'>('en')
-  const touchX = useRef(0)
-  const touchY = useRef(0)
+  const [step, setStep] = useState(0)
+  const [slideDir, setSlideDir] = useState<'forward' | 'backward'>('forward')
+  const [dragX, setDragX] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const [lang, setLang] = useState<'EN' | 'NE'>('EN')
+  const touchStart = useRef(0)
   const realTime = useRealTime()
-  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
     if (typeof window !== 'undefined') localStorage.setItem('onboardingSeen', 'true')
   }, [])
 
-  const go = (idx: number) => {
-    if (animating || idx === current) return
-    haptic([8])
-    setAnimating(true)
-    setTimeout(() => { setCurrent(idx); setAnimating(false) }, reducedMotion ? 0 : 220)
+  const go = (target: number) => {
+    if (target < 0 || target >= UI_DECK.length) return
+    haptic([6])
+    setSlideDir(target > step ? 'forward' : 'backward')
+    setStep(target)
+    setDragX(0)
   }
 
   const goNext = () => {
-    if (current === SLIDES.length - 1) {
-      haptic([15, 10, 15])
+    if (step === UI_DECK.length - 1) {
+      haptic([10, 5, 10])
       router.push('/signup')
       return
     }
-    go(current + 1)
+    go(step + 1)
   }
 
   const onTouchStart = (e: React.TouchEvent) => {
-    touchX.current = e.touches[0].clientX
-    touchY.current = e.touches[0].clientY
+    touchStart.current = e.touches[0].clientX
+    setIsDragging(true)
   }
 
-  const onTouchEnd = (e: React.TouchEvent) => {
-    const dx = touchX.current - e.changedTouches[0].clientX
-    const dy = Math.abs(touchY.current - e.changedTouches[0].clientY)
-    if (dy > Math.abs(dx)) return
-    if (dx > 40) goNext()
-    if (dx < -40 && current > 0) go(current - 1)
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging) return
+    const offset = e.touches[0].clientX - touchStart.current
+    if ((step === 0 && offset > 0) || (step === UI_DECK.length - 1 && offset < 0)) {
+      setDragX(offset * 0.2)
+    } else {
+      setDragX(offset)
+    }
   }
 
-  const s = SLIDES[current]
-  const anim = reducedMotion ? {} : {
-    opacity: animating ? 0 : 1,
-    transform: animating ? 'translateY(12px)' : 'translateY(0)',
-    transition: 'all 0.3s ease',
+  const onTouchEnd = () => {
+    setIsDragging(false)
+    if (dragX < -60) go(step + 1)
+    else if (dragX > 60) go(step - 1)
+    else setDragX(0)
   }
 
-  const WAVES = [5, 9, 4, 14, 7, 18, 5, 12, 8, 16, 6, 10, 15, 7, 12]
+  const node = UI_DECK[step]
 
   return (
     <div
       onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       style={{
         minHeight: '100vh',
-        background: `radial-gradient(ellipse at 25% 15%, ${s.accent}20 0%, transparent 55%), radial-gradient(ellipse at 75% 85%, ${s.accent}0C 0%, transparent 55%), linear-gradient(160deg, ${s.bg[0]}, ${s.bg[1]}, ${s.bg[0]})`,
-        fontFamily: 'Inter, -apple-system, sans-serif',
+        backgroundColor: '#040203',
+        backgroundImage: `radial-gradient(circle at 50% 25%, ${node.accent}12 0%, transparent 55%)`,
+        fontFamily: '-apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif',
         display: 'flex', flexDirection: 'column',
         overflow: 'hidden', userSelect: 'none',
-        transition: reducedMotion ? 'none' : 'background 0.7s ease',
+        transition: 'background-image 0.6s ease',
+        boxSizing: 'border-box',
       }}
     >
       {/* Ambient glow */}
-      <div style={{ position: 'fixed', top: -100, right: -80, width: 300, height: 300, borderRadius: '50%', background: s.accent, opacity: 0.06, filter: 'blur(60px)', pointerEvents: 'none', transition: 'background 0.7s ease' }}/>
-      <div style={{ position: 'fixed', bottom: 80, left: -60, width: 200, height: 200, borderRadius: '50%', background: s.accent, opacity: 0.04, filter: 'blur(40px)', pointerEvents: 'none', transition: 'background 0.7s ease' }}/>
+      <div style={{ position: 'fixed', top: -80, right: -60, width: 280, height: 280, borderRadius: '50%', background: node.accent, opacity: 0.06, filter: 'blur(60px)', pointerEvents: 'none', transition: 'background 0.6s ease' }}/>
+      <div style={{ position: 'fixed', bottom: 60, left: -60, width: 200, height: 200, borderRadius: '50%', background: node.accent, opacity: 0.04, filter: 'blur(40px)', pointerEvents: 'none', transition: 'background 0.6s ease' }}/>
 
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '56px 28px 0', position: 'relative', zIndex: 10 }}>
+      <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '56px 24px 0', zIndex: 90, flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <SahayatriLogo size={17} color="white"/>
+          <div style={{ width: '28px', height: '28px', borderRadius: '8px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 16px rgba(220,20,60,0.25)' }}>
+            <SahayatriLogo size={16} color="white"/>
           </div>
-          <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '-0.2px' }}>Sahayatri</span>
+          <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', letterSpacing: '-0.2px' }}>Sahayatri</span>
         </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button onClick={() => setLang(l => l === 'en' ? 'np' : 'en')}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '9999px', padding: '5px 11px', color: 'rgba(255,255,255,0.45)', fontSize: '11px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-            {lang === 'en' ? 'नेपाली' : 'EN'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button onClick={() => setLang(l => l === 'EN' ? 'NE' : 'EN')}
+            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '9999px', width: '38px', height: '28px', color: 'rgba(255,255,255,0.6)', fontSize: '10px', fontWeight: 800, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', letterSpacing: '0.3px' }}>
+            {lang === 'EN' ? 'NE' : 'EN'}
           </button>
-          {current < SLIDES.length - 1 && (
+          {step < UI_DECK.length - 1 && (
             <button onClick={() => router.push('/signup')}
-              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.28)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.28)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
               Skip →
             </button>
           )}
         </div>
-      </div>
+      </header>
 
-      {/* Visual */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 28px 16px', gap: '28px', position: 'relative', zIndex: 5 }}>
-
-        <div style={{ width: '100%', maxWidth: '340px', minHeight: '210px', display: 'flex', alignItems: 'center', justifyContent: 'center', ...anim }}>
-
-          {/* LOGO */}
-          {s.visual === 'logo' && (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-              <div style={{ width: '130px', height: '130px', borderRadius: '40px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', outline: `3px solid ${s.accent}30`, outlineOffset: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 24px 80px rgba(220,20,60,0.5), inset 0 1px 0 rgba(255,255,255,0.12)', position: 'relative', overflow: 'hidden' }}>
-                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)' }}/>
-                <SahayatriLogo size={75} color="white"/>
-              </div>
-              <div style={{ width: '80px', height: '16px', background: 'radial-gradient(ellipse, rgba(220,20,60,0.35) 0%, transparent 70%)', filter: 'blur(6px)', marginTop: '-8px' }}/>
-            </div>
-          )}
-
-          {/* WORRY — Real time */}
-          {s.visual === 'worry' && (
-            <div style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '24px', padding: '20px', backdropFilter: 'blur(20px)' }}>
-              {/* Live clocks */}
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ flex: 1, textAlign: 'center', padding: '14px 10px', background: 'rgba(255,255,255,0.04)', borderRadius: '14px' }}>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>YOU</p>
-                  <p style={{ fontSize: '24px', fontWeight: 200, color: 'white', letterSpacing: '-0.8px', lineHeight: 1, marginBottom: '4px', fontVariantNumeric: 'tabular-nums' }}>{realTime.local || '—:— —'}</p>
-                  <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>{realTime.city}</p>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '0 4px' }}>
-                  <div style={{ width: '1px', height: '40px', background: 'rgba(255,255,255,0.08)' }}/>
-                </div>
-                <div style={{ flex: 1, textAlign: 'center', padding: '14px 10px', background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)', borderRadius: '14px' }}>
-                  <p style={{ fontSize: '10px', color: 'rgba(124,58,237,0.7)', fontWeight: 700, letterSpacing: '1px', marginBottom: '6px' }}>NEPAL</p>
-                  <p style={{ fontSize: '24px', fontWeight: 200, color: '#7C3AED', letterSpacing: '-0.8px', lineHeight: 1, marginBottom: '4px', fontVariantNumeric: 'tabular-nums' }}>{realTime.ktm || '—:— —'}</p>
-                  <p style={{ fontSize: '10px', color: 'rgba(124,58,237,0.4)' }}>Kathmandu</p>
-                </div>
-              </div>
-              {/* Thought bubble */}
-              <div style={{ background: 'rgba(124,58,237,0.08)', border: '1px solid rgba(124,58,237,0.15)', borderRadius: '14px', padding: '14px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#7C3AED', animation: 'blink 2s ease infinite' }}/>
-                  <p style={{ fontSize: '10px', fontWeight: 700, color: 'rgba(124,58,237,0.7)', letterSpacing: '0.5px' }}>YOUR THOUGHTS RIGHT NOW</p>
-                </div>
-                <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.45)', lineHeight: 1.65, fontStyle: 'italic' }}>
-                  "Is Aama okay? Did someone check on her? It is so late there..."
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* CARE — Live updates */}
-          {s.visual === 'care' && (
-            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {[
-                { emoji: '🌅', time: '7:14 AM', title: 'Good morning — Aama is up', sub: 'Photo received from companion', color: '#10B981' },
-                { emoji: '💊', time: '9:02 AM', title: 'All medicines taken', sub: '3 of 3 confirmed by companion', color: '#3B82F6' },
-                { emoji: '🍛', time: '12:45 PM', title: 'Lunch completed', sub: 'Dal bhat, saag, achar — full meal', color: '#F59E0B' },
-              ].map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${item.color}20`, borderRadius: '16px', padding: '13px 14px', position: 'relative', overflow: 'hidden' }}>
-                  <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: s.accent, borderRadius: '16px 0 0 16px' }}/>
-                  <div style={{ width: '38px', height: '38px', borderRadius: '11px', background: `${s.accent}12`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>{item.emoji}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', marginBottom: '2px' }}>{item.title}</p>
-                    <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{item.sub}</p>
-                  </div>
-                  <div style={{ flexShrink: 0, textAlign: 'right' }}>
-                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)', marginBottom: '4px' }}>{item.time}</p>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
-                      <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: s.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="7" height="7" viewBox="0 0 10 10"><path d="M2 5L4 7.5L8 2.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                      </div>
-                      <p style={{ fontSize: '9px', color: s.accent, fontWeight: 700 }}>Live</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* SATHI — Soundwave chat */}
-          {s.visual === 'sathi' && (
-            <div style={{ width: '100%', background: 'rgba(255,255,255,0.03)', border: `1px solid ${s.accent}25`, borderRadius: '24px', padding: '18px', backdropFilter: 'blur(20px)', position: 'relative', overflow: 'hidden' }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, ${s.accent}, ${s.accent}44)` }}/>
-              {/* Header with soundwave */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', paddingBottom: '14px', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <div style={{ width: '34px', height: '34px', borderRadius: '50%', background: 'linear-gradient(135deg, #F59E0B, #D97706)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', boxShadow: '0 4px 12px rgba(245,158,11,0.3)', flexShrink: 0 }}>🪔</div>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: '2px' }}>Sathi</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10B981', animation: 'blink 1.5s ease infinite' }}/>
-                    <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>Listening...</p>
-                  </div>
-                </div>
-                {/* Soundwave */}
-                <svg width="56" height="22" viewBox="0 0 56 22" style={{ flexShrink: 0 }}>
-                  {WAVES.map((h, i) => (
-                    <rect key={i} x={i * 3.8} y={(22 - h) / 2} width="2.2" height={h} rx="1.1" fill="#F59E0B" opacity="0.65"
-                      style={{ animation: `wave ${0.7 + i * 0.06}s ease-in-out ${i * 0.05}s infinite alternate`, transformOrigin: 'center' }}/>
-                  ))}
-                </svg>
-              </div>
-              {/* Chat */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ alignSelf: 'flex-start', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.12)', borderRadius: '4px 14px 14px 14px', padding: '10px 13px', maxWidth: '88%' }}>
-                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>साँझ भयो। You seem quiet. How are you really feeling?</p>
-                </div>
-                <div style={{ alignSelf: 'flex-end', background: 'linear-gradient(135deg, rgba(220,20,60,0.75), rgba(165,14,45,0.75))', borderRadius: '14px 4px 14px 14px', padding: '10px 13px', maxWidth: '80%' }}>
-                  <p style={{ fontSize: '13px', color: 'white', lineHeight: 1.6 }}>I haven't called Aama in 4 days. I feel terrible.</p>
-                </div>
-                <div style={{ alignSelf: 'flex-start', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.12)', borderRadius: '4px 14px 14px 14px', padding: '10px 13px', maxWidth: '92%' }}>
-                  <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.6 }}>That guilt is love. Aama's lamp was lit this morning — she is okay. Call her tomorrow at 7am. I will remind you. 🪔</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* END */}
-          {s.visual === 'end' && <EndSlide/>}
-        </div>
-
-        {/* Text */}
-        <div style={{ width: '100%', maxWidth: '340px', ...anim, transitionDelay: reducedMotion ? '0ms' : '60ms' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
-            <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: s.accent }}/>
-            <p style={{ fontSize: '10px', fontWeight: 700, color: s.accent, letterSpacing: '1.8px' }}>{s.tag}</p>
+      {/* Main content */}
+      <div
+        style={{ flex: 1, display: 'flex', flexDirection: 'column', zIndex: 50, transform: `translateX(${dragX}px)`, transition: isDragging ? 'none' : 'transform 0.45s cubic-bezier(0.16,1,0.3,1)' }}
+      >
+        {/* Visual area */}
+        <div style={{ flex: '0 0 auto', minHeight: '200px', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '24px 24px 0' }}>
+          <div key={step} className={`vnode ${slideDir}`} style={{ width: '100%', maxWidth: '340px' }}>
+            <Visual variant={node.variant} accent={node.accent} local={realTime.local} ktm={realTime.ktm} city={realTime.city}/>
           </div>
-          <h1 style={{ fontSize: '32px', fontWeight: 900, color: 'white', letterSpacing: '-1px', lineHeight: 1.18, marginBottom: '8px', whiteSpace: 'pre-line' }}>{s.headline}</h1>
-          <p style={{ fontSize: '17px', fontWeight: 600, color: s.accent, letterSpacing: '-0.3px', marginBottom: '14px', opacity: 0.9 }}>{s.subline}</p>
-          <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.8 }}>{s.body}</p>
+        </div>
+
+        {/* Text area */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '20px 32px 8px' }}>
+          <div style={{ maxWidth: '340px', margin: '0 auto', width: '100%' }}>
+            {/* Kicker */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '12px' }}>
+              <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: node.accent, boxShadow: `0 0 8px ${node.accent}` }}/>
+              <p style={{ fontSize: '10px', fontWeight: 800, color: node.accent, letterSpacing: '1.5px', transition: 'color 0.4s' }}>{node.kicker}</p>
+            </div>
+            {/* Headline */}
+            <h1 key={`h-${step}`} className="tslide" style={{ fontSize: '32px', fontWeight: 800, color: 'white', letterSpacing: '-1.2px', lineHeight: 1.12, marginBottom: '8px', whiteSpace: 'pre-line' }}>
+              {node.title}
+            </h1>
+            {/* Subline */}
+            <p key={`s-${step}`} className="tslide" style={{ fontSize: '16px', fontWeight: 600, color: node.accent, lineHeight: 1.3, marginBottom: '12px', animationDelay: '0.04s', transition: 'color 0.4s' }}>
+              {node.subline}
+            </p>
+            {/* Body */}
+            <p key={`b-${step}`} className="tslide" style={{ fontSize: '14px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.7, animationDelay: '0.08s' }}>
+              {node.body}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Bottom */}
-      <div style={{ padding: '0 28px 50px', display: 'flex', flexDirection: 'column', gap: '14px', position: 'relative', zIndex: 10 }}>
-        {/* Dots */}
-        <div style={{ display: 'flex', gap: '6px', justifyContent: 'center' }}>
-          {SLIDES.map((_, i) => (
+      {/* Footer */}
+      <footer style={{ padding: '0 28px 48px', display: 'flex', flexDirection: 'column', gap: '12px', zIndex: 100, flexShrink: 0 }}>
+        {/* Progress dots */}
+        <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', marginBottom: '4px' }}>
+          {UI_DECK.map((_, i) => (
             <button key={i} onClick={() => go(i)}
-              style={{ width: i === current ? '26px' : '6px', height: '6px', borderRadius: '3px', background: i === current ? s.accent : 'rgba(255,255,255,0.15)', border: 'none', cursor: 'pointer', transition: reducedMotion ? 'none' : 'all 0.4s cubic-bezier(0.34,1.56,0.64,1)', padding: 0 }}/>
+              style={{ width: i === step ? '28px' : '5px', height: '5px', borderRadius: '3px', background: i === step ? node.accent : 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer', padding: 0, transition: 'all 0.4s cubic-bezier(0.16,1,0.3,1)' }}/>
           ))}
         </div>
 
         {/* CTA */}
         <button onClick={goNext}
-          style={{ width: '100%', padding: '19px', background: current === SLIDES.length - 1 ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : `linear-gradient(135deg, ${s.accent}, ${s.accent}AA)`, border: 'none', borderRadius: '20px', color: 'white', fontSize: '17px', fontWeight: 800, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: `0 8px 32px ${s.accent}30, inset 0 1px 0 rgba(255,255,255,0.1)`, letterSpacing: '-0.3px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', transition: reducedMotion ? 'none' : 'all 0.3s ease' }}>
-          {current === SLIDES.length - 1 ? "Get Started — Free Forever" : 'Continue'}
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          className="cbtn"
+          style={{ width: '100%', height: '54px', background: step === UI_DECK.length - 1 ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : 'rgba(255,255,255,0.95)', border: 'none', borderRadius: '16px', color: step === UI_DECK.length - 1 ? 'white' : '#0A0A0A', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontFamily: 'inherit', boxShadow: step === UI_DECK.length - 1 ? `0 12px 32px ${node.accent}25` : '0 8px 24px rgba(0,0,0,0.2)', transition: 'all 0.3s ease' }}>
+          {step === UI_DECK.length - 1 ? 'Get Started — It\'s Free' : 'Continue'}
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
         </button>
 
-        {current === SLIDES.length - 1 ? (
+        {/* Secondary */}
+        {step === UI_DECK.length - 1 ? (
           <button onClick={() => router.push('/login')}
-            style={{ background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '16px', padding: '14px', color: 'rgba(255,255,255,0.35)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', fontFamily: 'Inter, sans-serif' }}>
-            I already have an account
+            style={{ background: 'none', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', padding: '12px', color: 'rgba(255,255,255,0.3)', fontSize: '13px', fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit' }}>
+            Already have an account? Sign in
           </button>
         ) : (
-          <p style={{ textAlign: 'center', fontSize: '11px', color: 'rgba(255,255,255,0.15)', letterSpacing: '0.3px' }}>
-            Tap to continue · Swipe to navigate
+          <p style={{ textAlign: 'center', fontSize: '10px', color: 'rgba(255,255,255,0.12)', letterSpacing: '0.5px', fontWeight: 700 }}>
+            SWIPE OR TAP TO EXPLORE
           </p>
         )}
-      </div>
+      </footer>
 
       <style>{`
-        @keyframes wave { from{transform:scaleY(0.35)} to{transform:scaleY(1)} }
+        .vnode { will-change: transform, opacity; }
+        .forward { animation: fwd 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+        .backward { animation: bwd 0.55s cubic-bezier(0.16,1,0.3,1) both; }
+        .tslide { animation: tup 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+        .cbtn:active { transform: scale(0.97); }
+        @keyframes fwd { from{opacity:0;transform:scale(1.03) translateX(16px);filter:blur(2px)} to{opacity:1;transform:scale(1) translateX(0);filter:blur(0)} }
+        @keyframes bwd { from{opacity:0;transform:scale(0.97) translateX(-16px);filter:blur(2px)} to{opacity:1;transform:scale(1) translateX(0);filter:blur(0)} }
+        @keyframes tup { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes wave { from{transform:scaleY(0.3)} to{transform:scaleY(1.3)} }
         @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-        * { -webkit-tap-highlight-color: transparent; }
+        @keyframes pulse { 0%{box-shadow:0 0 0 0 currentColor} 100%{box-shadow:0 0 0 8px transparent} }
+        * { -webkit-tap-highlight-color:transparent; }
       `}</style>
+    </div>
+  )
+}
+
+function Visual({ variant, accent, local, ktm, city }: { variant: string, accent: string, local: string, ktm: string, city: string }) {
+  const card = { background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '20px', padding: '18px', position: 'relative' as const, overflow: 'hidden' as const }
+  const accentBar = { position: 'absolute' as const, top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, ${accent}, ${accent}44)` }
+
+  if (variant === 'identity') return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+      <div style={{ width: '110px', height: '110px', borderRadius: '32px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 24px 56px rgba(220,20,60,0.35), inset 0 1px 0 rgba(255,255,255,0.12)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '50%', background: 'linear-gradient(180deg, rgba(255,255,255,0.1) 0%, transparent 100%)' }}/>
+        <SahayatriLogo size={62} color="white"/>
+      </div>
+      <div style={{ width: '70px', height: '12px', background: `radial-gradient(ellipse, ${accent}35 0%, transparent 70%)`, filter: 'blur(5px)', marginTop: '-6px' }}/>
+      {/* Trust badges */}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        {['🇳🇵 Made for Nepalis', '✓ Verified companions', '⭐ 4.9 rating'].map((b, i) => (
+          <div key={i} style={{ padding: '4px 10px', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '9999px' }}>
+            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>{b}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  if (variant === 'chrono') return (
+    <div style={{ ...card }}>
+      <div style={accentBar}/>
+      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center', marginBottom: '14px' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '11px', fontWeight: 800, color: 'rgba(255,255,255,0.25)', letterSpacing: '1px', marginBottom: '6px' }}>YOU</p>
+          <p style={{ fontSize: '30px', fontWeight: 200, color: 'white', letterSpacing: '-1px', fontFamily: 'monospace', lineHeight: 1, marginBottom: '4px' }}>{local}</p>
+          <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.2)' }}>{city}</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', padding: '0 8px' }}>
+          <div style={{ height: '40px', width: '1px', background: 'rgba(255,255,255,0.06)' }}/>
+          <span style={{ fontSize: '16px' }}>✈️</span>
+          <div style={{ height: '40px', width: '1px', background: 'rgba(255,255,255,0.06)' }}/>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ fontSize: '11px', fontWeight: 800, color: accent, letterSpacing: '1px', marginBottom: '6px' }}>NEPAL</p>
+          <p style={{ fontSize: '30px', fontWeight: 200, color: accent, letterSpacing: '-1px', fontFamily: 'monospace', lineHeight: 1, marginBottom: '4px' }}>{ktm}</p>
+          <p style={{ fontSize: '10px', color: `${accent}80` }}>Kathmandu</p>
+        </div>
+      </div>
+      <div style={{ background: `${accent}08`, border: `1px solid ${accent}15`, borderRadius: '12px', padding: '10px 14px' }}>
+        <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, fontStyle: 'italic', textAlign: 'center' }}>
+          "Midnight in Vancouver. Morning in Nepal."
+        </p>
+      </div>
+      <div style={{ position: 'absolute', top: 14, right: 14, width: '6px', height: '6px', borderRadius: '50%', background: accent, animation: 'blink 2s ease infinite' }}/>
+    </div>
+  )
+
+  if (variant === 'feed') return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      {[
+        { emoji: '🌅', time: '7:14 AM', title: 'Good morning — Aama is up', sub: 'Photo received · companion checked in', color: '#10B981' },
+        { emoji: '💊', time: '9:02 AM', title: 'All medicines taken', sub: '3 of 3 confirmed by companion', color: '#3B82F6' },
+        { emoji: '🍛', time: '12:45 PM', title: 'Lunch completed', sub: 'Dal bhat, saag, achar — full meal', color: '#F59E0B' },
+      ].map((item, i) => (
+        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'rgba(255,255,255,0.02)', border: `1px solid ${accent}18`, borderRadius: '14px', padding: '11px 13px', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '3px', background: accent, borderRadius: '14px 0 0 14px' }}/>
+          <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: `${accent}10`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px', flexShrink: 0 }}>{item.emoji}</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <p style={{ fontSize: '12.5px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', marginBottom: '2px' }}>{item.title}</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)' }}>{item.sub}</p>
+          </div>
+          <div style={{ flexShrink: 0, textAlign: 'right' }}>
+            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.18)', marginBottom: '3px' }}>{item.time}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
+              <div style={{ width: '11px', height: '11px', borderRadius: '50%', background: accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="6" height="6" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7.5L8 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </div>
+              <p style={{ fontSize: '9px', color: accent, fontWeight: 700 }}>Live</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
+  if (variant === 'wave') return (
+    <div style={{ ...card }}>
+      <div style={accentBar}/>
+      {/* Sathi header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: `linear-gradient(135deg, ${accent}, ${accent}AA)`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', boxShadow: `0 4px 12px ${accent}30`, flexShrink: 0 }}>🪔</div>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: '13px', fontWeight: 700, color: 'white', marginBottom: '2px' }}>Sathi</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#10B981', animation: 'blink 1.5s ease infinite' }}/>
+            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.3)' }}>Listening...</p>
+          </div>
+        </div>
+        {/* Soundwave */}
+        <svg width="52" height="20" viewBox="0 0 52 20">
+          {[4,8,3,12,6,16,4,10,7,14,5,9,13].map((h, i) => (
+            <rect key={i} x={i * 4} y={(20 - h) / 2} width="2" height={h} rx="1" fill={accent} opacity="0.6"
+              style={{ animation: `wave ${0.7 + i * 0.06}s ease-in-out ${i * 0.05}s infinite alternate`, transformOrigin: 'center' }}/>
+          ))}
+        </svg>
+      </div>
+      {/* Chat bubbles */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ alignSelf: 'flex-start', background: `${accent}0A`, border: `1px solid ${accent}15`, borderRadius: '4px 14px 14px 14px', padding: '9px 12px', maxWidth: '88%' }}>
+          <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.55 }}>साँझ भयो। You seem quiet tonight. How are you really feeling?</p>
+        </div>
+        <div style={{ alignSelf: 'flex-end', background: 'rgba(220,20,60,0.6)', borderRadius: '14px 4px 14px 14px', padding: '9px 12px', maxWidth: '80%' }}>
+          <p style={{ fontSize: '12.5px', color: 'white', lineHeight: 1.55 }}>I haven't called Aama in 4 days. I feel terrible.</p>
+        </div>
+        <div style={{ alignSelf: 'flex-start', background: `${accent}0A`, border: `1px solid ${accent}15`, borderRadius: '4px 14px 14px 14px', padding: '9px 12px', maxWidth: '92%' }}>
+          <p style={{ fontSize: '12.5px', color: 'rgba(255,255,255,0.7)', lineHeight: 1.55 }}>That guilt is love. Aama's lamp was lit this morning — she is okay. Call her tomorrow. I will remind you. 🪔</p>
+        </div>
+      </div>
+    </div>
+  )
+
+  if (variant === 'funnel') {
+    const CITIES = [
+      { flag: '🇳🇵', name: 'Nepal', city: 'Kathmandu · Pokhara', count: '200+', accent: '#DC143C' },
+      { flag: '🇨🇦', name: 'Canada', city: 'Vancouver · Toronto', count: '120+', accent: '#DC143C' },
+      { flag: '🇬🇧', name: 'UK', city: 'London · Manchester', count: '80+', accent: '#DC143C' },
+      { flag: '🇦🇺', name: 'Australia', city: 'Sydney · Melbourne', count: '60+', accent: '#DC143C' },
+      { flag: '🇺🇸', name: 'USA', city: 'New York · Texas', count: '40+', accent: '#DC143C' },
+    ]
+    return <AnimatedCountries accent={accent} cities={CITIES}/>
+  }
+
+  return null
+}
+
+function AnimatedCountries({ accent, cities }: { accent: string, cities: any[] }) {
+  const [idx, setIdx] = useState(0)
+  const [anim, setAnim] = useState(false)
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setAnim(true)
+      setTimeout(() => { setIdx(i => (i + 1) % cities.length); setAnim(false) }, 280)
+    }, 2200)
+    return () => clearInterval(t)
+  }, [])
+
+  const c = cities[idx]
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      {/* Stats */}
+      <div style={{ display: 'flex', gap: '8px' }}>
+        {[{ val: '500+', label: 'Families' }, { val: '4.9★', label: 'Rating' }, { val: '98%', label: 'Happy' }].map((s, i) => (
+          <div key={i} style={{ flex: 1, textAlign: 'center', padding: '14px 6px', background: 'rgba(255,255,255,0.03)', border: `1px solid ${accent}15`, borderRadius: '14px' }}>
+            <p style={{ fontSize: '19px', fontWeight: 900, color: accent, letterSpacing: '-0.8px', marginBottom: '3px' }}>{s.val}</p>
+            <p style={{ fontSize: '10px', color: 'rgba(255,255,255,0.25)', fontWeight: 600 }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* Animated country */}
+      <div style={{ background: 'rgba(255,255,255,0.02)', border: `1px solid ${accent}20`, borderRadius: '18px', padding: '16px', position: 'relative', overflow: 'hidden', transition: 'border-color 0.5s ease' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: `linear-gradient(90deg, ${accent}, ${accent}33)` }}/>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', opacity: anim ? 0 : 1, transform: anim ? 'translateY(6px)' : 'translateY(0)', transition: 'all 0.28s ease' }}>
+          <div style={{ fontSize: '44px', lineHeight: 1, filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.4))', flexShrink: 0 }}>{c.flag}</div>
+          <div style={{ flex: 1 }}>
+            <p style={{ fontSize: '17px', fontWeight: 800, color: 'white', letterSpacing: '-0.4px', marginBottom: '3px' }}>{c.name}</p>
+            <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', marginBottom: '8px' }}>📍 {c.city}</p>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: `${accent}12`, border: `1px solid ${accent}25`, borderRadius: '9999px', padding: '3px 9px' }}>
+              <div style={{ width: '5px', height: '5px', borderRadius: '50%', background: accent, animation: 'blink 1.5s ease infinite' }}/>
+              <p style={{ fontSize: '10px', fontWeight: 700, color: accent }}>{c.count} families connected</p>
+            </div>
+          </div>
+        </div>
+        {/* Dots */}
+        <div style={{ display: 'flex', gap: '5px', justifyContent: 'center', marginTop: '14px' }}>
+          {cities.map((_, i) => (
+            <div key={i} onClick={() => setIdx(i)}
+              style={{ width: i === idx ? '18px' : '5px', height: '5px', borderRadius: '2.5px', background: i === idx ? accent : 'rgba(255,255,255,0.1)', transition: 'all 0.4s ease', cursor: 'pointer' }}/>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

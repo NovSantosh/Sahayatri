@@ -286,26 +286,46 @@ export default function Care() {
             { id: 'connectips', name: 'ConnectIPS', desc: 'Direct bank transfer', color: '#1A56DB', bg: 'rgba(26,86,219,0.08)', border: 'rgba(26,86,219,0.25)', initial: 'C' },
           ].map((method) => (
             <div key={method.id}
-              onClick={() => {
+              onClick={async () => {
                 setShowPaymentSheet(false)
-                // Redirect to payment
-                fetch('/api/payment/initiate', {
+                // 1. Create the booking in the database first
+                const bookingRes = await fetch('/api/bookings', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    clientEmail: session?.user?.email,
+                    companionName: selectedCompanion?.name || 'Any available',
+                    companionRole: selectedCompanion?.speciality || selectedCare?.title,
+                    service: selectedCare?.title,
+                    date: familyName ? new Date().toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+                    time: '10:00 AM',
+                    duration: 1,
+                    rate: selectedCare?.rate,
+                    notes: notes,
+                  })
+                })
+                const bookingData = await bookingRes.json()
+                if (!bookingData.success) {
+                  alert('Could not create booking. Please try again.')
+                  return
+                }
+                // 2. Now start payment with the REAL booking id + confirmation code
+                const payRes = await fetch('/api/payment/initiate', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     method: method.id,
                     amount: selectedCare?.rate,
-                    bookingId,
+                    bookingId: bookingData.booking._id,
+                    confirmationCode: bookingData.confirmationCode,
                     userEmail: session?.user?.email,
                     serviceName: selectedCare?.title,
                   })
                 })
-                  .then(r => r.json())
-                  .then(data => {
-                    if (data.redirectUrl) {
-                      window.location.href = data.redirectUrl
-                    }
-                  })
+                const payData = await payRes.json()
+                if (payData.redirectUrl) {
+                  window.location.href = payData.redirectUrl
+                }
               }}
               style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: '14px', border: `1px solid ${t.border}`, background: t.inputBg, cursor: 'pointer', marginBottom: '10px', transition: 'all 0.2s ease'}}>
               <div style={{width: '42px', height: '42px', borderRadius: '12px', background: method.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>

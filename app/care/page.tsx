@@ -314,17 +314,27 @@ export default function Care() {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    method: method.id,
-                    amount: selectedCare?.rate,
                     bookingId: bookingData.booking._id,
-                    confirmationCode: bookingData.confirmationCode,
-                    userEmail: session?.user?.email,
-                    serviceName: selectedCare?.title,
+                    amount: selectedCare?.rate,
                   })
                 })
                 const payData = await payRes.json()
-                if (payData.redirectUrl) {
-                  window.location.href = payData.redirectUrl
+                if (payData.success && payData.gatewayUrl) {
+                  // eSewa requires a real form POST — build it and submit
+                  const form = document.createElement('form')
+                  form.method = 'POST'
+                  form.action = payData.gatewayUrl
+                  Object.entries(payData.formData).forEach(([key, value]) => {
+                    const input = document.createElement('input')
+                    input.type = 'hidden'
+                    input.name = key
+                    input.value = String(value)
+                    form.appendChild(input)
+                  })
+                  document.body.appendChild(form)
+                  form.submit()
+                } else {
+                  alert('Could not start payment. Please try again.')
                 }
               }}
               style={{display: 'flex', alignItems: 'center', gap: '14px', padding: '14px', borderRadius: '14px', border: `1px solid ${t.border}`, background: t.inputBg, cursor: 'pointer', marginBottom: '10px', transition: 'all 0.2s ease'}}>

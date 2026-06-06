@@ -69,17 +69,24 @@ export default function PaymentSheet({ amount, serviceName, bookingId, onClose }
       const res = await fetch('/api/payment/initiate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          method: selected,
-          amount,
-          bookingId,
-          userEmail: session?.user?.email,
-          serviceName,
-        })
+        body: JSON.stringify({ bookingId, amount })
       })
       const data = await res.json()
-      if (data.redirectUrl) {
-        window.location.href = data.redirectUrl
+      if (data.success && data.gatewayUrl) {
+        // eSewa requires a real form POST to its gateway
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = data.gatewayUrl
+        Object.entries(data.formData).forEach(([key, value]) => {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = key
+          input.value = String(value)
+          form.appendChild(input)
+        })
+        document.body.appendChild(form)
+        form.submit()
+        return
       } else {
         setError('Failed to initiate payment. Please try again.')
       }

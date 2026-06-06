@@ -16,6 +16,7 @@ const BookingSchema = new mongoose.Schema({
   paymentMethod: { type: String, enum: ['esewa', 'khalti', 'bank', 'pending'], default: 'pending' },
   paymentStatus: { type: String, enum: ['unpaid', 'paid'], default: 'unpaid' },
   confirmationCode: { type: String },
+  transactionUuid: { type: String },
   notes: { type: String },
   createdAt: { type: Date, default: Date.now },
 })

@@ -36,6 +36,7 @@ function BookServiceForm() {
     setLoading(true)
     setError('')
     try {
+      // 1. Save the booking first
       const res = await fetch('/api/bookings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,8 +54,31 @@ function BookServiceForm() {
         }),
       })
       const data = await res.json()
-      if (res.ok) { setBooking(data.booking); setStep(3) }
-      else { setError(data.error || 'Failed to book') }
+      if (!data.success) { setError(data.error || 'Failed to book'); setLoading(false); return }
+      // 2. Launch real eSewa payment with the saved booking
+      const payRes = await fetch('/api/payment/initiate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId: data.booking._id, amount: rate }),
+      })
+      const payData = await payRes.json()
+      if (payData.success && payData.gatewayUrl) {
+        const form = document.createElement('form')
+        form.method = 'POST'
+        form.action = payData.gatewayUrl
+        Object.entries(payData.formData).forEach(([key, value]) => {
+          const input = document.createElement('input')
+          input.type = 'hidden'
+          input.name = key
+          input.value = String(value)
+          form.appendChild(input)
+        })
+        document.body.appendChild(form)
+        form.submit()
+        return
+      } else {
+        setError('Could not start payment. Please try again.')
+      }
     } catch (e) { setError('Something went wrong') }
     setLoading(false)
   }

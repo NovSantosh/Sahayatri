@@ -179,10 +179,7 @@ export default function Dashboard() {
               <Link href="/profile" style={{width: '38px', height: '38px', borderRadius: '50%', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 800, fontSize: '13px', textDecoration: 'none', boxShadow: '0 4px 12px rgba(220,20,60,0.3)'}}>
                 {initials}
               </Link>
-              {/* Notification badge on avatar */}
-              <div style={{position: 'absolute', top: '-2px', right: '-2px', width: '14px', height: '14px', borderRadius: '50%', background: brand.primary, border: `2px solid ${t.pageBg}`, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                <span style={{fontSize: '8px', fontWeight: 800, color: 'white'}}>3</span>
-              </div>
+
             </div>
           </div>
         </div>
@@ -391,7 +388,7 @@ export default function Dashboard() {
               { id: 'qa0', Icon: HeartIcon, label: 'Book Care', sub: 'For family in Nepal', path: '/care', color: brand.primary, bg: brand.primaryLight },
               { id: 'qa1', Icon: CameraIcon, label: 'Share a Moment', sub: 'Post to Memory', path: '/memory', color: brand.primary, bg: brand.primaryLight },
               { id: 'qa2', Icon: FamilyIcon, label: 'Family Room', sub: 'Stay connected', path: '/family', color: '#3B82F6', bg: 'rgba(59,130,246,0.1)' },
-              { id: 'qa3', Icon: WalletIcon, label: 'Payments', sub: 'eSewa · Khalti', path: '/wallet', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
+              { id: 'qa3', Icon: WalletIcon, label: 'Pay Bookings', sub: 'Settle unpaid', path: '/bookings', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
               { id: 'qa4', Icon: CalendarIcon, label: 'My Bookings', sub: 'View all', path: '/bookings', color: brand.accent, bg: brand.accentBg },
             ].map((item) => (
               <div key={item.id}
@@ -421,7 +418,7 @@ export default function Dashboard() {
             <div style={{position: 'relative', zIndex: 1}}>
               <div style={{display: 'inline-flex', alignItems: 'center', gap: '6px', background: brand.primaryLight, border: `1px solid ${brand.primaryBorder}`, borderRadius: '20px', padding: '4px 12px', marginBottom: '14px'}}>
                 <div style={{width: '4px', height: '4px', borderRadius: '50%', background: brand.primary, animation: 'pulse 2s ease infinite'}}/>
-                <span style={{fontSize: '10px', fontWeight: 700, color: brand.primary, textTransform: 'uppercase', letterSpacing: '0.8px'}}>Coming Soon</span>
+                <span style={{fontSize: '10px', fontWeight: 700, color: brand.primary, textTransform: 'uppercase', letterSpacing: '0.8px'}}>Now Available</span>
               </div>
               <h3 style={{fontSize: '19px', fontWeight: 800, color: 'white', lineHeight: 1.35, marginBottom: '8px', letterSpacing: '-0.4px'}}>Verified companions.<br/>Real care for your family.</h3>
               <p style={{fontSize: '13px', color: 'rgba(255,255,255,0.4)', lineHeight: 1.6, marginBottom: '18px'}}>Every companion background checked. Your family deserves the best.</p>
@@ -450,19 +447,20 @@ export default function Dashboard() {
                 Icon: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={'#3B82F6'} strokeWidth="1.8" strokeLinecap="round"><circle cx="12" cy="6" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg> },
             ].map((s) => (
               <div key={s.id}
+                onClick={() => router.push('/care')}
                 onMouseDown={() => press(s.id)}
                 onMouseUp={release}
                 onTouchStart={() => press(s.id)}
-                onTouchEnd={release}
+                onTouchEnd={() => { release(); router.push('/care') }}
                 style={{...card, padding: '16px', ...pressStyle(s.id)}}>
                 <div style={{width: '40px', height: '40px', borderRadius: '12px', background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '11px'}}>
                   <s.Icon/>
                 </div>
                 <p style={{fontSize: '14px', fontWeight: 700, color: t.text1, marginBottom: '3px', transition: 'color 0.3s ease'}}>{s.label}</p>
                 <p style={{fontSize: '11px', color: t.text3, marginBottom: '10px', lineHeight: 1.4, transition: 'color 0.3s ease'}}>{s.sub}</p>
-                <div style={{display: 'inline-flex', alignItems: 'center', gap: '4px', background: s.bg, borderRadius: '20px', padding: '3px 9px'}}>
-                  <div style={{width: '4px', height: '4px', borderRadius: '50%', background: s.color}}/>
-                  <p style={{fontSize: '10px', fontWeight: 700, color: s.color}}>Soon</p>
+                <div style={{display: 'inline-flex', alignItems: 'center', gap: '4px', background: s.bg, borderRadius: '20px', padding: '3px 10px'}}>
+                  <p style={{fontSize: '10px', fontWeight: 700, color: s.color}}>Book</p>
+                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={s.color} strokeWidth="3" strokeLinecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
                 </div>
               </div>
             ))}

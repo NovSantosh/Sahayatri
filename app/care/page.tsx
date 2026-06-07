@@ -172,6 +172,8 @@ export default function Care() {
   const [expanded, setExpanded] = useState<string | null>(null)
   const [familyName, setFamilyName] = useState('')
   const [familyPhone, setFamilyPhone] = useState('')
+  const [careDate, setCareDate] = useState('')
+  const [careTime, setCareTime] = useState('')
   const [familyAddress, setFamilyAddress] = useState('')
   const [notes, setNotes] = useState('')
   const [frequency, setFrequency] = useState('once')
@@ -297,8 +299,8 @@ export default function Care() {
                     companionName: selectedCompanion?.name || 'Any available',
                     companionRole: selectedCompanion?.speciality || selectedCare?.title,
                     service: selectedCare?.title,
-                    date: familyName ? new Date().toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-                    time: '10:00 AM',
+                    date: careDate,
+                    time: careTime,
                     duration: 1,
                     rate: selectedCare?.rate,
                     notes: notes,
@@ -465,6 +467,22 @@ export default function Care() {
         </div>
 
         <div style={{...card, padding: '20px'}}>
+          <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '14px'}}>When should we start?</p>
+          <p style={{fontSize: '12px', fontWeight: 600, color: t.text3, marginBottom: '6px'}}>Date</p>
+          <input type="date" value={careDate} min={new Date().toISOString().split('T')[0]} onChange={e => setCareDate(e.target.value)}
+            style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '13px 16px', fontSize: '15px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' as const, marginBottom: '14px'}}/>
+          <p style={{fontSize: '12px', fontWeight: 600, color: t.text3, marginBottom: '8px'}}>Preferred time</p>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px'}}>
+            {['7:00 AM','9:00 AM','11:00 AM','1:00 PM','3:00 PM','5:00 PM'].map(slot => (
+              <button key={slot} onClick={() => setCareTime(slot)}
+                style={{padding: '10px 4px', borderRadius: '10px', border: `1.5px solid ${careTime === slot ? brand.primary : t.border}`, background: careTime === slot ? brand.primaryLight : 'transparent', color: careTime === slot ? brand.primary : t.text2, fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
+                {slot}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div style={{...card, padding: '20px'}}>
           <p style={{fontSize: '15px', fontWeight: 800, color: t.text1, marginBottom: '14px'}}>How often?</p>
           {[
             { id: 'once', label: 'One time only', sub: 'Single visit' },
@@ -494,9 +512,9 @@ export default function Care() {
             style={{width: '100%', background: t.inputBg, border: `1px solid ${t.border}`, borderRadius: '12px', padding: '13px 16px', fontSize: '14px', color: t.text1, outline: 'none', fontFamily: 'Inter, sans-serif', boxSizing: 'border-box' as const, resize: 'none' as const, lineHeight: 1.6}}/>
         </div>
 
-        <button onClick={() => familyName && familyPhone && familyAddress && setStep('confirm')}
-          disabled={!familyName || !familyPhone || !familyAddress}
-          style={{width: '100%', padding: '16px', background: (!familyName || !familyPhone || !familyAddress) ? t.inputBg : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: (!familyName || !familyPhone || !familyAddress) ? t.text3 : 'white', fontSize: '15px', fontWeight: 800, cursor: (!familyName || !familyPhone || !familyAddress) ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
+        <button onClick={() => familyName && familyPhone && familyAddress && careDate && careTime && setStep('confirm')}
+          disabled={!familyName || !familyPhone || !familyAddress || !careDate || !careTime}
+          style={{width: '100%', padding: '16px', background: (!familyName || !familyPhone || !familyAddress || !careDate || !careTime) ? t.inputBg : 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '16px', color: (!familyName || !familyPhone || !familyAddress || !careDate || !careTime) ? t.text3 : 'white', fontSize: '15px', fontWeight: 800, cursor: (!familyName || !familyPhone || !familyAddress || !careDate || !careTime) ? 'not-allowed' : 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease'}}>
           Review Booking
         </button>
       </div>

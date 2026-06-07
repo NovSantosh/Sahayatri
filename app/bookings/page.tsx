@@ -3,19 +3,23 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useTheme } from '../context/ThemeContext'
-import { brand } from '../design-system'
-import { CalendarIcon, ClockIcon, LocationIcon, CheckIcon, ArrowLeftIcon, WalletIcon } from '../components/Icons'
+import * as ds from '../design-system'
+import { CalendarIcon } from '../components/Icons'
+import PaymentSheet from '../components/PaymentSheet'
 
 interface Booking {
   _id: string
-  serviceName: string
-  providerName: string
+  service: string
+  companionName: string
+  companionRole: string
   date: string
   time: string
-  address: string
+  notes: string
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
   paymentStatus: 'unpaid' | 'paid'
-  amount: number
+  total: number
+  rate: number
+  confirmationCode: string
   createdAt: string
 }
 
@@ -26,6 +30,7 @@ export default function Bookings() {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'all' | 'upcoming' | 'completed'>('all')
+  const [payBooking, setPayBooking] = useState<Booking | null>(null)
 
   useEffect(() => {
     if (session?.user?.email) fetchBookings()
@@ -40,24 +45,40 @@ export default function Bookings() {
     setLoading(false)
   }
 
-  const timeAgo = (date: string) => {
-    const s = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
-    if (s < 60) return 'just now'
-    if (s < 3600) return `${Math.floor(s / 60)}m ago`
-    if (s < 86400) return `${Math.floor(s / 3600)}h ago`
-    return `${Math.floor(s / 86400)}d ago`
+  const firstName = (session?.user?.name || 'there').split(' ')[0]
+  const amountOf = (b: Booking) => b.total || b.rate || 0
+  const hasNamedCompanion = (b: Booking) =>
+    !!b.companionName && b.companionName !== b.service && b.companionName !== 'Any available'
+  const providerOf = (b: Booking) => hasNamedCompanion(b) ? b.companionName : (b.companionRole || 'Home service')
+  const initialsOf = (name: string) => name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+
+  const fmtWhen = (b: Booking) => {
+    let datePart = ''
+    if (b.date) {
+      const d = new Date(b.date)
+      datePart = isNaN(d.getTime()) ? b.date : d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })
+    }
+    return [datePart, b.time].filter(Boolean).join(' · ')
   }
 
-  const statusConfig: any = {
-    pending:   { label: 'Pending',   color: brand.warning, bg: 'rgba(245,158,11,0.1)' },
-    confirmed: { label: 'Confirmed', color: '#3B82F6',    bg: 'rgba(59,130,246,0.1)' },
-    completed: { label: 'Completed', color: brand.success, bg: 'rgba(16,185,129,0.1)' },
-    cancelled: { label: 'Cancelled', color: t.text3,       bg: t.inputBg },
+  const statusConfig: Record<string, { label: string; color: string; bg: string; strip: string }> = {
+    pending:   { label: 'Pending',   color: '#854F0B', bg: 'rgba(245,158,11,0.12)', strip: '#F59E0B' },
+    confirmed: { label: 'Confirmed', color: '#0F6E56', bg: 'rgba(16,185,129,0.12)', strip: '#10B981' },
+    completed: { label: 'Completed', color: '#0F6E56', bg: 'rgba(16,185,129,0.12)', strip: '#10B981' },
+    cancelled: { label: 'Cancelled', color: t.text3,   bg: 'rgba(0,0,0,0.05)',     strip: '#9CA3AF' },
   }
 
-  const paymentConfig: any = {
-    unpaid: { label: 'Unpaid', color: brand.primary, bg: brand.primaryLight },
-    paid:   { label: 'Paid',   color: brand.success,  bg: 'rgba(16,185,129,0.1)' },
+  const avatarGrad = (name: string) => {
+    const grads = [
+      'linear-gradient(135deg,#F4A0B5,#DC143C)',
+      'linear-gradient(135deg,#9FD0F4,#3B82F6)',
+      'linear-gradient(135deg,#F8C77E,#E08C1E)',
+      'linear-gradient(135deg,#A7E0C8,#10B981)',
+      'linear-gradient(135deg,#C3B8F5,#6366F1)',
+    ]
+    let h = 0
+    for (let i = 0; i < name.length; i++) h = name.charCodeAt(i) + ((h << 5) - h)
+    return grads[Math.abs(h) % grads.length]
   }
 
   const filtered = bookings.filter(b => {
@@ -66,183 +87,145 @@ export default function Bookings() {
     return true
   })
 
-  const unpaidCount = bookings.filter(b => b.paymentStatus === 'unpaid').length
+  const totalCount = bookings.length
+  const confirmedCount = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed').length
+  const pendingCount = bookings.filter(b => b.paymentStatus === 'unpaid' && b.status !== 'cancelled').length
 
-  const card = {
-    background: t.cardBg,
-    borderRadius: '20px',
-    border: `1px solid ${t.border}`,
-    boxShadow: t.shadow,
-    transition: 'background 0.3s ease, border-color 0.3s ease',
-  }
+  const pageBg = '#F4EEF0'
+  const heroGrad = `linear-gradient(140deg, ${ds.brand.primary}, ${ds.brand.primaryDark})`
 
   return (
-    <div style={{minHeight: '100vh', background: t.pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px', transition: 'background 0.3s ease'}}>
+    <div style={{ minHeight: '100dvh', background: pageBg, fontFamily: 'Inter, -apple-system, sans-serif', paddingBottom: '40px' }}>
 
-      {/* ── HEADER ── */}
-      <div style={{background: t.headerBg, backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', padding: '52px 20px 0', borderBottom: `1px solid ${t.border}`, position: 'sticky', top: 0, zIndex: 50, transition: 'background 0.3s ease'}}>
-        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px'}}>
-          <div>
-            <h1 style={{fontSize: '24px', fontWeight: 900, color: t.text1, letterSpacing: '-0.8px', transition: 'color 0.3s ease'}}>My Bookings</h1>
-            <p style={{fontSize: '12px', color: t.text3, marginTop: '3px'}}>
-              {bookings.length > 0 ? `${bookings.length} total · ${unpaidCount > 0 ? `${unpaidCount} unpaid` : 'all paid'}` : 'No bookings yet'}
+      <div style={{ padding: '52px 16px 0' }}>
+        {/* HERO */}
+        <div className="anim" style={{ background: heroGrad, borderRadius: '22px', padding: '18px', color: 'white', boxShadow: '0 12px 32px rgba(220,20,60,0.28)', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '-40px', right: '-30px', width: '180px', height: '180px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)' }}/>
+          <div style={{ position: 'relative', zIndex: 1 }}>
+            <p style={{ ...ds.type.caption, opacity: 0.85 }}>नमस्ते, {firstName}</p>
+            <p style={{ ...ds.type.h3, marginTop: '3px', marginBottom: '14px' }}>
+              {pendingCount > 0 ? `${pendingCount} booking${pendingCount > 1 ? 's' : ''} need payment` : 'Your family is in good hands'}
             </p>
+            <div style={{ display: 'flex', gap: ds.space.sm }}>
+              {[{ n: totalCount, l: 'Bookings' }, { n: confirmedCount, l: 'Confirmed' }, { n: pendingCount, l: 'To pay' }].map((s, i) => (
+                <div key={i} style={{ flex: 1, background: 'rgba(255,255,255,0.14)', borderRadius: ds.radius.md, padding: '10px' }}>
+                  <p style={{ ...ds.type.h3 }}>{s.n}</p>
+                  <p style={{ ...ds.type.caption, opacity: 0.85, marginTop: '2px' }}>{s.l}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <button onClick={() => router.push('/services')}
-            style={{padding: '9px 16px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '9999px', color: 'white', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 12px rgba(220,20,60,0.3)'}}>
-            + Book
-          </button>
         </div>
 
-        {/* Tabs */}
-        <div style={{display: 'flex', gap: '6px', paddingBottom: '14px'}}>
+        {/* TABS */}
+        <div className="anim" style={{ display: 'flex', gap: '6px', marginTop: ds.space.lg, animationDelay: '60ms' }}>
           {(['all', 'upcoming', 'completed'] as const).map((tab) => (
             <button key={tab} onClick={() => setActiveTab(tab)}
-              style={{flexShrink: 0, padding: '7px 18px', borderRadius: '9999px', border: 'none', background: activeTab === tab ? 'linear-gradient(135deg, #DC143C, #A50E2D)' : t.inputBg, color: activeTab === tab ? 'white' : t.text3, fontSize: '13px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease', boxShadow: activeTab === tab ? '0 4px 12px rgba(220,20,60,0.25)' : 'none', textTransform: 'capitalize'}}>
+              style={{ padding: '8px 18px', borderRadius: ds.radius.full, border: 'none', background: activeTab === tab ? ds.brand.primary : '#FFFFFF', color: activeTab === tab ? 'white' : t.text3, ...ds.type.caption, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s ease', textTransform: 'capitalize', boxShadow: activeTab === tab ? '0 4px 12px rgba(220,20,60,0.25)' : '0 1px 3px rgba(0,0,0,0.04)' }}>
               {tab}
             </button>
           ))}
         </div>
       </div>
 
-      <div style={{padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'}}>
+      <div style={{ padding: '18px 16px 0', display: 'flex', flexDirection: 'column', gap: ds.space.md }}>
 
-        {/* Unpaid banner */}
-        {unpaidCount > 0 && (
-          <div style={{background: brand.primaryLight, border: `1px solid ${brand.primaryBorder}`, borderRadius: '16px', padding: '14px 16px', display: 'flex', alignItems: 'center', gap: '12px'}}>
-            <div style={{width: '38px', height: '38px', borderRadius: '12px', background: brand.primary, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(220,20,60,0.3)'}}>
-              <WalletIcon size={20} color="white" strokeWidth={2}/>
-            </div>
-            <div style={{flex: 1}}>
-              <p style={{fontSize: '14px', fontWeight: 700, color: brand.primary}}>
-                {unpaidCount} payment{unpaidCount > 1 ? 's' : ''} due
-              </p>
-              <p style={{fontSize: '12px', color: brand.primary, opacity: 0.7, marginTop: '2px'}}>
-                Complete your payment to confirm bookings
-              </p>
-            </div>
-            <button onClick={() => router.push('/wallet')}
-              style={{padding: '8px 14px', background: brand.primary, border: 'none', borderRadius: '10px', color: 'white', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', flexShrink: 0}}>
-              Pay now
-            </button>
-          </div>
-        )}
-
-        {/* Loading */}
         {loading && (
-          <div style={{textAlign: 'center', padding: '60px 20px'}}>
-            <div style={{width: '36px', height: '36px', border: `3px solid ${t.border}`, borderTop: `3px solid ${brand.primary}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px'}}/>
-            <p style={{fontSize: '13px', color: t.text3}}>Loading bookings…</p>
+          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+            <div style={{ width: '32px', height: '32px', border: '3px solid rgba(0,0,0,0.08)', borderTop: `3px solid ${ds.brand.primary}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 14px' }}/>
+            <p style={{ ...ds.type.caption, color: t.text3 }}>Loading bookings…</p>
           </div>
         )}
 
-        {/* Empty state */}
         {!loading && filtered.length === 0 && (
-          <div style={{...card, padding: '56px 24px', textAlign: 'center', marginTop: '8px'}}>
-            <div style={{width: '64px', height: '64px', borderRadius: '50%', background: brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px'}}>
-              <CalendarIcon size={28} color={brand.primary} strokeWidth={1.5}/>
+          <div className="anim" style={{ background: '#FFFFFF', borderRadius: ds.radius.xl, padding: '48px 24px', textAlign: 'center', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: ds.brand.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+              <CalendarIcon size={26} color={ds.brand.primary} strokeWidth={1.5}/>
             </div>
-            <h3 style={{fontSize: '17px', fontWeight: 700, color: t.text1, marginBottom: '8px', transition: 'color 0.3s ease'}}>
-              {activeTab === 'all' ? 'No bookings yet' : `No ${activeTab} bookings`}
-            </h3>
-            <p style={{fontSize: '13px', color: t.text3, lineHeight: 1.6, maxWidth: '220px', margin: '0 auto 20px'}}>
-              Book a home service and it will appear here.
-            </p>
-            <button onClick={() => router.push('/services')}
-              style={{padding: '12px 24px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '14px', color: 'white', fontWeight: 700, fontSize: '14px', cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.3)'}}>
-              Browse Services
-            </button>
+            <h3 style={{ ...ds.type.h3, color: '#0F0F10', marginBottom: '6px' }}>{activeTab === 'all' ? 'No bookings yet' : `No ${activeTab} bookings`}</h3>
+            <p style={{ ...ds.type.caption, color: t.text3, maxWidth: '220px', margin: '0 auto 18px' }}>Book care or a home service and it will appear here.</p>
+            <button onClick={() => router.push('/care')} className="pressable"
+              style={{ padding: '11px 24px', background: heroGrad, border: 'none', borderRadius: ds.radius.md, color: 'white', ...ds.type.bodyBold, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 16px rgba(220,20,60,0.3)' }}>Book Now</button>
           </div>
         )}
 
-        {/* Bookings list */}
-        {!loading && filtered.map((booking) => {
-          const status = statusConfig[booking.status] || statusConfig.pending
-          const payment = paymentConfig[booking.paymentStatus] || paymentConfig.unpaid
+        {!loading && filtered.length > 0 && (
+          <p style={{ ...ds.type.bodyBold, color: '#0F0F10', marginBottom: '-4px' }}>Your bookings</p>
+        )}
 
+        {!loading && filtered.map((b, i) => {
+          const status = statusConfig[b.status] || statusConfig.pending
+          const isUnpaid = b.paymentStatus === 'unpaid' && b.status !== 'cancelled'
+          const isPaid = b.paymentStatus === 'paid'
+          const provider = providerOf(b)
+          const when = fmtWhen(b)
+
+          // CALM style for paid/settled cards
+          if (isPaid) {
+            return (
+              <div key={b._id} className="anim" style={{ background: '#FFFFFF', borderRadius: ds.radius.xl, padding: '16px', boxShadow: '0 4px 16px rgba(0,0,0,0.05)', animationDelay: `${i * 70}ms` }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '13px' }}>
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: avatarGrad(provider), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '16px', flexShrink: 0 }}>{initialsOf(provider)}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ ...ds.type.h3, color: '#0F0F10', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{hasNamedCompanion(b) ? provider : b.service}</p>
+                    <p style={{ ...ds.type.caption, color: t.text3, marginTop: '3px' }}>{hasNamedCompanion(b) ? b.service : 'Home service'}</p>
+                  </div>
+                  <span style={{ ...ds.type.label, color: '#0F6E56', background: 'rgba(16,185,129,0.12)', padding: '4px 10px', borderRadius: ds.radius.full, flexShrink: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>Paid
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: ds.space.md, paddingTop: ds.space.md, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                  <span style={{ ...ds.type.caption, color: t.text3 }}>{when || 'Scheduled'}</span>
+                  <span style={{ ...ds.type.bodyBold, color: '#0F0F10' }}>NPR {amountOf(b).toLocaleString()}</span>
+                </div>
+              </div>
+            )
+          }
+
+          // RICH style for unpaid / active cards
           return (
-            <div key={booking._id} style={{...card, overflow: 'hidden'}}>
-
-              {/* Top bar — colored by status */}
-              <div style={{height: '3px', background: status.color, opacity: 0.6}}/>
-
-              <div style={{padding: '16px'}}>
-                {/* Service name + badges */}
-                <div style={{display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px', gap: '10px'}}>
-                  <div style={{flex: 1}}>
-                    <h3 style={{fontSize: '16px', fontWeight: 800, color: t.text1, marginBottom: '3px', letterSpacing: '-0.3px', transition: 'color 0.3s ease'}}>{booking.serviceName}</h3>
-                    <p style={{fontSize: '13px', color: t.text2, transition: 'color 0.3s ease'}}>{booking.providerName}</p>
-                  </div>
-                  <div style={{display: 'flex', flexDirection: 'column', gap: '5px', alignItems: 'flex-end', flexShrink: 0}}>
-                    <div style={{padding: '3px 10px', borderRadius: '9999px', background: status.bg}}>
-                      <span style={{fontSize: '10px', fontWeight: 700, color: status.color}}>{status.label}</span>
-                    </div>
-                    <div style={{padding: '3px 10px', borderRadius: '9999px', background: payment.bg}}>
-                      <span style={{fontSize: '10px', fontWeight: 700, color: payment.color}}>{payment.label}</span>
-                    </div>
-                  </div>
+            <div key={b._id} className="anim" style={{ background: '#FFFFFF', borderRadius: ds.radius.xl, padding: '16px', boxShadow: '0 6px 20px rgba(0,0,0,0.06)', animationDelay: `${i * 70}ms` }}>
+              <div style={{ display: 'flex', gap: '13px', alignItems: 'center' }}>
+                <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: avatarGrad(provider), display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700, fontSize: '17px', flexShrink: 0 }}>{initialsOf(provider)}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <p style={{ ...ds.type.h3, color: '#0F0F10', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{hasNamedCompanion(b) ? provider : b.service}</p>
+                  <p style={{ ...ds.type.caption, color: t.text3, marginTop: '3px' }}>{hasNamedCompanion(b) ? b.service : 'Home service'}</p>
                 </div>
-
-                {/* Details */}
-                <div style={{display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px'}}>
-                  {booking.date && (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: 'rgba(59,130,246,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                        <CalendarIcon size={15} color={'#3B82F6'} strokeWidth={2}/>
-                      </div>
-                      <p style={{fontSize: '13px', color: t.text2, transition: 'color 0.3s ease'}}>{booking.date}{booking.time ? ` · ${booking.time}` : ''}</p>
-                    </div>
-                  )}
-                  {booking.address && (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: 'rgba(16,185,129,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                        <LocationIcon size={15} color={brand.success} strokeWidth={2}/>
-                      </div>
-                      <p style={{fontSize: '13px', color: t.text2, transition: 'color 0.3s ease'}}>{booking.address}</p>
-                    </div>
-                  )}
-                  {booking.amount > 0 && (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
-                      <div style={{width: '30px', height: '30px', borderRadius: '9px', background: 'rgba(245,158,11,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                        <WalletIcon size={15} color={brand.warning} strokeWidth={2}/>
-                      </div>
-                      <p style={{fontSize: '13px', fontWeight: 700, color: t.text1, transition: 'color 0.3s ease'}}>NPR {booking.amount.toLocaleString()}</p>
-                    </div>
-                  )}
+                <span style={{ ...ds.type.label, color: status.color, background: status.bg, padding: '4px 10px', borderRadius: ds.radius.full, flexShrink: 0 }}>{status.label}</span>
+              </div>
+              {when && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginTop: ds.space.md, padding: '9px 12px', background: '#FBF7F8', borderRadius: ds.radius.md }}>
+                  <CalendarIcon size={14} color={t.text3} strokeWidth={2}/>
+                  <span style={{ ...ds.type.caption, color: t.text2 }}>{when}</span>
                 </div>
-
-                {/* Footer */}
-                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: `1px solid ${t.border}`}}>
-                  <p style={{fontSize: '11px', color: t.text3}}>Booked {timeAgo(booking.createdAt)}</p>
-                  {booking.paymentStatus === 'unpaid' && booking.status !== 'cancelled' && (
-                    <button onClick={() => router.push('/wallet')}
-                      style={{padding: '8px 16px', background: 'linear-gradient(135deg, #DC143C, #A50E2D)', border: 'none', borderRadius: '10px', color: 'white', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 12px rgba(220,20,60,0.3)'}}>
-                      Pay now
-                    </button>
-                  )}
-                  {booking.status === 'completed' && (
-                    <div style={{display: 'flex', alignItems: 'center', gap: '5px', background: 'rgba(16,185,129,0.1)', borderRadius: '9999px', padding: '5px 12px'}}>
-                      <CheckIcon size={12} color={brand.success} strokeWidth={2.5}/>
-                      <span style={{fontSize: '11px', fontWeight: 700, color: brand.success}}>Completed</span>
-                    </div>
-                  )}
+              )}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: ds.space.md, paddingTop: ds.space.md, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
+                <div>
+                  <span style={{ ...ds.type.h3, color: '#0F0F10' }}>NPR {amountOf(b).toLocaleString()}</span>
+                  {b.confirmationCode && <span style={{ ...ds.type.caption, color: t.text4, marginLeft: '7px' }}>{b.confirmationCode}</span>}
                 </div>
+                {isUnpaid && (
+                  <button onClick={() => setPayBooking(b)} className="pressable"
+                    style={{ padding: '9px 22px', background: heroGrad, border: 'none', borderRadius: ds.radius.md, color: 'white', ...ds.type.caption, fontWeight: 700, cursor: 'pointer', fontFamily: 'Inter, sans-serif', boxShadow: '0 4px 12px rgba(220,20,60,0.25)' }}>
+                    Pay now
+                  </button>
+                )}
               </div>
             </div>
           )
         })}
-
-        {/* Bottom tip */}
-        {!loading && bookings.length > 0 && (
-          <div style={{textAlign: 'center', padding: '16px 20px'}}>
-            <p style={{fontSize: '13px', color: t.text3}}>Need help with a booking? Contact support.</p>
-          </div>
-        )}
-
       </div>
+
+      {payBooking && (
+        <PaymentSheet amount={amountOf(payBooking)} serviceName={payBooking.service} bookingId={payBooking._id} onClose={() => setPayBooking(null)} />
+      )}
 
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+        .anim { opacity: 0; animation: fadeUp .5s cubic-bezier(.22,1,.36,1) forwards; }
+        .pressable { transition: transform .15s ease; }
+        .pressable:active { transform: scale(.97); }
         ::-webkit-scrollbar { display: none; }
       `}</style>
     </div>

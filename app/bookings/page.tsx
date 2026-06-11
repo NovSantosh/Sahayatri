@@ -91,7 +91,7 @@ export default function Bookings() {
   const confirmedCount = bookings.filter(b => b.status === 'confirmed' || b.status === 'completed').length
   const pendingCount = bookings.filter(b => b.paymentStatus === 'unpaid' && b.status !== 'cancelled').length
 
-  const pageBg = '#F4EEF0'
+  const pageBg = '#FAFAFB'
   const heroGrad = `linear-gradient(140deg, ${ds.brand.primary}, ${ds.brand.primaryDark})`
 
   return (

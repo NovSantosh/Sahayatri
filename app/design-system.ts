@@ -34,6 +34,7 @@ export const space = {
   lg: '16px',
   xl: '20px',
   '2xl': '24px',
+  card: '24px',
   '3xl': '32px',
   '4xl': '40px',
   '5xl': '48px',
@@ -60,12 +61,12 @@ export const motion = {
 
 // Light theme
 export const light = {
-  pageBg: '#F7F7F8',
+  pageBg: '#FAFAFB',
   cardBg: '#FFFFFF',
-  headerBg: 'rgba(247,247,248,0.92)',
+  headerBg: 'rgba(250,250,251,0.85)',
   inputBg: '#F3F4F6',
   border: '#E5E7EB',
-  shadow: '0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)',
+  shadow: '0 8px 28px rgba(17,24,39,0.06), 0 2px 6px rgba(17,24,39,0.03)',
   shadowHover: '0 4px 12px rgba(0,0,0,0.1), 0 8px 32px rgba(0,0,0,0.06)',
   text1: '#0F0F10',
   text2: '#374151',
